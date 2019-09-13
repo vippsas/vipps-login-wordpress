@@ -158,6 +158,7 @@ class VippsLogin {
   // This is used to recognize the Vipps 'callback' - written like this to allow for sites wihtout pretty URLs IOK 2019-09-12
    public function is_special_page() {
         $specials = array('continue-from-vipps' => 'continue_from_vipps');
+        $forwhat = null;
         $method = null;
         if ( get_option('permalink_structure')) {
             foreach($specials as $special=>$specialmethod) {
@@ -173,7 +174,7 @@ class VippsLogin {
                 $forwhat = @$_GET['forwhat'];
             }
         }
-        return $method;
+        return array($method,$forwhat);
    }
 
 
@@ -323,8 +324,8 @@ class VippsLogin {
 
   // This allows us to handle 'special' pages by using registered query variables; rewrite rules can be added to add the actual argument to the query.
   public function template_redirect () {
-        $special = $this->is_special_page() ;
-        if ($special) return $this->$special();
+        list($special,$forwhat) = $this->is_special_page() ;
+        if ($special) return $this->$special($forwhat);
         return false;
   }
 
