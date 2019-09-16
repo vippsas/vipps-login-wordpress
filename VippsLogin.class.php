@@ -54,23 +54,6 @@ class VippsLogin {
 
   }
 
-  // Get the app token, store it for about half the time it will be valid for (just to have a margin)
-  private function vipps_app_token () {
-   $content = get_transient('_vipps_login_app_token');;
-   if ($content) return $content['access_token'];
-
-   $res = $this->get_auth_token();
-   if (empty($res) || $res['response'] != 200) {
-     return null;
-   }
-   $content = $res['content'];
-   $content['when'] = time();
-
-   set_transient('_vipps_login_app_token',$content,($content['expires_in']/2));
-
-   $tok = $content['access_token'];
-   return $tok;
-  }
 
   // For a given redirect (operation, actually) and code (nonce, as returned from the Auth call), get an auth token
   private function get_auth_token($code,$forwhat) {
@@ -84,7 +67,7 @@ class VippsLogin {
       $headers = array();
       $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
 
-      $args = array('grant_type'=>'authorization_code', 'code'=>$code, 'redirect_uri'=>$redirect);
+      $args = array('grant_type'=>'authorization_code', 'code'=>$code, 'redirect_uri'=>$redir);
 
       return $this->http_call($url,$args,'POST',$headers,'url');
   }
@@ -93,8 +76,10 @@ class VippsLogin {
       $headers = array();
       $headers['Authorization'] = "Bearer $accesstoken";
       # IOK FIXME better use .wellknown for this
-      $url = $this->backendUrl("oauth2/userinfo");
+      $url = $this->backendUrl("userinfo");
       $args = array();
+
+      print("Url $url");
 
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
@@ -117,7 +102,8 @@ class VippsLogin {
   }
 
   public function login_form_continue_with_vipps () {
-     $url = $this->getAuthRedirect('login',0);
+     $state = base64_encode(substr(sha1(32), 8)); // FIXME
+     $url = $this->getAuthRedirect('login',$state);
      if (!$url) return;
      echo "<div style='margin:20px;' class='continue-with-vipps'><a href='$url' class='button' style='width:100%'>Login with Vipps yo!</a></div>";
      return true;
@@ -129,20 +115,50 @@ class VippsLogin {
         // Actually, we're totally going to redirect somewhere here. FIXME
         status_header(200,'OK');
 
-// FIXME
-// Errorhandling: 'error', 'error_description', 'state'
 
-        $code = $_REQUEST['code'];
-        $state = $_REQUEST['state'];
-        
-        $authtoken = $this->get_auth_token($code, $forwhat);
-        // Errorhandling! FIXME
-        $userinfo = $this-> get_openid_userinfo($authtoken);
-        // Errorhandling! FIXME
+        $state = @$_request['state'];
+        $error = @$_REQUEST['error'];
+        $errordesc = @$_REQUEST['error_description'];
+        $error_hint = @$_REQUEST['error_hint'];
+
+/*
+An error has occured during login with Vipps:
+access_denied
+User cancelled the login
+*/
+
+        if (!empty($error)) {
+          $errormessage = "<h1>" . __('An error has occured during login with Vipps:', 'login-vipps') . "</h1>";
+          $errormessage .= "<p>" . sanitize_text_field($error) . "</p>";
+          $errormessage .= "<p>" . sanitize_text_field($errordesc) . "</p>";
+          $errormessage .= "<p>" . sanitize_text_field($error_hint) . "</p>";
+          wp_die($errormessage);
+        }
+
+        $code =  @$_REQUEST['code'];
+        $state = @$_REQUEST['state'];
+        $scope = @$_REQUEST['scope'];
+ 
+        $accesstoken = null;
+  
+        if ($code) {
+         $authtoken = $this->get_auth_token($code, $forwhat);
+         if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
+             $accesstoken = $authtoken['content']['access_token'];
+         } else {
+             wp_die($authtoken['headers'][0]);
+         }
+         // Errorhandling! FIXME
+         $userinfo = $this-> get_openid_userinfo($accesstoken);
+         print_r($userinfo);
+         print "</pre>";
+         // Errorhandling! FIXME
+        }
 
         // Or preferrably, *filter* this so we can return 'handled' or not handled.
         // So this is what actually will do the several actions.
         do_action('continue_with_vipps_' .  $forwhat, $state, $userinfo);
+
 
         wp_die('Hooray you got here!' . print_r($_REQUEST,true));
   }
@@ -163,9 +179,10 @@ class VippsLogin {
         if ( get_option('permalink_structure')) {
             foreach($specials as $special=>$specialmethod) {
                 // IOK 2018-06-07 Change to add any prefix from home-url for better matching IOK 2018-06-07
-                if (preg_match("!/wp-vipps-login/$special/([^/]*)!", $_SERVER['REQUEST_URI'], $matches)) {
-                    $method = $specialmethod; break;
+                if (preg_match("!/wp-vipps-login/$special/([^/?]*)!", $_SERVER['REQUEST_URI'], $matches)) {
+                    $method = $specialmethod;
                     $forwhat = $matches[1];
+                    break;
                 }
             }
         } else {
