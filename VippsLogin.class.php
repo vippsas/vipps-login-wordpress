@@ -38,10 +38,6 @@ class VippsLogin {
   public function init () {
     add_filter('authenticate', array($this,'authenticate'),10,3); 
 
-    if (!is_admin()) {
-     add_filter('page_template',array($this,'page_template'));
-    }
-
     // Profile updates for customers 
     add_action('personal_options_update',array($this,'profile_update'));
     add_action('edit_user_profile_update',array($this,'profile_update'));
