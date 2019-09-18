@@ -25,6 +25,8 @@ class VippsLogin {
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
    add_action('show_user_profile', array($this,'show_extra_profile_fields'));
    add_action('show_user_profile', array($this,'show_profile_subscription'));
+
+   $this->cleanSessions();
   }
 
   public function admin_menu () {
@@ -394,6 +396,37 @@ User cancelled the login
      }
    }
    return $valid;
+  }
+
+  // Create a new fresh session
+  public function createSession($content=array(),$expire = 3600) {
+      global $wpdb;
+      // Default expire is 3600
+      if (!$expire || !is_int($expire)) $expire = 3600;
+      $expiretime = gmdate('Y-m-d H:i:s', time() + $expire);
+      
+      $randombytes = random_bytes(256);
+      $hash = hash('sha256',$randombytes,true);
+      $sessionkey = base64_encode($hash);
+      $ok = false;
+      $count = 0;
+      $tablename = $wpdb->prefix . 'vipps_login_sessions';
+      $content = json_encode($content);
+      // If there is a *collision* in the sessionkey, something is really weird with the universe, but hey: try 1000 times. IOK 2019-09-18
+      while ($count < 1000 && !$wpdb->insert($tablename,array('state'=>$sessionkey,'expire'=>$expiretime,'content'=>$content), array('%s','%s','%s'))) {
+         $count++;
+         $sessionkey = base64_encode(random_bytes(256));
+      }
+      $this->cleanSessions();
+      return $sessionkey; 
+  }
+
+  public function cleanSessions() {
+      // Delete old sessions.
+      global $wpdb;
+      $tablename = $wpdb->prefix . 'vipps_login_sessions';
+      $q = $wpdb->prepare("DELETE FROM {$tablename} WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
+      $wpdb->query($q);
   }
 
   // We need helper tables to find the products given the Smartstore product information.
