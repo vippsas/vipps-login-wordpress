@@ -81,10 +81,10 @@ class VippsLogin {
 
 
   // For a given redirect (operation, actually) and code (nonce, as returned from the Auth call), get an auth token
-  private function get_auth_token($code,$forwhat) {
+  private function get_auth_token($code) {
       $clientid= $this->settings['clientid'];
       $secret = $this->settings['clientsecret'];
-      $redir  = $this->make_callback_url($forwhat);
+      $redir  = $this->make_callback_url();
 
       # IOK FIXME better use .wellknown for this
       $url = $this->backendUrl("oauth2/token");
@@ -109,9 +109,9 @@ class VippsLogin {
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
-  public function getAuthRedirect($forwhat,$state=0,$scope="openid address birthDate email name phoneNumber") {
+  public function getAuthRedirect($state,$scope="openid address birthDate email name phoneNumber") {
     $url      = $this->backendUrl('oauth2/auth');
-    $redir    = $this->make_callback_url($forwhat);
+    $redir    = $this->make_callback_url();
     $clientid = $this->settings['clientid'];
     if (is_array($scope)) $scope = join(' ',$scope);
 
@@ -127,24 +127,28 @@ class VippsLogin {
   }
 
   public function login_form_continue_with_vipps () {
-     $state = base64_encode(substr(sha1(32), 8)); // FIXME
-     $url = $this->getAuthRedirect('login',$state);
+     $session = $this->createSession(array('action'=>'login'));
+     $url = $this->getAuthRedirect($session);
      if (!$url) return;
      echo "<div style='margin:20px;' class='continue-with-vipps'><a href='$url' class='button' style='width:100%'>Login with Vipps yo!</a></div>";
      return true;
   }
 
   // This is the actual handler for all returns from Vipps; it's extendable by using standard Wordpress actions/filters
-  public function continue_from_vipps ($forwhat) {
+  public function continue_from_vipps () {
         wc_nocache_headers();
         // Actually, we're totally going to redirect somewhere here. FIXME
         status_header(200,'OK');
 
-
-        $state = @$_request['state'];
+        $state = @$_REQUEST['state'];
         $error = @$_REQUEST['error'];
         $errordesc = @$_REQUEST['error_description'];
         $error_hint = @$_REQUEST['error_hint'];
+
+        $session = $this->getSession($state);
+        
+
+        $forwhat = @$session['action'];
 
 /*
 An error has occured during login with Vipps:
@@ -154,9 +158,11 @@ User cancelled the login
 
         if (!empty($error)) {
           $errormessage = "<h1>" . __('An error has occured during login with Vipps:', 'login-vipps') . "</h1>";
+          $errormessage .= "<p> state " . sanitize_text_field($state) . "</p>";
           $errormessage .= "<p>" . sanitize_text_field($error) . "</p>";
           $errormessage .= "<p>" . sanitize_text_field($errordesc) . "</p>";
           $errormessage .= "<p>" . sanitize_text_field($error_hint) . "</p>";
+          if($state) $this->deleteSession($state);
           wp_die($errormessage);
         }
 
@@ -167,56 +173,58 @@ User cancelled the login
         $accesstoken = null;
   
         if ($code) {
-         $authtoken = $this->get_auth_token($code, $forwhat);
+         $authtoken = $this->get_auth_token($code);
          if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
              $accesstoken = $authtoken['content']['access_token'];
          } else {
+             if($state) $this->deleteSession($state);
              wp_die($authtoken['headers'][0]);
          }
          // Errorhandling! FIXME
          $userinfo = $this-> get_openid_userinfo($accesstoken);
+         if($state) $this->deleteSession($state);
+         print "<pre>";
+         print "userinfo<br>";
          print_r($userinfo);
+         print "session for state $state:<br>";
+         print_r($session);
          print "</pre>";
          // Errorhandling! FIXME
         }
 
         // Or preferrably, *filter* this so we can return 'handled' or not handled.
         // So this is what actually will do the several actions.
-        do_action('continue_with_vipps_' .  $forwhat, $state, $userinfo);
+        do_action('continue_with_vipps_' .  $forwhat, $session, $userinfo);
 
-
-        wp_die('Hooray you got here!' . print_r($_REQUEST,true));
+        wp_die('Hooray you got here!');
   }
 
-  public function make_callback_url ($forwhat) {
+  public function make_callback_url () {
       if ( !get_option('permalink_structure')) {
-            return set_url_scheme(home_url(),'https') . "/?wp-vipps-login=continue-from-vipps&forwhat=$forwhat&callback=";
+            return set_url_scheme(home_url(),'https') . "/?wp-vipps-login=continue-from-vipps&callback=";
           } else {
-            return set_url_scheme(home_url(),'https') . "/wp-vipps-login/continue-from-vipps/$forwhat";
+            return set_url_scheme(home_url(),'https') . "/wp-vipps-login/continue-from-vipps/";
          }
   }
 
   // This is used to recognize the Vipps 'callback' - written like this to allow for sites wihtout pretty URLs IOK 2019-09-12
    public function is_special_page() {
         $specials = array('continue-from-vipps' => 'continue_from_vipps');
-        $forwhat = null;
         $method = null;
         if ( get_option('permalink_structure')) {
             foreach($specials as $special=>$specialmethod) {
                 // IOK 2018-06-07 Change to add any prefix from home-url for better matching IOK 2018-06-07
-                if (preg_match("!/wp-vipps-login/$special/([^/?]*)!", $_SERVER['REQUEST_URI'], $matches)) {
+                if (preg_match("!/wp-vipps-login/$special/!", $_SERVER['REQUEST_URI'], $matches)) {
                     $method = $specialmethod;
-                    $forwhat = $matches[1];
                     break;
                 }
             }
         } else {
             if (isset($_GET['wp-vipps-login'])) {
                 $method = @$specials[$_GET['wp-vipps-login']];
-                $forwhat = @$_GET['forwhat'];
             }
         }
-        return array($method,$forwhat);
+        return $method;
    }
 
 
@@ -368,8 +376,8 @@ User cancelled the login
 
   // This allows us to handle 'special' pages by using registered query variables; rewrite rules can be added to add the actual argument to the query.
   public function template_redirect () {
-        list($special,$forwhat) = $this->is_special_page() ;
-        if ($special) return $this->$special($forwhat);
+        $special = $this->is_special_page() ;
+        if ($special) return $this->$special();
         return false;
   }
 
@@ -419,6 +427,13 @@ User cancelled the login
       }
       $this->cleanSessions();
       return $sessionkey; 
+  }
+
+  public function deleteSession($session) {
+      global $wpdb;
+      $tablename = $wpdb->prefix . 'vipps_login_sessions';
+      $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE state = %s ", $session);
+      $wpdb->query($q);
   }
 
   public function cleanSessions() {
