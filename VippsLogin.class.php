@@ -425,8 +425,32 @@ User cancelled the login
       // Delete old sessions.
       global $wpdb;
       $tablename = $wpdb->prefix . 'vipps_login_sessions';
-      $q = $wpdb->prepare("DELETE FROM {$tablename} WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
+      $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
       $wpdb->query($q);
+  }
+  public function getSession($key) {
+     global $wpdb;
+     $tablename = $wpdb->prefix . 'vipps_login_sessions';
+     $q = $wpdb->prepare("SELECT content FROM `{$tablename}` WHERE state=%s", $key);
+     $exists = $wpdb->get_var($q);
+     if ($exists) return json_decode($exists,true); 
+     return array();
+  }
+  public function updateSession($key,$data,$expire=0) {
+    global $wpdb;
+    $newexpire = "";
+    if (intval($expire)) $newexpire = gmdate('Y-m-d H:i:s', time() + $expire);
+    $newcontent = json_encode($data);
+ 
+    $tablename = $wpdb->prefix . 'vipps_login_sessions';
+    $q = "";
+    if ($newexpire) {
+      $q = $wpdb->prepare("UPDATE `{$tablename}` SET content=%s,expire=%s WHERE state=%s", $newcontent,$newexpire, $key);
+    } else { 
+      $q = $wpdb->prepare("UPDATE `{$tablename}` SET content=%s WHERE state=%s", $newcontent, $key);
+    }
+    $wpdb->query($q);
+    return $data;
   }
 
   // We need helper tables to find the products given the Smartstore product information.
