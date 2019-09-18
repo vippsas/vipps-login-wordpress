@@ -25,6 +25,8 @@ class VippsLogin {
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
    add_action('show_user_profile', array($this,'show_extra_profile_fields'));
    add_action('show_user_profile', array($this,'show_profile_subscription'));
+   add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
+   add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
 
    $this->cleanSessions();
   }
@@ -53,6 +55,7 @@ class VippsLogin {
     add_filter('email_change_email', array($this, 'email_change_email'), 10, 3);
 
     add_action('login_form', array($this, 'login_form_continue_with_vipps'));
+    add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
 
   }
 
@@ -109,6 +112,15 @@ class VippsLogin {
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
+  // To be used in a POST: returns an URL that can be used to start the login process.
+  public function ajax_vipps_login_get_link () {
+     check_ajax_referer ('vippslogin','vlnonce',true);
+     $session = $this->createSession(array('action'=>'login'));
+     $url = $this->getAuthRedirect($session);
+     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+     wp_die(); 
+  }
+
   public function getAuthRedirect($state,$scope="openid address birthDate email name phoneNumber") {
     $url      = $this->backendUrl('oauth2/auth');
     $redir    = $this->make_callback_url();
@@ -126,11 +138,38 @@ class VippsLogin {
 //    return "https://api.vipps.no/access-management-1.0/access/" . $command;
   }
 
+  // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
+  public function login_enqueue_scripts() {
+    wp_enqueue_script('jquery');
+  }
   public function login_form_continue_with_vipps () {
      $session = $this->createSession(array('action'=>'login'));
      $url = $this->getAuthRedirect($session);
      if (!$url) return;
-     echo "<div style='margin:20px;' class='continue-with-vipps'><a href='$url' class='button' style='width:100%'>Login with Vipps yo!</a></div>";
+?>
+     <div style='margin:20px;' class='continue-with-vipps'>
+<script>
+ function login_with_vipps() {
+    var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
+    var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
+    jQuery.ajax(ajaxUrl, {
+       data: { 'action': 'vipps_login_get_link', 'vlnonce' : nonce },
+       dataType: 'json',
+       error: function (jqXHR,textStatus,errorThrown) {
+           alert("Error " + textStatus);
+       },
+       success: function(data, textStatus, jqXHR) {
+         if (data && data['url']) {
+           window.location.href = data['url'];
+         }
+       }
+
+    });
+ }
+</script>
+<a href='javascript:login_with_vipps();' class='button' style='width:100%'>Login with Vipps yo!</a>
+</div>
+<?php
      return true;
   }
 
