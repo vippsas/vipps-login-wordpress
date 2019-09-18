@@ -4,6 +4,7 @@
 class VippsLogin {
   public $options = array();
   public $settings = array();
+  public static $dbversion = 1;
  
   function __construct() {
      $this->settings = get_option('vipps_login_options', array());
@@ -18,6 +19,9 @@ class VippsLogin {
   }
 
   public function admin_init () {
+
+   add_action('admin_notices',array($this,'stored_admin_notices'));
+
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
    add_action('show_user_profile', array($this,'show_extra_profile_fields'));
    add_action('show_user_profile', array($this,'show_profile_subscription'));
@@ -48,6 +52,29 @@ class VippsLogin {
 
     add_action('login_form', array($this, 'login_form_continue_with_vipps'));
 
+  }
+
+  // Helper function for admin notices
+  public function add_admin_notice($notice) {
+    add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-info is-dismissible'><p>$notice</p></div>"; });
+  }
+
+  // Make admin-notices persistent so we can provide error messages whenever possible. IOK 2018-05-11
+  public function store_admin_notices() {
+        ob_start();
+        do_action('admin_notices');
+        $notices = ob_get_clean();
+        set_transient('_vipps_login__save_admin_notices',$notices, 5*60);
+  }
+
+  // If we have admin-notices that we haven't gotten a chance to show because of
+  // a redirect, this method will fetch and show them IOK 2018-05-07
+  public function stored_admin_notices() {
+        $stored = get_transient('_vipps_login_save_admin_notices');
+        if ($stored) {
+            delete_transient('_vipps_login_save_admin_notices');
+            print $stored;
+        }
   }
 
 
@@ -225,6 +252,8 @@ User cancelled the login
   public function plugins_loaded () {
     $this->options =  get_option('vipps_login_options'); 
     add_action('wp_logout', array($this,'wp_logout'),10,3); 
+    // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
+    $this->dbtables();
   }
 
   public function wp_logout () {
@@ -344,16 +373,15 @@ User cancelled the login
 
   public function activate () {
           // Options
-          $default = array('clientid'=>'','clientsecret'=>'');
+          $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0);
 	  add_option('vipps_login_options',$default,false);
+          $this->dbtables();
+
   }
 
   public function deactivate () {
   }
 
-  // FIXME move this to separate file I guess
-  public static function uninstall() {
-  }
 
   public function validate ($input) {
    $current =  get_option('vipps_login_options'); 
@@ -367,6 +395,46 @@ User cancelled the login
    }
    return $valid;
   }
+
+  // We need helper tables to find the products given the Smartstore product information.
+  public function dbtables() {
+                global $wpdb;
+                $prefix = $wpdb->prefix;
+                $tablename = $wpdb->prefix . 'vipps_login_sessions';
+                $charset_collate = $wpdb->get_charset_collate();
+                $options = get_option('vipps_login_options');
+                $version = static::$dbversion;
+                if ($options['dbversion'] == $version) {
+                   return false;
+                }
+
+// 'state', the primary key, is created large enough to contain a SHA256 hash, but is 
+// varchar just in case.
+// https://codex.wordpress.org/Creating_Tables_with_Plugins
+                $tablecreatestatement = "CREATE TABLE `${tablename}` (
+state varchar(44) NOT NULL,
+expire timestamp DEFAULT CURRENT_TIMESTAMP,
+content text DEFAULT '',
+PRIMARY KEY  (state),
+KEY expire (expire)
+) ${charset_collate};";
+
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+                $result = dbDelta( $tablecreatestatement, true );
+                foreach ($result as $s) {
+                    error_log($s);
+                }
+                $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
+                if($exists != $tablename) {
+                  $this->add_admin_notice(__('Could not create session table - Login With Vipps plugin is not correctly installed', 'login-vipps'));
+                } else {
+                  error_log(__("Installed database tables for Login With Vipps", 'login-vipps'));
+                  $options['dbversion']=static::$dbversion;
+                  update_option('vipps_login_options',$options,false);
+                }
+                return true;
+  }
+
 
   public function toolpage () {
     if (!is_admin() || !current_user_can('manage_options')) {
