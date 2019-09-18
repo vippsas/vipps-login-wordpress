@@ -428,13 +428,15 @@ User cancelled the login
       $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
       $wpdb->query($q);
   }
-  public function getSession($key) {
+  public function getSession($session,$key=false) {
      global $wpdb;
      $tablename = $wpdb->prefix . 'vipps_login_sessions';
-     $q = $wpdb->prepare("SELECT content FROM `{$tablename}` WHERE state=%s", $key);
+     $q = $wpdb->prepare("SELECT content FROM `{$tablename}` WHERE state=%s", $session);
      $exists = $wpdb->get_var($q);
-     if ($exists) return json_decode($exists,true); 
-     return array();
+     if (!$exists) return false;
+     $content = json_decode($exists,true);
+     if ($key) return (isset($content[$key]) ? $content[$key] : false);
+     return $content;
   }
   public function updateSession($key,$data,$expire=0) {
     global $wpdb;
@@ -451,6 +453,12 @@ User cancelled the login
     }
     $wpdb->query($q);
     return $data;
+  }
+  public function setSession($session,$key,$value) {
+    $content = $this->getSession($session);
+    if (!is_array($content)) return false;
+    $content[$key] = $value;
+    $this->updateSession($session,$content);
   }
 
   // We need helper tables to find the products given the Smartstore product information.
