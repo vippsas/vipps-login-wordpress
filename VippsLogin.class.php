@@ -107,8 +107,6 @@ class VippsLogin {
       $url = $this->backendUrl("userinfo");
       $args = array();
 
-      print("Url $url");
-
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
