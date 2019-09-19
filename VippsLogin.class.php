@@ -175,7 +175,6 @@ class VippsLogin {
   public function continue_from_vipps () {
         wc_nocache_headers();
         // Actually, we're totally going to redirect somewhere here. FIXME
-        status_header(200,'OK');
 
         $state = @$_REQUEST['state'];
         $error = @$_REQUEST['error'];
@@ -183,9 +182,9 @@ class VippsLogin {
         $error_hint = @$_REQUEST['error_hint'];
 
         $session = $this->getSession($state);
-        
 
         $forwhat = @$session['action'];
+        $userinfo = null;
 
 /*
 An error has occured during login with Vipps:
@@ -208,26 +207,61 @@ User cancelled the login
         $scope = @$_REQUEST['scope'];
  
         $accesstoken = null;
-  
-        if ($code) {
-         $authtoken = $this->get_auth_token($code);
-         if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
-             $accesstoken = $authtoken['content']['access_token'];
-         } else {
-             if($state) $this->deleteSession($state);
-             wp_die($authtoken['headers'][0]);
+    
+        if (isset($session['userinfo'])) {
+          $userinfo = $session['userinfo'];
+        }  else {
+         if ($code) {
+          $authtoken = $this->get_auth_token($code);
+          if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
+              $accesstoken = $authtoken['content']['access_token'];
+          } else {
+              if($state) $this->deleteSession($state);
+              wp_die($authtoken['headers'][0]);
+          }
+           // Errorhandling! FIXME
+          $userinfo = $this->get_openid_userinfo($accesstoken);
+          $this->setSession($state, 'userinfo', $userinfo);
          }
-         // Errorhandling! FIXME
-         $userinfo = $this-> get_openid_userinfo($accesstoken);
-         if($state) $this->deleteSession($state);
-         print "<pre>";
-         print "userinfo<br>";
-         print_r($userinfo);
-         print "session for state $state:<br>";
-         print_r($session);
-         print "</pre>";
-         // Errorhandling! FIXME
-        }
+        } 
+
+        if ($userinfo && $userinfo['response'] ==  200 && !empty($userinfo['content'])) {
+           $userinfo = $userinfo['content'];
+           $email = $userinfo['email'];
+           $name = $userinfo['name'];
+           $username = sanitize_user($email);
+           $lastname = $userinfo['family_name'];
+           $firstname =  $userinfo['given_name'];
+           $phone =  $userinfo['phone_number'];
+         
+           $address = $userinfo['address'][0];
+           foreach($userinfo['address'] as $add) {
+              if ($add['address_type'] == 'home') {
+                 $address = $add; break;
+              }
+           }
+           $user = get_user_by('email',$email);
+           if (!$user) {
+               print "New user - start registration process if allowed<br>";
+           } else {
+            $vippsphone = get_usermeta($user->ID,'_vipps_phone');
+            if ($vippsphone == $phone) {
+                 wp_set_auth_cookie($user->ID, false);
+                 wp_set_current_user($user->ID,$user->user_login); // 'secure'
+                 do_action('wp_login', $user->user_login, $user);
+                 $profile = get_edit_user_link($user->ID);
+                 $redir = apply_filters('login_redirect', $profile,$profile, $user);
+                 wp_safe_redirect($redir, 302, 'Vipps');
+                          
+                 exit();
+
+            } else {
+                // Create a session with a secret word, store this etc.
+                print "'$phone' '$sid'<br>";
+                print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
+            }
+          }
+       }
 
         // Or preferrably, *filter* this so we can return 'handled' or not handled.
         // So this is what actually will do the several actions.
