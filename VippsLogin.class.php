@@ -460,7 +460,7 @@ User cancelled the login
       // If there is a *collision* in the sessionkey, something is really weird with the universe, but hey: try 1000 times. IOK 2019-09-18
       while ($count < 1000 && !$wpdb->insert($tablename,array('state'=>$sessionkey,'expire'=>$expiretime,'content'=>$content), array('%s','%s','%s'))) {
          $count++;
-         $sessionkey = base64_encode(random_bytes(256));
+         $sessionkey = base64_encode(hash('sha256',random_bytes(256), true));
       }
       $this->cleanSessions();
       return $sessionkey; 
