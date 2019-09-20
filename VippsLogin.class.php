@@ -60,8 +60,81 @@ class VippsLogin {
 
     add_action('login_form', array($this, 'login_form_continue_with_vipps'));
     add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
+    
+    // THE CONFIRM HANDLING IOK FIXME 
+    // handler
+    add_action('user_request_action_confirmed', array($this, 'confirm_vipps_connect_and_login'), 11); // Should happen before 12; the reuest is updated at 10
+
+    // The user email
+    add_filter('user_request_action_description', array($this, 'confirm_vipps_connect_and_login_description'), 10, 2);
+    add_filter('user_request_action_email_content', array($this, 'confirm_vipps_connect_and_login_email_content'), 10, 2);
+    add_filter('user_request_action_email_subject', array($this, 'confirm_vipps_connect_and_login_email_subject'), 10, 3);
+
+    // The admin email (not used)
+    add_filter( 'user_confirmed_action_email_content', array($this, 'user_confirmed_vipps_connection_email_content'), 10, 2);
+    add_filter( 'user_request_confirmed_email_subject', array($this, 'user_confirmed_vipps_connection_email_subject'), 10, 3);
+
 
   }
+#### START CONFIRMATION
+  public function confirm_vipps_connect_and_login ($requestid) {
+       $request = wp_get_user_request_data( $request_id );
+       if (!is_a( $request, 'WP_User_Request' ) || 'request-confirmed' !== $request->status) {
+                return;
+        }
+       $action = $request->action_name;
+       if ($action !== 'vipps_connect_login') return;
+
+       $data = $request->request_data;
+
+       $email = @$data['email'];
+       $userid = @$data['userid'];
+       $phone = @$data['vippsphone'];
+
+       // Check post author, check email etc IOK FIXME
+       $vippsphone = update_user_meta($userid,'_vipps_phone',$phone);
+
+       // We don't need to alert admin, so we don't.
+       update_post_meta( $request_id, '_wp_admin_notified', true );
+  }
+
+  public function confirm_vipps_connect_and_login_description ($desc, $action) {
+      if ($action !== 'vipps_connect_login') return $desc;
+      return __('Connect you Vipps account', 'login-vipps');
+  }
+  public function confirm_vipps_connect_and_login_email_content ($email_text, $email_data) {
+       if ($email_data->request->action_name !== 'vipps_connect_login') return $email_text;
+       return $email_text; // Bleh
+  }
+  public function confirm_vipps_connect_and_login_email_subject ($subject,$sitename,$email_data) {
+       if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
+       return sprintf(__('Confirm that you want to connect your Vipps account on %s', 'login-vipps'), $sitename); 
+  }
+
+  // Admin emails, not used but still
+  public function user_confirmed_vipps_connection_email_content ($email_text, $email_data) {
+       if ($email_data->request->action_name !== 'vipps_connect_login') return $email_text;
+       $email_text = __(
+                'Hei,
+
+A user just connected his Vipps account with his Wordpress account on ###SITENAME###:
+
+User: ###USER_EMAIL###
+Request: ###DESCRIPTION###
+
+No further action is required.
+
+Regards,
+All at ###SITENAME###
+###SITEURL###'
+        );
+      return $email_text; 
+  }
+  public function user_confirmed_vipps_connection_email_subject ($subject, $sitename, $email_data) {
+        if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
+  }
+
+#### END CONFIRMATION
 
   // Helper function for admin notices
   public function add_admin_notice($notice) {
@@ -262,8 +335,9 @@ User cancelled the login
             } else {
                 // Create a session with a secret word, store this etc.
                 print "'$phone' '$email'<br>";
-                // $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID));
-//wp_send_user_request(825);
+                 $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID));
+                 wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
+                 wp_send_user_request($requestid); // ERRORHANDLE!
                 print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
             }
           }
@@ -435,21 +509,6 @@ User cancelled the login
    }
 
 
-  // update user meta and main user info from vipps at login
-  public function addUserMeta($user,$externaldata) {
-    $id = $user->ID; 
-    update_user_meta($id, 'vipps_login', 1); 
-    update_user_meta($id, 'vipps_email', $externaldata['email']);
-    update_user_meta($id,'vipps_last_login', time());
-    update_user_meta($id,'vipps_login_count', $count+1);
-
-    $mainkeys = array('first_name','last_name','display_name','nickname','user_nicename');
-    $main = array('ID'=>$id);
-    foreach($mainkeys as $key) {
-     $main[$key] = $external[$key];
-    }
-    wp_update_user($main);
-  }
 
   // This allows us to handle 'special' pages by using registered query variables; rewrite rules can be added to add the actual argument to the query.
   public function template_redirect () {
