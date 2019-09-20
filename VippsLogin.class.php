@@ -34,6 +34,10 @@ class VippsLogin {
   public function admin_menu () {
     add_options_page(__('Login with Vipps', 'login-vipps'), __('Login with Vipps','login-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
 
+
+     // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
+     // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
+
     if (current_user_can('manage_options')) {
          $uid = isset($_REQUEST['user_id']) ? intval($_REQUEST['user_id']) : 0;
          if ($uid>0 && current_user_can('edit_user', $uid)) {
@@ -245,7 +249,7 @@ User cancelled the login
                print "New user - start registration process if allowed<br>";
            } else {
             $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-            if ($vippsphone == $phone) {
+            if (false && $vippsphone == $phone) {
                  wp_set_auth_cookie($user->ID, false);
                  wp_set_current_user($user->ID,$user->user_login); // 'secure'
                  do_action('wp_login', $user->user_login, $user);
@@ -257,7 +261,9 @@ User cancelled the login
 
             } else {
                 // Create a session with a secret word, store this etc.
-                print "'$phone' '$sid'<br>";
+                print "'$phone' '$email'<br>";
+                // $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID));
+//wp_send_user_request(825);
                 print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
             }
           }
