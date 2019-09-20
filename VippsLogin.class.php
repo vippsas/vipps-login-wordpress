@@ -325,8 +325,33 @@ User cancelled the login
               }
            }
            $user = get_user_by('email',$email);
-           if (!$user) {
+           if (!$user)  {
+            if (get_option('users_can_register')) {
+               // Fix username here so it's unique
+               $pass = wp_generate_password( 32, true);
+	       $user_id = wp_create_user( $username, $random_password, $email);
+               // Errorhandling
+               $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 
+                                 'nickname'=>$firstname, 'first_name'=>$firstname, 'last_name'=>$lastname,
+                                 'user_registered'=>date('Y-m-d H:i:s'));
+               // If Woo here, also set address fields etc.
+               wp_update_user($userdata);
+               update_user_meta($user_id,'_vipps_phone',$phone);
+               $user = get_user_by('id', $user_id);
+               wp_set_auth_cookie($user->ID, false);
+               wp_set_current_user($user->ID,$user->user_login); // 'secure'
+               do_action('wp_login', $user->user_login, $user);
+               $profile = get_edit_user_link($user->ID);
+               $redir = apply_filters('login_redirect', $profile,$profile, $user);
+
+// create welcome message
+
+               wp_safe_redirect($redir, 302, 'Vipps');
+               exit();
                print "New user - start registration process if allowed<br>";
+            } else {
+               wp_die("Fant ingen bruker med eposten du er registrert med - kan ikke logge inn.");
+            }
            } else {
             $vippsphone = get_usermeta($user->ID,'_vipps_phone');
             if ($vippsphone == $phone) {
