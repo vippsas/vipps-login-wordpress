@@ -77,7 +77,7 @@ class VippsLogin {
 
   }
 #### START CONFIRMATION
-  public function confirm_vipps_connect_and_login ($requestid) {
+  public function confirm_vipps_connect_and_login ($request_id) {
        $request = wp_get_user_request_data( $request_id );
        if (!is_a( $request, 'WP_User_Request' ) || 'request-confirmed' !== $request->status) {
                 return;
@@ -96,11 +96,18 @@ class VippsLogin {
 
        // We don't need to alert admin, so we don't.
        update_post_meta( $request_id, '_wp_admin_notified', true );
+       update_post_meta( $request_id, '_wp_user_request_completed_timestamp', time() );
+       $result = wp_update_post(
+                array(
+                        'ID'          => $request_id,
+                        'post_status' => 'request-completed',
+                )
+        );
   }
 
   public function confirm_vipps_connect_and_login_description ($desc, $action) {
       if ($action !== 'vipps_connect_login') return $desc;
-      return __('Connect you Vipps account', 'login-vipps');
+      return __('Connect your Vipps account', 'login-vipps');
   }
   public function confirm_vipps_connect_and_login_email_content ($email_text, $email_data) {
        if ($email_data->request->action_name !== 'vipps_connect_login') return $email_text;
@@ -322,20 +329,25 @@ User cancelled the login
                print "New user - start registration process if allowed<br>";
            } else {
             $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-            if (false && $vippsphone == $phone) {
+            if ($vippsphone == $phone) {
                  wp_set_auth_cookie($user->ID, false);
                  wp_set_current_user($user->ID,$user->user_login); // 'secure'
                  do_action('wp_login', $user->user_login, $user);
                  $profile = get_edit_user_link($user->ID);
                  $redir = apply_filters('login_redirect', $profile,$profile, $user);
                  wp_safe_redirect($redir, 302, 'Vipps');
-                          
                  exit();
 
             } else {
                 // Create a session with a secret word, store this etc.
                 print "'$phone' '$email'<br>";
+                 // First check that we didn't already send one to this email, if we did, mark as failed
                  $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID));
+                 if (is_wp_error($requestid)) {
+                   // and -> errors contain ''duplicate_request'
+                   print "<pre>";print_r($requestid); print "</pre>";
+                 }
+
                  wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
                  wp_send_user_request($requestid); // ERRORHANDLE!
                 print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
