@@ -11,27 +11,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-require_once(dirname(__FILE__) . '/VippsLogin.class.php');
-global $VippsLogin;
-$VippsLogin = VippsLogin::instance();
+global $ContinueWithVipps;
 
+// Continue With Vipps contains general code for interacting with the Vipps app,
+// the VippsLogin class contains an application of that, implementing normal WP login.
+require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');
+
+
+$ContinueWithVipps = ContinueWithVipps::instance();
+
+register_activation_hook(__FILE__,array($ContinueWithVipps,'activate'));
+register_deactivation_hook(__FILE__,array($ContinueWithVipps,'deactivate'));
+
+add_action('init',array($ContinueWithVipps,'init'));
+add_action('after_setup_theme', array($ContinueWithVipps,'after_setup_theme'));
+add_action('plugins_loaded', array($ContinueWithVipps,'plugins_loaded'));
+if (is_admin()) {
+ add_action('admin_init',array($ContinueWithVipps,'admin_init'));
+ add_action('admin_menu',array($ContinueWithVipps,'admin_menu'));
+} else {
+ add_action('template_redirect',array($ContinueWithVipps,'template_redirect'));
+}
+
+global $VippsLogin;
+require_once(dirname(__FILE__) . '/VippsLogin.class.php');
+$VippsLogin= VippsLogin::instance();
 register_activation_hook(__FILE__,array($VippsLogin,'activate'));
 register_deactivation_hook(__FILE__,array($VippsLogin,'deactivate'));
-
-# Use a separate uninstall file instead maybe IOK FIXME
-register_uninstall_hook(__FILE__,array('VippsLogin','uninstall'));
-
-
 add_action('init',array($VippsLogin,'init'));
-add_action('after_setup_theme', array($VippsLogin,'after_setup_theme'));
-add_action('plugins_loaded', array($VippsLogin,'plugins_loaded'));
-
-if (is_admin()) {
- add_action('admin_init',array($VippsLogin,'admin_init'));
- add_action('admin_menu',array($VippsLogin,'admin_menu'));
-} else {
- add_action('template_redirect',array($VippsLogin,'template_redirect'));
-}
 
 
 ?>
