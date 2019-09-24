@@ -144,6 +144,7 @@ All at ###SITENAME###
                wp_set_auth_cookie($user->ID, false);
                wp_set_current_user($user->ID,$user->user_login); // 'secure'
                do_action('wp_login', $user->user_login, $user);
+               wp_new_user_notification($user->ID, null, 'both');
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
 
