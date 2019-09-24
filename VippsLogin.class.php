@@ -13,10 +13,38 @@ class VippsLogin {
         return static::$instance;
   }
   public function admin_init () {
+    // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
+    // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
+    if (current_user_can('manage_options')) {
+         $uid = isset($_REQUEST['user_id']) ? intval($_REQUEST['user_id']) : 0;
+         if ($uid>0 && current_user_can('edit_user', $uid)) {
+             add_action( 'edit_user_profile_update', array($this,'save_extra_profile_fields'));
+             add_action( 'edit_user_profile', array($this,'show_extra_profile_fields'));
+         }
+    }
+     add_action('show_user_profile', array($this,'show_extra_profile_fields'));
+     add_action('show_user_profile', array($this,'show_profile_subscription'));
   }
-  public function admin_menu () {
-  }
+
   public function init () {
+    // Hook into standard auth and logout
+    add_filter('authenticate', array($this,'authenticate'),10,3); 
+    add_action('wp_logout', array($this,'wp_logout'),10,3); 
+    // Profile updates for customers 
+    add_action('personal_options_update',array($this,'profile_update'));
+    add_action('edit_user_profile_update',array($this,'profile_update'));
+    add_action('user_profile_update_errors', array($this,'user_profile_update_errors'), 10,3);
+
+
+    // Login form button
+    add_action('login_form', array($this, 'login_form_continue_with_vipps'));
+    add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
+
+    // Ajax code to get the redir url
+    add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
+    add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
+
+
     // THE CONFIRM HANDLING IOK FIXME 
     // handler
     add_action('user_request_action_confirmed', array($this, 'confirm_vipps_connect_and_login'), 11); // Should happen before 12; the reuest is updated at 10
@@ -30,10 +58,21 @@ class VippsLogin {
     add_filter( 'user_confirmed_action_email_content', array($this, 'user_confirmed_vipps_connection_email_content'), 10, 2);
     add_filter( 'user_request_confirmed_email_subject', array($this, 'user_confirmed_vipps_connection_email_subject'), 10, 3);
 
+    // Main return handler
     add_action('continue_with_vipps_login', array($this, 'continue_with_vipps_login'), 10, 2);
     add_action('continue_with_vipps_error_login', array($this, 'continue_with_vipps_error_login'), 10, 4);
 
 
+  }
+
+  // To be used in a POST: returns an URL that can be used to start the login process.
+  public function ajax_vipps_login_get_link () {
+     check_ajax_referer ('vippslogin','vlnonce',true);
+     $continue = ContinueWithVipps::instance();
+     $session = $continue->createSession(array('action'=>'login'));
+     $url = $continue->getAuthRedirect($session);
+     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+     wp_die();
   }
 
 
@@ -184,4 +223,46 @@ All at ###SITENAME###
           }
        }
   }
+
+  // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
+  public function login_enqueue_scripts() {
+    wp_enqueue_script('jquery');
+  }
+  public function login_form_continue_with_vipps () {
+?>
+     <div style='margin:20px;' class='continue-with-vipps'>
+<script>
+ function login_with_vipps() {
+    var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
+    var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
+    jQuery.ajax(ajaxUrl, {
+       data: { 'action': 'vipps_login_get_link', 'vlnonce' : nonce },
+       dataType: 'json',
+       error: function (jqXHR,textStatus,errorThrown) {
+           alert("Error " + textStatus);
+       },
+       success: function(data, textStatus, jqXHR) {
+         if (data && data['url']) {
+           window.location.href = data['url'];
+         }
+       }
+
+    });
+ }
+</script>
+<a href='javascript:login_with_vipps();' class='button' style='width:100%'>Login with Vipps yo!</a>
+</div>
+<?php
+     return true;
+  }
+
+  public function authenticate ($user, $username, $password) {
+     return $user;
+  }
+
+  public function wp_logout () {
+   $user = wp_get_current_user();
+   error_log("User logging out");
+  }
+
 }

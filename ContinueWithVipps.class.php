@@ -19,49 +19,23 @@ class ContinueWithVipps {
   }
 
   public function admin_init () {
-
    add_action('admin_notices',array($this,'stored_admin_notices'));
-
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
-   add_action('show_user_profile', array($this,'show_extra_profile_fields'));
-   add_action('show_user_profile', array($this,'show_profile_subscription'));
-   add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
-   add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
-
    $this->cleanSessions();
   }
 
   public function admin_menu () {
     add_options_page(__('Login with Vipps', 'login-vipps'), __('Login with Vipps','login-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
-
-
-     // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
-     // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
-
-    if (current_user_can('manage_options')) {
-         $uid = isset($_REQUEST['user_id']) ? intval($_REQUEST['user_id']) : 0;
-         if ($uid>0 && current_user_can('edit_user', $uid)) {
-             add_action( 'edit_user_profile_update', array($this,'save_extra_profile_fields'));
-             add_action( 'edit_user_profile', array($this,'show_extra_profile_fields'));
-         }
-    }
   }
 
   public function init () {
-    add_filter('authenticate', array($this,'authenticate'),10,3); 
-
-    // Profile updates for customers 
-    add_action('personal_options_update',array($this,'profile_update'));
-    add_action('edit_user_profile_update',array($this,'profile_update'));
-
-    add_action('user_profile_update_errors', array($this,'user_profile_update_errors'), 10,3);
-
-    add_filter('email_change_email', array($this, 'email_change_email'), 10, 3);
-
-    add_action('login_form', array($this, 'login_form_continue_with_vipps'));
-    add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
   }
 
+  public function plugins_loaded () {
+    $this->options =  get_option('vipps_login_options'); 
+    // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
+    $this->dbtables();
+  }
 
   // Helper function for admin notices
   public function add_admin_notice($notice) {
@@ -114,15 +88,6 @@ class ContinueWithVipps {
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
-  // To be used in a POST: returns an URL that can be used to start the login process.
-  public function ajax_vipps_login_get_link () {
-     check_ajax_referer ('vippslogin','vlnonce',true);
-     $session = $this->createSession(array('action'=>'login'));
-     $url = $this->getAuthRedirect($session);
-     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
-     wp_die(); 
-  }
-
   public function getAuthRedirect($state,$scope="openid address birthDate email name phoneNumber") {
     $url      = $this->backendUrl('oauth2/auth');
     $redir    = $this->make_callback_url();
@@ -136,46 +101,10 @@ class ContinueWithVipps {
 
   // Return the  URL to the oAuth-backend.
   public function backendUrl ($command) {
+    return "https://api.vipps.no/access-management-1.0/access/" . $command;
     return "https://apitest.vipps.no/access-management-1.0/access/" . $command;
 //    return "https://api.vipps.no/access-management-1.0/access/" . $command;
   }
-
-  // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
-  public function login_enqueue_scripts() {
-    wp_enqueue_script('jquery');
-  }
-  public function login_form_continue_with_vipps () {
-     $session = $this->createSession(array('action'=>'login'));
-     $url = $this->getAuthRedirect($session);
-     if (!$url) return;
-?>
-     <div style='margin:20px;' class='continue-with-vipps'>
-<script>
- function login_with_vipps() {
-    var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
-    var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
-    jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_login_get_link', 'vlnonce' : nonce },
-       dataType: 'json',
-       error: function (jqXHR,textStatus,errorThrown) {
-           alert("Error " + textStatus);
-       },
-       success: function(data, textStatus, jqXHR) {
-         if (data && data['url']) {
-           window.location.href = data['url'];
-         }
-       }
-
-    });
- }
-</script>
-<a href='javascript:login_with_vipps();' class='button' style='width:100%'>Login with Vipps yo!</a>
-</div>
-<?php
-     return true;
-  }
-
-
 
   // This is the actual handler for all returns from Vipps; it's extendable by using standard Wordpress actions/filters
   public function continue_from_vipps () {
@@ -256,62 +185,6 @@ class ContinueWithVipps {
    }
 
 
-  // Hm. FIXME checkit
-  public function email_change_email($email_change_email, $user, $userdata) {
-   return $email_change_email;
-  }
-
-  // Called when both admin and the user saves his or her profile page. IOK 2017-04-27
-  public function profile_update($userid) {
-   return $this->profile_update_vipps_fields($userid, get_edit_user_link());
-  }
-
-  public function profile_update_vipps_fields($userid,$backlink) {
-   if (!get_user_meta($userid, 'vipps_login', true)) return;
-   // IOK FIXME UPDATE fields here
-   return true;
-  }
-
-  // Remove all twitter, facebook etc fields
-  public function user_contactmethods ($profile_fields) {
-   return $profile_fields;
-  }
-
-  function user_profile_update_errors (&$errors, $update = null, &$user  = null) {
-   if (!$update) return;
-   // $errors->remove('empty_email'); # IOK FIXME probably remove
-   return;
-  }
-
-  //  Don't show admin bar to non-admins
-  public function after_setup_theme () {
-  }
-
-  public function plugins_loaded () {
-    $this->options =  get_option('vipps_login_options'); 
-    add_action('wp_logout', array($this,'wp_logout'),10,3); 
-    // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
-    $this->dbtables();
-  }
-
-  public function wp_logout () {
-   $user = wp_get_current_user();
-   if (!empty($user)) {
-      if (get_user_meta($user->ID, 'vipps_login', true)) {
-          // Kill cookies maybe, or note that this user doesn't want to autologin FIXME
-      }
-   }
-  }
-
-  public function login_redirect($redirect_to,$requested_redirect_to=null,$user=null) {
-    // For some reason this might be called with no user.
-    if (empty($user)) $user = wp_get_current_user();
-    if (empty($user)) return $redirect_to;
-    if (!get_user_meta($user->ID, 'vipps_login', true)) return $redirect_to;
- 
-    return $redirect_to;
-  }
-
  // Just a very compatbile way to do REST
  private function http_call($url,$data,$verb='GET',$headers=[],$encoding='url'){
     $date = date("Y-m-d H:i:s");
@@ -370,22 +243,6 @@ class ContinueWithVipps {
     }
     return array('response'=>$response,'headers'=>$http_response_header,'content'=>$content);
   }
-
-  // External filter for checking  user
-  public function authenticate ($user,$username,$password) {
-      if (!$username) return $user;
-      if ($user) return $user;
-
-       // If this is a Vipps-only-login, then ensure login is via Vipps
-       $existing = get_user_by('login',$username);
-       if ($existing && !$existing->ID) $existing = null;
-
-      // IOK FIXME let's see what we need to tdo
-      // add_filter('login_redirect', array($this,'login_redirect'));
-       return $user;
-   }
-
-
 
   // This allows us to handle 'special' pages by using registered query variables; rewrite rules can be added to add the actual argument to the query.
   public function template_redirect () {
@@ -570,39 +427,6 @@ KEY expire (expire)
 
 <?php
   }
-
-
-  function save_extra_profile_fields( $userid ) {
-    if (!current_user_can('edit_user',$userid)) return false;
-    $is_customer = intval(trim($_POST['vipps_login']));
-    update_user_meta( $userid, 'vipps_login', $is_customer);
-
-    if ($is_customer) {
-      foreach($_POST as $key => $v) {
-         if (preg_match("!^vipps_customer_!",$key)) {
-           $value = sanitize_text_field($v);
-           update_user_meta($userid,$key,$value);
-         }
-      }
-    }
- 
-  }
-
-  function show_extra_profile_fields( $user ) {
-    $is_customer = get_user_meta($user->ID, 'vipps_login', true);
- ?>
-   <h3><?php _e('Login with Vipps enabled', 'vipps-login'); ?></h3>
-    <table class="form-table">
-     <tr>
-      <th><label for="vipps_customer"><?php _e('Login with Vipps','vipps-login'); ?></label></th>
-       <td>
-        <span id='vipps_login' class="description"><?php _e('This user logs in with Vipps', 'vipps-login'); ?></span><br>
-       </td>
-     </tr>
-<?php if ($is_customer): ?>
-<?php endif; ?>
-    </table>
-<?php }
 
 
 }
