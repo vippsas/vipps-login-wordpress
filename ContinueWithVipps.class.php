@@ -415,6 +415,8 @@ KEY expire (expire)
        <td><?php _e('Your client secret, from the Vipps Portal','vipps-login'); ?></td>
    </tr>
 
+<?php do_action('continue_with_vipps_extra_option_fields'); ?>
+
  </table>
   <div>
    <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" />

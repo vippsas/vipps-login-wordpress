@@ -22,9 +22,31 @@ class VippsLogin {
              add_action( 'edit_user_profile', array($this,'show_extra_profile_fields'));
          }
     }
+
      add_action('show_user_profile', array($this,'show_extra_profile_fields'));
      add_action('show_user_profile', array($this,'show_profile_subscription'));
+
+     // Settings, that will end up on the simple "Login with Vipps" options screen
+     register_setting('vipps_login_options2','vipps_login_options2', array($this,'validate'));
+     add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
+
   }
+
+
+  public function validate ($input) {
+   $current =  get_option('vipps_login_options2');
+
+   $valid = array();
+   foreach($input as $k=>$v) {
+     switch ($k) {
+      default:
+       $valid[$k] = $v;
+     }
+   }
+   return $valid;
+  }
+
+
 
   public function init () {
     // Hook into standard auth and logout
@@ -264,5 +286,20 @@ All at ###SITENAME###
    $user = wp_get_current_user();
    error_log("User logging out");
   }
+
+  public function extra_option_fields () {
+  $options = get_option('vipps_login_options2');
+
+
+?>
+<?php settings_fields('vipps_login_options2'); ?>
+   <tr>
+       <td><?php _e('TEST', 'login-vipps'); ?></td>
+       <td width=30%><input id=configpath style="width:20em" name="vipps_login_options2[TEST]" value="<?php echo htmlspecialchars($options['TEST']);?>" type="text"></td>
+       <td><?php _e('TEST FIELD','vipps-login'); ?></td>
+   </tr>
+<?php
+ }
+
 
 }
