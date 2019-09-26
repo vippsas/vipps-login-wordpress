@@ -12,6 +12,10 @@ class VippsLogin {
         if (!static::$instance) static::$instance = new VippsLogin();
         return static::$instance;
   }
+
+  // Used to check that we have logged in via Vipps in the 'authenticate' filter.
+  protected $currentSid = null;
+
   public function admin_init () {
     // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
     // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
@@ -24,7 +28,6 @@ class VippsLogin {
     }
 
      add_action('show_user_profile', array($this,'show_extra_profile_fields'));
-     add_action('show_user_profile', array($this,'show_profile_subscription'));
 
      // Settings, that will end up on the simple "Login with Vipps" options screen
      register_setting('vipps_login_options2','vipps_login_options2', array($this,'validate'));
@@ -49,8 +52,9 @@ class VippsLogin {
 
 
   public function init () {
-    // Hook into standard auth and logout
-    add_filter('authenticate', array($this,'authenticate'),10,3); 
+    // Hook into standard auth and logout, but do so after the secure signon bits and so forth.
+    add_filter('authenticate', array($this,'authenticate'),50,3); 
+
     add_action('wp_logout', array($this,'wp_logout'),10,3); 
     // Profile updates for customers 
     add_action('personal_options_update',array($this,'profile_update'));
@@ -112,9 +116,11 @@ class VippsLogin {
        $email = @$data['email'];
        $userid = @$data['userid'];
        $phone = @$data['vippsphone'];
+       $sub = @$data['sub'];
 
        // Check post author, check email etc IOK FIXME
        $vippsphone = update_user_meta($userid,'_vipps_phone',$phone);
+       $vippsid = update_user_meta($userid,'_vipps_id',$sub);
 
        // We don't need to alert admin, so we don't.
        update_post_meta( $request_id, '_wp_admin_notified', true );
@@ -179,6 +185,8 @@ All at ###SITENAME###
            $lastname = $userinfo['family_name'];
            $firstname =  $userinfo['given_name'];
            $phone =  $userinfo['phone_number'];
+           $sub =  $userinfo['sub'];
+           $sid=  $userinfo['sid'];
          
            $address = $userinfo['address'][0];
            foreach($userinfo['address'] as $add) {
@@ -187,6 +195,15 @@ All at ###SITENAME###
               }
            }
            $user = get_user_by('email',$email);
+
+           // MFA plugins may actually redirect here again, in which case we will now be logged in.
+           if (is_user_logged_in() == $user) {
+               $profile = get_edit_user_link($user->ID);
+               $redir = apply_filters('login_redirect', $profile,$profile, $user);
+               if($session) ContinueWithVipps::instance()->deleteSession($session);
+               wp_safe_redirect($redir, 302, 'Vipps');
+               exit();
+           }
 
 
            if (!$user)  {
@@ -201,7 +218,21 @@ All at ###SITENAME###
                // If Woo here, also set address fields etc.
                wp_update_user($userdata);
                update_user_meta($user_id,'_vipps_phone',$phone);
+               update_user_meta($userid,'_vipps_id',$sub);
                $user = get_user_by('id', $user_id);
+               $this->currentSid = array($user->ID, $sid);
+
+               $user = apply_filters('authenticate', $user, '', '');
+
+               if (is_wp_error($user)) {
+                  wp_die(print_r($user,true)); // FIXME IOK
+               }
+
+               add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
+                    $data['vippssession'] = $sid;
+                    return $data;
+               }, 10, 2);
+
                wp_set_auth_cookie($user->ID, false);
                wp_set_current_user($user->ID,$user->user_login); // 'secure'
                do_action('wp_login', $user->user_login, $user);
@@ -211,20 +242,35 @@ All at ###SITENAME###
 
 // create welcome message
 
+               if($session) ContinueWithVipps::instance()->deleteSession($session);
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
-               print "New user - start registration process if allowed<br>";
             } else {
+               if($session) ContinueWithVipps::instance()->deleteSession($session);
                wp_die("Fant ingen bruker med eposten du er registrert med - kan ikke logge inn.");
             }
            } else {
+            $this->currentSid = array($user->ID, $sid);
             $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-            if ($vippsphone == $phone) {
+            $vippsid = get_usermeta($user->id,'_vipps_id',$sub);
+            if ($vippsphone == $phone && $vippsid == $sub) { 
+
+                 $user = apply_filters('authenticate', $user, '', '');
+                 if (is_wp_error($user)) {
+                   wp_die(print_r($user,true)); // FIXME IOK
+                 }
+
+               add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
+                    $data['vippssession'] = $sid;
+                    return $data;
+               }, 10, 2);
+ 
                  wp_set_auth_cookie($user->ID, false);
                  wp_set_current_user($user->ID,$user->user_login); // 'secure'
                  do_action('wp_login', $user->user_login, $user);
                  $profile = get_edit_user_link($user->ID);
                  $redir = apply_filters('login_redirect', $profile,$profile, $user);
+                 if($session) ContinueWithVipps::instance()->deleteSession($session);
                  wp_safe_redirect($redir, 302, 'Vipps');
                  exit();
 
@@ -232,7 +278,7 @@ All at ###SITENAME###
                 // Create a session with a secret word, store this etc.
                 print "'$phone' '$email'<br>";
                  // First check that we didn't already send one to this email, if we did, mark as failed
-                 $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID));
+                 $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
                  if (is_wp_error($requestid)) {
                    // and -> errors contain ''duplicate_request'
                    print "<pre>";print_r($requestid); print "</pre>";
@@ -278,7 +324,24 @@ All at ###SITENAME###
      return true;
   }
 
+
+ function show_extra_profile_fields( $user ) {
+    // Add vipps stuff here
+ }
+ function save_extra_profile_fields( $userid ) {
+    if (!current_user_can('edit_user',$userid)) return false;
+}
+
   public function authenticate ($user, $username, $password) {
+     if (!$user) return $user;
+     if (! ($user instanceof WP_User)) return $user;
+
+     if (!$this->currentSid) $this->currentSid = array($user->ID, null);
+     if ($this->currentSid) {
+        list ($userid, $sid) = $this->currentSid; 
+        # If user requries vipps and we have no sid, then return a WP_Error
+        error_log("logging in $userid and $sid for " . $user->ID);
+     }
      return $user;
   }
 
