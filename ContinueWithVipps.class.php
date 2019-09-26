@@ -88,11 +88,17 @@ class ContinueWithVipps {
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
-  public function getAuthRedirect($state,$scope="openid address birthDate email name phoneNumber") {
-    $url      = $this->backendUrl('oauth2/auth');
-    $redir    = $this->make_callback_url();
-    $clientid = $this->settings['clientid'];
+  public static function getAuthRedirect($action,$session=null,$scope="openid address birthDate email name phoneNumber") {
+    $me = static::instance();
+    $url      = $me->backendUrl('oauth2/auth');
+    $redir    = $me->make_callback_url();
+    $clientid = $me->settings['clientid'];
     if (is_array($scope)) $scope = join(' ',$scope);
+
+    if (!is_array($session)) $session = array();
+    $session['action'] = $action;
+    $sessionkey = $me->createSession($session);
+    $state = $action . "::" . $sessionkey;
 
     if (!$clientid) return "";
     $args = array('client_id'=>$clientid, 'response_type'=>'code', 'scope'=>$scope, 'state'=>$state, 'redirect_uri'=>$redir);
@@ -112,23 +118,28 @@ class ContinueWithVipps {
         // Actually, we're totally going to redirect somewhere here. FIXME
 
         $state = @$_REQUEST['state'];
+        $action ='';
+        $sessionkey='';
+        if ($state) {
+          list($action,$sessionkey) = explode("::", $state);
+        }
+        $session = $this->getSession($sessionkey);
+
         $error = @$_REQUEST['error'];
         $errordesc = @$_REQUEST['error_description'];
         $error_hint = @$_REQUEST['error_hint'];
 
-        $session = $this->getSession($state);
-
-        $forwhat = @$session['action'];
+        $forwhat = $action; // Should also be set in the session
         $userinfo = null;
 
         if ($error) {
+          // Delete this - you may need to create a new session in your errorhandler.
           if($state) $this->deleteSession($state);
-          do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
+          do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint);
           wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-vipps'), esc_html($forwhat), esc_html($error)));
         }
 
         $code =  @$_REQUEST['code'];
-        $state = @$_REQUEST['state'];
         $scope = @$_REQUEST['scope'];
  
         $accesstoken = null;
@@ -141,18 +152,24 @@ class ContinueWithVipps {
           if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
               $accesstoken = $authtoken['content']['access_token'];
           } else {
-              if($state) $this->deleteSession($state);
  // DO BETTER HERE!
+              if($state) $this->deleteSession($state);
               wp_die($authtoken['headers'][0]);
           }
            // Errorhandling! FIXME
           $userinfo = $this->get_openid_userinfo($accesstoken);
-          // IOK FIXME AND HERE - THIS SHOULD ACTUALLY BE DELETED 
           $this->setSession($state, 'userinfo', $userinfo);
          }
         } 
+ 
+        if ($userinfo['response'] != 200) {
+           # FIXME ERRORHANDLING 
+           if($state) $this->deleteSession($state);
+           wp_die($userinfo['response']);
+        }
 
-        do_action('continue_with_vipps_' .  $forwhat, $session, $userinfo);
+        do_action('continue_with_vipps_' .  $forwhat, @$userinfo['content'], $state);
+        if($state) $this->deleteSession($state);
         wp_die();
   }
 

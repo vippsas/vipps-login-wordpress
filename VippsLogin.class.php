@@ -56,6 +56,9 @@ class VippsLogin {
     add_filter('authenticate', array($this,'authenticate'),50,3); 
 
     add_action('wp_logout', array($this,'wp_logout'),10,3); 
+
+    add_filter('wp_login_errors', array($this, 'wp_login_errors'), 10, 2);
+
     // Profile updates for customers 
     add_action('personal_options_update',array($this,'profile_update'));
     add_action('edit_user_profile_update',array($this,'profile_update'));
@@ -94,9 +97,7 @@ class VippsLogin {
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
      check_ajax_referer ('vippslogin','vlnonce',true);
-     $continue = ContinueWithVipps::instance();
-     $session = $continue->createSession(array('action'=>'login'));
-     $url = $continue->getAuthRedirect($session);
+     $url = ContinueWithVipps::getAuthRedirect('login');
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
@@ -169,16 +170,51 @@ All at ###SITENAME###
         if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
   }
 
-#### END CONFIRMATION
-  public function continue_with_vipps_error_login($error,$errordesc,$error_hint, $session) {
-    print "Error $error!";
-    print "<div>$errordesc</div>";
+  // This is for getText to be able to catch these
+  private function translatableErrors() {
+    print __('User cancelled the login', 'login-vipps');
   }
 
-  public function continue_with_vipps_login($session,$userinfo) {
+  public function wp_login_errors ($errors, $redirect_to) {
+    $session = array();
+    $state = @$_REQUEST['vippsstate'];
+    $errorcode = @$_REQUEST['vippserror'];
+    if ($state) {
+      $session = ContinueWithVipps::instance()->getSession($state);
+    }
+    if (!$session) return $errors;
+    if (isset($session['error'])) {
+       $desc = __($session['error'],'login-vipps');
+       if (isset($session['errordesc'])) {
+          $desc = __($session['errordesc'],'login-vipps');
+       }
+       $errors->add($session['error'], $desc);
+    }
+    ContinueWithVipps::instance()->deleteSession($state);
+    return $errors;
+  }
 
-        if ($userinfo && $userinfo['response'] ==  200 && !empty($userinfo['content'])) {
-           $userinfo = $userinfo['content'];
+#### END CONFIRMATION
+  public function continue_with_vipps_error_login($error,$errordesc,$error_hint) {
+    $redir = wp_login_url();
+
+    $continue = ContinueWithVipps::instance();
+    $sessionkey = $continue->createSession(array('error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
+
+    $redir = add_query_arg(array('vippsstate'=>urlencode($sessionkey), 'vippserror'=>urlencode($error)), $redir);
+    wp_safe_redirect($redir);
+    exit();
+  }
+
+  public function continue_with_vipps_login($userinfo,$sessionkey) {
+
+           if (!$userinfo) {
+               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               $loginurl = wp_login_url() ;
+               wp_safe_redirect($loginurl);
+               exit();
+           }
+
            $email = $userinfo['email'];
            $name = $userinfo['name'];
            $username = sanitize_user($email);
@@ -200,7 +236,7 @@ All at ###SITENAME###
            if (is_user_logged_in() == $user) {
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
-               if($session) ContinueWithVipps::instance()->deleteSession($session);
+               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
            }
@@ -225,7 +261,9 @@ All at ###SITENAME###
                $user = apply_filters('authenticate', $user, '', '');
 
                if (is_wp_error($user)) {
-                  wp_die(print_r($user,true)); // FIXME IOK
+                  $error = $user;
+                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
+                  exit();
                }
 
                add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
@@ -239,15 +277,14 @@ All at ###SITENAME###
                wp_new_user_notification($user->ID, null, 'both');
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
-
 // create welcome message
-
-               if($session) ContinueWithVipps::instance()->deleteSession($session);
+               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
             } else {
-               if($session) ContinueWithVipps::instance()->deleteSession($session);
-               wp_die("Fant ingen bruker med eposten du er registrert med - kan ikke logge inn.");
+               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
+               exit();
             }
            } else {
             $this->currentSid = array($user->ID, $sid);
@@ -257,7 +294,9 @@ All at ###SITENAME###
 
                  $user = apply_filters('authenticate', $user, '', '');
                  if (is_wp_error($user)) {
-                   wp_die(print_r($user,true)); // FIXME IOK
+                  $error = $user;
+                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
+                  exit();
                  }
 
                add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
@@ -270,7 +309,7 @@ All at ###SITENAME###
                  do_action('wp_login', $user->user_login, $user);
                  $profile = get_edit_user_link($user->ID);
                  $redir = apply_filters('login_redirect', $profile,$profile, $user);
-                 if($session) ContinueWithVipps::instance()->deleteSession($session);
+                 if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
                  wp_safe_redirect($redir, 302, 'Vipps');
                  exit();
 
@@ -289,7 +328,6 @@ All at ###SITENAME###
                 print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
             }
           }
-       }
   }
 
   // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
