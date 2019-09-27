@@ -180,7 +180,7 @@ All at ###SITENAME###
     $state = @$_REQUEST['vippsstate'];
     $errorcode = @$_REQUEST['vippserror'];
     if ($state) {
-      $session = ContinueWithVipps::instance()->getSession($state);
+      $session = VippsSession::get($state);
     }
     if (!$session) return $errors;
     if (isset($session['error'])) {
@@ -190,7 +190,7 @@ All at ###SITENAME###
        }
        $errors->add($session['error'], $desc);
     }
-    ContinueWithVipps::instance()->deleteSession($state);
+    if ($session) $session->destroy();
     return $errors;
   }
 
@@ -199,17 +199,18 @@ All at ###SITENAME###
     $redir = wp_login_url();
 
     $continue = ContinueWithVipps::instance();
-    $sessionkey = $continue->createSession(array('error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
+    $session = VippsSession::create(array('error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
 
-    $redir = add_query_arg(array('vippsstate'=>urlencode($sessionkey), 'vippserror'=>urlencode($error)), $redir);
+    $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
     wp_safe_redirect($redir);
     exit();
   }
 
   public function continue_with_vipps_login($userinfo,$sessionkey) {
+           $session = VippsSession::get($sessionkey);
 
            if (!$userinfo) {
-               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               if ($session) $session->destroy();
                $loginurl = wp_login_url() ;
                wp_safe_redirect($loginurl);
                exit();
@@ -236,7 +237,7 @@ All at ###SITENAME###
            if (is_user_logged_in() == $user) {
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
-               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               if($session) $session->destroy();
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
            }
@@ -278,11 +279,11 @@ All at ###SITENAME###
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
 // create welcome message
-               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               if($session) $session->destroy();
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
             } else {
-               if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+               if($session) $session->destroy();
                $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
                exit();
             }
@@ -309,7 +310,7 @@ All at ###SITENAME###
                  do_action('wp_login', $user->user_login, $user);
                  $profile = get_edit_user_link($user->ID);
                  $redir = apply_filters('login_redirect', $profile,$profile, $user);
-                 if($sessionkey) ContinueWithVipps::instance()->deleteSession($sessionkey);
+                 if($session) $session->destroy();
                  wp_safe_redirect($redir, 302, 'Vipps');
                  exit();
 

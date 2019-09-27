@@ -21,7 +21,7 @@ class ContinueWithVipps {
   public function admin_init () {
    add_action('admin_notices',array($this,'stored_admin_notices'));
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
-   $this->cleanSessions();
+   VippsSession::clean();
   }
 
   public function admin_menu () {
@@ -88,16 +88,17 @@ class ContinueWithVipps {
       return $this->http_call($url,$args,'GET',$headers,'url');
   }
 
-  public static function getAuthRedirect($action,$session=null,$scope="openid address birthDate email name phoneNumber") {
+  public static function getAuthRedirect($action,$sessiondata=null,$scope="openid address birthDate email name phoneNumber") {
     $me = static::instance();
     $url      = $me->backendUrl('oauth2/auth');
     $redir    = $me->make_callback_url();
     $clientid = $me->settings['clientid'];
     if (is_array($scope)) $scope = join(' ',$scope);
 
-    if (!is_array($session)) $session = array();
-    $session['action'] = $action;
-    $sessionkey = $me->createSession($session);
+    if (!is_array($sessiondata)) $sessiondata = array();
+    $sessiondata['action'] = $action;
+    $session = VippsSession::create($sessiondata);
+    $sessionkey = $session->sessionkey;
     $state = $action . "::" . $sessionkey;
 
     if (!$clientid) return "";
@@ -123,7 +124,7 @@ class ContinueWithVipps {
         if ($state) {
           list($action,$sessionkey) = explode("::", $state);
         }
-        $session = $this->getSession($sessionkey);
+        $session = VippsSession::get($sessionkey);
 
         $error = @$_REQUEST['error'];
         $errordesc = @$_REQUEST['error_description'];
@@ -134,7 +135,7 @@ class ContinueWithVipps {
 
         if ($error) {
           // Delete this - you may need to create a new session in your errorhandler.
-          if($state) $this->deleteSession($state);
+          if($state && $session) $session->destroy();
           do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint);
           wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-vipps'), esc_html($forwhat), esc_html($error)));
         }
@@ -144,7 +145,7 @@ class ContinueWithVipps {
  
         $accesstoken = null;
     
-        if (isset($session['userinfo'])) {
+        if ($session && isset($session['userinfo'])) {
           $userinfo = $session['userinfo'];
         }  else {
          if ($code) {
@@ -153,23 +154,23 @@ class ContinueWithVipps {
               $accesstoken = $authtoken['content']['access_token'];
           } else {
  // DO BETTER HERE!
-              if($state) $this->deleteSession($state);
+              if($state && $session) $session->destroy();
               wp_die($authtoken['headers'][0]);
           }
            // Errorhandling! FIXME
           $userinfo = $this->get_openid_userinfo($accesstoken);
-          $this->setSession($state, 'userinfo', $userinfo);
+          $session->set( 'userinfo', $userinfo);
          }
         } 
  
         if ($userinfo['response'] != 200) {
            # FIXME ERRORHANDLING 
-           if($state) $this->deleteSession($state);
+           if($state && $session) $session->destroy();
            wp_die($userinfo['response']);
         }
 
         do_action('continue_with_vipps_' .  $forwhat, @$userinfo['content'], $state);
-        if($state) $this->deleteSession($state);
+        if($state) $session->destroy();
         wp_die();
   }
 
@@ -291,76 +292,6 @@ class ContinueWithVipps {
      }
    }
    return $valid;
-  }
-
-  // Create a new fresh session
-  public function createSession($content=array(),$expire = 3600) {
-      global $wpdb;
-      // Default expire is 3600
-      if (!$expire || !is_int($expire)) $expire = 3600;
-      $expiretime = gmdate('Y-m-d H:i:s', time() + $expire);
-      
-      $randombytes = random_bytes(256);
-      $hash = hash('sha256',$randombytes,true);
-      $sessionkey = base64_encode($hash);
-      $ok = false;
-      $count = 0;
-      $tablename = $wpdb->prefix . 'vipps_login_sessions';
-      $content = json_encode($content);
-      // If there is a *collision* in the sessionkey, something is really weird with the universe, but hey: try 1000 times. IOK 2019-09-18
-      while ($count < 1000 && !$wpdb->insert($tablename,array('state'=>$sessionkey,'expire'=>$expiretime,'content'=>$content), array('%s','%s','%s'))) {
-         $count++;
-         $sessionkey = base64_encode(hash('sha256',random_bytes(256), true));
-      }
-      $this->cleanSessions();
-      return $sessionkey; 
-  }
-
-  public function deleteSession($session) {
-      global $wpdb;
-      $tablename = $wpdb->prefix . 'vipps_login_sessions';
-      $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE state = %s ", $session);
-      $wpdb->query($q);
-  }
-
-  public function cleanSessions() {
-      // Delete old sessions.
-      global $wpdb;
-      $tablename = $wpdb->prefix . 'vipps_login_sessions';
-      $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
-      $wpdb->query($q);
-  }
-  public function getSession($session,$key=false) {
-     global $wpdb;
-     $tablename = $wpdb->prefix . 'vipps_login_sessions';
-     $q = $wpdb->prepare("SELECT content FROM `{$tablename}` WHERE state=%s", $session);
-     $exists = $wpdb->get_var($q);
-     if (!$exists) return false;
-     $content = json_decode($exists,true);
-     if ($key) return (isset($content[$key]) ? $content[$key] : false);
-     return $content;
-  }
-  public function updateSession($key,$data,$expire=0) {
-    global $wpdb;
-    $newexpire = "";
-    if (intval($expire)) $newexpire = gmdate('Y-m-d H:i:s', time() + $expire);
-    $newcontent = json_encode($data);
- 
-    $tablename = $wpdb->prefix . 'vipps_login_sessions';
-    $q = "";
-    if ($newexpire) {
-      $q = $wpdb->prepare("UPDATE `{$tablename}` SET content=%s,expire=%s WHERE state=%s", $newcontent,$newexpire, $key);
-    } else { 
-      $q = $wpdb->prepare("UPDATE `{$tablename}` SET content=%s WHERE state=%s", $newcontent, $key);
-    }
-    $wpdb->query($q);
-    return $data;
-  }
-  public function setSession($session,$key,$value) {
-    $content = $this->getSession($session);
-    if (!is_array($content)) return false;
-    $content[$key] = $value;
-    $this->updateSession($session,$content);
   }
 
   // We need helper tables to find the products given the Smartstore product information.

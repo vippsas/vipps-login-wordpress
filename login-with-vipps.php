@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+require_once(dirname(__FILE__) . '/VippsSession.class.php');
 
 global $ContinueWithVipps;
 require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');
