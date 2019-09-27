@@ -135,7 +135,7 @@ class ContinueWithVipps {
 
         if ($error) {
           // Delete this - you may need to create a new session in your errorhandler.
-          if($state && $session) $session->destroy();
+          if($session) $session->destroy();
           do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint);
           wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-vipps'), esc_html($forwhat), esc_html($error)));
         }
@@ -154,7 +154,7 @@ class ContinueWithVipps {
               $accesstoken = $authtoken['content']['access_token'];
           } else {
  // DO BETTER HERE!
-              if($state && $session) $session->destroy();
+              if($session) $session->destroy();
               wp_die($authtoken['headers'][0]);
           }
            // Errorhandling! FIXME
@@ -165,12 +165,14 @@ class ContinueWithVipps {
  
         if ($userinfo['response'] != 200) {
            # FIXME ERRORHANDLING 
-           if($state && $session) $session->destroy();
+           if($session) $session->destroy();
            wp_die($userinfo['response']);
         }
 
-        do_action('continue_with_vipps_' .  $forwhat, @$userinfo['content'], $state);
-        if($state) $session->destroy();
+        // Do *not* destroy the session here: this may redirect to other pages (eg. in 'authenticate' that will need to have the session
+        // be alive so that this can be called repeatedly. The session should be destroyed only when the action is done; that is, completes whatever it tries to do.
+        do_action('continue_with_vipps_' .  $forwhat, @$userinfo['content'], $session);
+        if($session) $session->destroy();
         wp_die();
   }
 

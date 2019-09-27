@@ -206,8 +206,7 @@ All at ###SITENAME###
     exit();
   }
 
-  public function continue_with_vipps_login($userinfo,$sessionkey) {
-           $session = VippsSession::get($sessionkey);
+  public function continue_with_vipps_login($userinfo,$session) {
 
            if (!$userinfo) {
                if ($session) $session->destroy();
