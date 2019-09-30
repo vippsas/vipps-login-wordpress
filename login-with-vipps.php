@@ -29,6 +29,9 @@ if (is_admin()) {
 }
 
 global $VippsLogin;
+register_activation_hook(__FILE__,array($VippsLogin,'activate'));
+register_deactivation_hook(__FILE__,array($VippsLogin,'deactivate'));
+
 require_once(dirname(__FILE__) . '/VippsLogin.class.php');
 $VippsLogin=VippsLogin::instance();
 register_activation_hook(__FILE__,array($VippsLogin,'activate'));

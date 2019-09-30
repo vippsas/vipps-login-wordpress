@@ -37,7 +37,9 @@ class VippsLogin {
 
 
   public function validate ($input) {
+
    $current =  get_option('vipps_login_options2');
+   if (empty($input)) return $current;
 
    $valid = array();
    foreach($input as $k=>$v) {
@@ -90,6 +92,8 @@ class VippsLogin {
     // Main return handler
     add_action('continue_with_vipps_login', array($this, 'continue_with_vipps_login'), 10, 2);
     add_action('continue_with_vipps_error_login', array($this, 'continue_with_vipps_error_login'), 10, 4);
+
+$this->ensure_continue_with_vipps_page();
 
 
   }
@@ -362,6 +366,57 @@ All at ###SITENAME###
      return true;
   }
 
+ function activate () {
+
+
+      $default = array('continuepageid'=>0);
+      add_option('vipps_login_options2',$default,false);
+ }
+ function deactivate () {
+
+ }
+
+ // Returns the page object of the 'continue with vipps' page, creating it if neccessary.
+ public function ensure_continue_with_vipps_page() {
+     $options = get_option('vipps_login_options2');
+     $continuepageid = $options['continuepageid'];
+     if ($continuepageid) {
+      $page = get_post($continuepageid);
+      if ($page) return $page;
+      if (!$page) {
+         $options['continuepageid'] = 0;
+         update_option('vipps_login_options2', $options);
+      }
+     }
+    
+     // This is the typical case, when the user installs and activates the plugin 
+     $author = null;
+     if (current_user_can('manage_options')) $author = wp_get_current_user();
+
+     // Otherwise, use a random admin
+     if (!$author) {
+       $alladmins = get_users(array('role'=>'administrator'));
+       error_log(print_r($alladmins,true));
+       if ($alladmins) { 
+          $alladmins = array_reverse($alladmins);
+          $author = $alladmins[0];
+       }
+     }
+     $authorid = 0;
+     if ($author) $authorid = $author->ID;
+
+     $defaultname = __('Continue with Vipps', 'login-vipps');
+ 
+     $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
+     $newid = wp_insert_post($pagedata);
+     if (is_wp_error($newid)) {
+         return new WP_Error(__("Could not find or create the 'continue with Vipps' page", 'login-vipps') . ": " .  $newid->get_error_message());
+     }
+
+     $options['continuepageid'] = $newid;
+     update_option('vipps_login_options2', $options);
+     return get_post($newid);
+ }
 
  function show_extra_profile_fields( $user ) {
     // Add vipps stuff here
@@ -390,14 +445,26 @@ All at ###SITENAME###
 
   public function extra_option_fields () {
   $options = get_option('vipps_login_options2');
+  $continuepageid = $options['continuepageid'];
 
+  $continuepage = $this->ensure_continue_with_vipps_page();
+  if (is_wp_error($continuepage)) {
+     $continuepage->get_error_message();
+     add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-erroris-dismissible'><p>$notice</p></div>"; });
+  } else {
+    $continuepageid = $continuepage->ID;
+  }
+
+print "Continuepageid = $continuepageid<br>";
 
 ?>
 <?php settings_fields('vipps_login_options2'); ?>
    <tr>
-       <td><?php _e('TEST', 'login-vipps'); ?></td>
-       <td width=30%><input id=configpath style="width:20em" name="vipps_login_options2[TEST]" value="<?php echo htmlspecialchars($options['TEST']);?>" type="text"></td>
-       <td><?php _e('TEST FIELD','vipps-login'); ?></td>
+       <td><?php _e('Continue-with-Vipps page', 'login-vipps'); ?></td>
+       <td width=30%>
+                 <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-vipps'))); ?>
+</td>
+       <td><?php _e('Sometimes when using Vipps Login, the user may need to answer questions, confirm their email or other actions. This page, which you may leave blank, will be used for this purpose','vipps-login'); ?></td>
    </tr>
 <?php
  }
