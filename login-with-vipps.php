@@ -39,6 +39,8 @@ register_deactivation_hook(__FILE__,array($VippsLogin,'deactivate'));
 add_action('init',array($VippsLogin,'init'));
 if (is_admin()) {
  add_action('admin_init',array($VippsLogin,'admin_init'));
+} else {
+ add_action('template_redirect',array($VippsLogin,'template_redirect'));
 }
 
 

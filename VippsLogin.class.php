@@ -93,7 +93,6 @@ class VippsLogin {
     add_action('continue_with_vipps_login', array($this, 'continue_with_vipps_login'), 10, 2);
     add_action('continue_with_vipps_error_login', array($this, 'continue_with_vipps_error_login'), 10, 4);
 
-$this->ensure_continue_with_vipps_page();
 
 
   }
@@ -105,6 +104,33 @@ $this->ensure_continue_with_vipps_page();
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
+
+
+  public function template_redirect () {
+     $continuepage = $this->ensure_continue_with_vipps_page();
+     if ($continuepage && !is_wp_error($continuepage) && is_page($continuepage->ID)) {
+           header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+           header('Pragma: no-cache');
+           header('Expires: Thu, 01 Dec 1990 16:00:00 GMT');
+           add_filter('the_content', function ($content) {
+             return $this->continue_with_vipps_page_shortcode(array(), $content);
+          });
+     }
+  }
+
+ public  function continue_with_vipps_page_shortcode($args,$content) {
+        $state = @$_REQUEST['state'];
+        $sessionkey = '';
+        $action = '';
+        if ($state) list($action,$sessionkey) = explode("::",$state);
+        $session = VippsSession::get($sessionkey);
+        if (!$session) {
+          return __('This page is used to handle your requests when continuing from Vipps and further action is required to complete your task. But in this case, it doesn\'t seem to be an open session', 'login-vipps'); 
+        }
+        ob_start();
+        do_action('continue_with_vipps_page_' . $action, $session, $state);
+        return ob_get_clean();
+ }
 
 
 #### START CONFIRMATION
@@ -367,9 +393,12 @@ All at ###SITENAME###
   }
 
  function activate () {
-
-
-      $default = array('continuepageid'=>0);
+      $continuepage = $this->ensure_continue_with_vipps_page();
+      $continueid = 0;
+      if (!is_wp_error($continuepage)) {
+        $continueid = $continuepage->ID;
+      }
+      $default = array('continuepageid'=>$continueid);
       add_option('vipps_login_options2',$default,false);
  }
  function deactivate () {
