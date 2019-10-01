@@ -118,6 +118,10 @@ class VippsLogin {
      setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN);
      return $cookie;
   }
+  public function deleteBrowserCookie() {
+     unset($_COOKIE['VippsSessoinKey']);
+     setcookie('VippsSessionKey', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN);
+  }
 
   public function checkBrowserCookie($against) {
      if (!isset($_COOKIE['VippsSessionKey'])) return false;
@@ -279,6 +283,7 @@ All at ###SITENAME###
          $profile = get_edit_user_link($user->ID);
          $redir = apply_filters('login_redirect', $profile,$profile, $user);
          if($session) $session->destroy();
+         $this->deleteBrowserCookie();
          wp_safe_redirect($redir, 302, 'Vipps');
          exit();
   }
@@ -286,6 +291,7 @@ All at ###SITENAME###
   public function continue_with_vipps_login($userinfo,$session) {
 
            if (!$userinfo) {
+               $this->deleteBrowserCookie();
                if ($session) $session->destroy();
                $loginurl = wp_login_url() ;
                wp_safe_redirect($loginurl);
@@ -329,6 +335,7 @@ All at ###SITENAME###
            // Add action here
            if (!$user && !get_option('users_can_register')) {
                if($session) $session->destroy();
+               $this->deleteBrowserCookie();
                $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
                exit();
            }
