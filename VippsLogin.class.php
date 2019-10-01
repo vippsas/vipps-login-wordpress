@@ -100,11 +100,29 @@ class VippsLogin {
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
      check_ajax_referer ('vippslogin','vlnonce',true);
-     $url = ContinueWithVipps::getAuthRedirect('login');
+
+     // We are going to store a random cookie in the browser so we can verify that this
+     // calls' session belongs to a single browser. IOK 2019-10-09
+     // Incidentally, this will invalidate any current session as well.
+     // Also, this *must* be called with POST to ensure you actually get the cookies, at least if you have
+     // caching proxies somewhere in your chain.
+     $cookie = $this->getBrowserCooke();
+     $url = ContinueWithVipps::getAuthRedirect('login',array('cookie'=>$cookie));
+
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
 
+  public function setBrowserCookie() {
+     $cookie = base64_encode(hash('sha256',random_bytes(256), true));
+     setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN);
+     return $cookie;
+  }
+
+  public function checkBrowserCookie($against) {
+     if (!isset($_COOKIE['VippsSessionKey'])) return false;
+     return ($_COOKIE['VippsSessionKey'] == $against);
+  }
 
   public function template_redirect () {
      $continuepage = $this->ensure_continue_with_vipps_page();
@@ -236,6 +254,35 @@ All at ###SITENAME###
     exit();
   }
 
+
+  // This function will login your user when appropriate (ie, after 'authenticate' has run and everything is good).
+  protected function actually_login_user($user,$session=null) {
+        // First, ensure that we interact properly with MFA stuff and so forth
+        $user = apply_filters('authenticate', $user, '', '');
+        if (is_wp_error($user)) {
+                  $error = $user;
+                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
+                  exit();
+        }
+
+         do_action('vipps_before_user_login', $user, $session);
+ 
+         $this->currentSid = array($user->ID, $sid);
+         add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
+                    $data['vippssession'] = $sid;
+                    return $data;
+         }, 10, 2);
+
+         wp_set_auth_cookie($user->ID, false);
+         wp_set_current_user($user->ID,$user->user_login); // 'secure'
+         do_action('wp_login', $user->user_login, $user);
+         $profile = get_edit_user_link($user->ID);
+         $redir = apply_filters('login_redirect', $profile,$profile, $user);
+         if($session) $session->destroy();
+         wp_safe_redirect($redir, 302, 'Vipps');
+         exit();
+  }
+
   public function continue_with_vipps_login($userinfo,$session) {
 
            if (!$userinfo) {
@@ -262,7 +309,7 @@ All at ###SITENAME###
            }
            $user = get_user_by('email',$email);
 
-           // MFA plugins may actually redirect here again, in which case we will now be logged in.
+           // MFA plugins may actually redirect here again, in which case we will now be logged in, and we can just redirect
            if (is_user_logged_in() == $user) {
                $profile = get_edit_user_link($user->ID);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
@@ -271,13 +318,27 @@ All at ###SITENAME###
                exit();
            }
 
+           // If not we must now check that the browser is actually allowed to do this thing
+           if (!isset($userinfo['cookie']) || !$this->checkBrowserCookie($userinfo['cookie'])){
+               // The user doesn't have a valid cookie for this session in their browser.
+               // Produce an error page that indicates that cookies *may* be blocked.. 
+               if ($session) $session->destroy();
+               wp_die(__("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
+           }
 
-           if (!$user)  {
-            if (get_option('users_can_register')) {
+           // Add action here
+           if (!$user && !get_option('users_can_register')) {
+               if($session) $session->destroy();
+               $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
+               exit();
+           }
+
+           // Here we don't have a user, but we are allowed to register, so let's do that
+           if (!$user) {
                // Fix username here so it's unique
                $pass = wp_generate_password( 32, true);
 	       $user_id = wp_create_user( $username, $random_password, $email);
-               // Errorhandling
+               // Errorhandling FIXME
                $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 
                                  'nickname'=>$firstname, 'first_name'=>$firstname, 'last_name'=>$lastname,
                                  'user_registered'=>date('Y-m-d H:i:s'));
@@ -286,79 +347,35 @@ All at ###SITENAME###
                update_user_meta($user_id,'_vipps_phone',$phone);
                update_user_meta($userid,'_vipps_id',$sub);
                $user = get_user_by('id', $user_id);
-               $this->currentSid = array($user->ID, $sid);
-
-               $user = apply_filters('authenticate', $user, '', '');
-
-               if (is_wp_error($user)) {
-                  $error = $user;
-                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
-                  exit();
-               }
-
-               add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
-                    $data['vippssession'] = $sid;
-                    return $data;
-               }, 10, 2);
-
-               wp_set_auth_cookie($user->ID, false);
-               wp_set_current_user($user->ID,$user->user_login); // 'secure'
-               do_action('wp_login', $user->user_login, $user);
-               wp_new_user_notification($user->ID, null, 'both');
-               $profile = get_edit_user_link($user->ID);
-               $redir = apply_filters('login_redirect', $profile,$profile, $user);
-// create welcome message
-               if($session) $session->destroy();
-               wp_safe_redirect($redir, 302, 'Vipps');
+               $this->actually_login_user($user,$session);
                exit();
-            } else {
-               if($session) $session->destroy();
-               $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
+           } 
+
+           // And now we have a user, but we must see if the accounts are connected, and if so, log in
+           $vippsphone = get_usermeta($user->ID,'_vipps_phone');
+           $vippsid = get_usermeta($user->id,'_vipps_id',$sub);
+           if ($vippsphone == $phone && $vippsid == $sub) { 
+               $this->actually_login_user($user,$session);
                exit();
             }
-           } else {
-            $this->currentSid = array($user->ID, $sid);
-            $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-            $vippsid = get_usermeta($user->id,'_vipps_id',$sub);
-            if ($vippsphone == $phone && $vippsid == $sub) { 
 
-                 $user = apply_filters('authenticate', $user, '', '');
-                 if (is_wp_error($user)) {
-                  $error = $user;
-                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
-                  exit();
-                 }
+            // We are *not* connnected, so we must now redirect to the waiting page
 
-               add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
-                    $data['vippssession'] = $sid;
-                    return $data;
-               }, 10, 2);
- 
-                 wp_set_auth_cookie($user->ID, false);
-                 wp_set_current_user($user->ID,$user->user_login); // 'secure'
-                 do_action('wp_login', $user->user_login, $user);
-                 $profile = get_edit_user_link($user->ID);
-                 $redir = apply_filters('login_redirect', $profile,$profile, $user);
-                 if($session) $session->destroy();
-                 wp_safe_redirect($redir, 302, 'Vipps');
-                 exit();
-
-            } else {
-                // Create a session with a secret word, store this etc.
-                print "'$phone' '$email'<br>";
-                 // First check that we didn't already send one to this email, if we did, mark as failed
-                 $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
-                 if (is_wp_error($requestid)) {
+            // The user hasn't been connected, so we need to that now
+            // Create a session with a secret word, store this etc.
+            print "'$phone' '$email'<br>";
+            // First check that we didn't already send one to this email, if we did, mark as failed
+            $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
+            if (is_wp_error($requestid)) {
                    // and -> errors contain ''duplicate_request'
                    print "<pre>";print_r($requestid); print "</pre>";
-                 }
-
-                 wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
-                 wp_send_user_request($requestid); // ERRORHANDLE!
-                print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
             }
-          }
+
+            wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
+            wp_send_user_request($requestid); // ERRORHANDLE!
+            print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
   }
+          
 
   // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
   public function login_enqueue_scripts() {
