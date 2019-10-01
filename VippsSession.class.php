@@ -53,7 +53,7 @@ class VippsSession implements ArrayAccess {
      $exists = $wpdb->get_var($q);
      if (!$exists) return null;
      $content = json_decode($exists,true);
-     return new VippsSession($sessionkey,$data);
+     return new VippsSession($sessionkey,$content);
   }
   public function destroy() {
       global $wpdb;

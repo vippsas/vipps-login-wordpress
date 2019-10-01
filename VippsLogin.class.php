@@ -106,7 +106,7 @@ class VippsLogin {
      // Incidentally, this will invalidate any current session as well.
      // Also, this *must* be called with POST to ensure you actually get the cookies, at least if you have
      // caching proxies somewhere in your chain.
-     $cookie = $this->getBrowserCooke();
+     $cookie = $this->setBrowserCookie();
      $url = ContinueWithVipps::getAuthRedirect('login',array('cookie'=>$cookie));
 
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
@@ -260,7 +260,7 @@ All at ###SITENAME###
 
 
   // This function will login your user when appropriate (ie, after 'authenticate' has run and everything is good).
-  protected function actually_login_user($user,$session=null) {
+  protected function actually_login_user($user,$sid=null,$session=null) {
         // First, ensure that we interact properly with MFA stuff and so forth
         $user = apply_filters('authenticate', $user, '', '');
         if (is_wp_error($user)) {
@@ -324,10 +324,12 @@ All at ###SITENAME###
                exit();
            }
 
+
            // If not we must now check that the browser is actually allowed to do this thing
-           if (!isset($userinfo['cookie']) || !$this->checkBrowserCookie($userinfo['cookie'])){
+           if (!isset($session['cookie']) || !$this->checkBrowserCookie($session['cookie'])){
                // The user doesn't have a valid cookie for this session in their browser.
                // Produce an error page that indicates that cookies *may* be blocked.. 
+               // Leave the browser cookie for debugging
                if ($session) $session->destroy();
                wp_die(__("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
            }
@@ -354,7 +356,7 @@ All at ###SITENAME###
                update_user_meta($user_id,'_vipps_phone',$phone);
                update_user_meta($userid,'_vipps_id',$sub);
                $user = get_user_by('id', $user_id);
-               $this->actually_login_user($user,$session);
+               $this->actually_login_user($user,$sid,$session);
                exit();
            } 
 
@@ -362,7 +364,7 @@ All at ###SITENAME###
            $vippsphone = get_usermeta($user->ID,'_vipps_phone');
            $vippsid = get_usermeta($user->id,'_vipps_id',$sub);
            if ($vippsphone == $phone && $vippsid == $sub) { 
-               $this->actually_login_user($user,$session);
+               $this->actually_login_user($user,$sid,$session);
                exit();
             }
 
@@ -449,7 +451,6 @@ All at ###SITENAME###
      // Otherwise, use a random admin
      if (!$author) {
        $alladmins = get_users(array('role'=>'administrator'));
-       error_log(print_r($alladmins,true));
        if ($alladmins) { 
           $alladmins = array_reverse($alladmins);
           $author = $alladmins[0];

@@ -126,6 +126,7 @@ class ContinueWithVipps {
         }
         $session = VippsSession::get($sessionkey);
 
+
         $error = @$_REQUEST['error'];
         $errordesc = @$_REQUEST['error_description'];
         $error_hint = @$_REQUEST['error_hint'];
@@ -145,7 +146,7 @@ class ContinueWithVipps {
  
         $accesstoken = null;
     
-        if ($session && isset($session['userinfo'])) {
+        if ($session && $session['userinfo']) {
           $userinfo = $session['userinfo'];
         }  else {
          if ($code) {
@@ -153,25 +154,31 @@ class ContinueWithVipps {
           if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
               $accesstoken = $authtoken['content']['access_token'];
           } else {
- // DO BETTER HERE!
               if($session) $session->destroy();
+              if ($forwhat) { 
+               do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-vipps'),'');
+              }
               wp_die($authtoken['headers'][0]);
           }
-           // Errorhandling! FIXME
           $userinfo = $this->get_openid_userinfo($accesstoken);
+
+          if ($userinfo['response'] != 200) {
+            # FIXME ERRORHANDLING 
+            if($session) $session->destroy();
+            if ($forwhat) { 
+              do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-vipps'),'');
+            }
+            wp_die($userinfo['response']);
+          }
+          $userinfo = @$userinfo['content'];
           $session->set( 'userinfo', $userinfo);
          }
         } 
  
-        if ($userinfo['response'] != 200) {
-           # FIXME ERRORHANDLING 
-           if($session) $session->destroy();
-           wp_die($userinfo['response']);
-        }
 
         // Do *not* destroy the session here: this may redirect to other pages (eg. in 'authenticate' that will need to have the session
         // be alive so that this can be called repeatedly. The session should be destroyed only when the action is done; that is, completes whatever it tries to do.
-        do_action('continue_with_vipps_' .  $forwhat, @$userinfo['content'], $session);
+        do_action('continue_with_vipps_' .  $forwhat, $userinfo, $session);
         if($session) $session->destroy();
         wp_die();
   }
