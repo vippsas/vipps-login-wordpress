@@ -90,12 +90,12 @@ class VippsSession implements ArrayAccess {
       $q = $wpdb->prepare("UPDATE `{$tablename}` SET content=%s WHERE state=%s", $newcontent, $this->sessionkey);
     }
     $wpdb->query($q);
-    $this->content=$data;
+    $this->contents=$data;
     return $this;
   }
   public function set($key,$value) {
-    $this->content[$key] = $value;
-    return $this->update($this->content);
+    $this->contents[$key] = $value;
+    return $this->update($this->contents);
   }
 
 }

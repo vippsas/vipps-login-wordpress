@@ -67,6 +67,12 @@ class VippsLogin {
     add_action('user_profile_update_errors', array($this,'user_profile_update_errors'), 10,3);
 
 
+    // Action that handles the waiting page
+    add_action('continue_with_vipps_page_login', array($this, 'continue_with_vipps_page_login'), 10, 1);
+    add_action('continue_with_vipps_before_page_login', array($this, 'continue_with_vipps_before_page_login') , 10, 1);
+
+
+
     // Login form button
     add_action('login_form', array($this, 'login_form_continue_with_vipps'));
     add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
@@ -131,28 +137,92 @@ class VippsLogin {
   public function template_redirect () {
      $continuepage = $this->ensure_continue_with_vipps_page();
      if ($continuepage && !is_wp_error($continuepage) && is_page($continuepage->ID)) {
+
+           $state = @$_REQUEST['state'];
+           $sessionkey = '';
+           $action = '';
+           if ($state) list($action,$sessionkey) = explode("::",$state);
+           do_action('continue_with_vipps_before_page_' . $action, $sessionkey);
+
            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
            header('Pragma: no-cache');
            header('Expires: Thu, 01 Dec 1990 16:00:00 GMT');
            add_filter('the_content', function ($content) {
-             return $this->continue_with_vipps_page_shortcode(array(), $content);
+             return $this->continue_with_vipps_waiting_page($content);
           });
      }
   }
 
- public  function continue_with_vipps_page_shortcode($args,$content) {
+ public function redirect_to_waiting_page($forwhat,$session) {
+    $state = $forwhat . "::" . $session->sessionkey;
+    $continuepage = $this->ensure_continue_with_vipps_page();
+    if (is_wp_error($continuepage)) {
+      wp_die(__("Cannot redirect to Login With Vipps waiting page - it doesn't exist! If you just tried to log in, check your email.", 'login-vipps'));
+    }
+    $waiturl = get_permalink($continuepage);
+    $redir = add_query_arg(array('state'=>urlencode($state)), $waiturl);
+    wp_safe_redirect($redir, 302, 'Vipps');
+    exit();
+ }
+
+ // This will replace the content of the page used as a waiting page - allow users to do their own thing here too!
+ public  function continue_with_vipps_waiting_page($content) {
         $state = @$_REQUEST['state'];
         $sessionkey = '';
         $action = '';
         if ($state) list($action,$sessionkey) = explode("::",$state);
         $session = VippsSession::get($sessionkey);
-        if (!$session) {
-          return __('This page is used to handle your requests when continuing from Vipps and further action is required to complete your task. But in this case, it doesn\'t seem to be an open session', 'login-vipps'); 
+
+        if (!$session  || !$this->checkBrowserCookie($session['cookie'])) {
+          $message = __('This page is used to handle your requests when continuing from Vipps and further action is required to complete your task. But in this case, it doesn\'t seem to be an open session', 'login-vipps');  
+          $message = apply_filters('continue_with_vipps_waiting_page_expired_session_' . $action, $message,  $session);
+          if ($session) $session->destroy();
+          return $message;
         }
         ob_start();
-        do_action('continue_with_vipps_page_' . $action, $session, $state);
+        do_action('continue_with_vipps_page_' . $action, $session);
         return ob_get_clean();
  }
+
+  // This happens right before the waiting page, before output is started. Used to check if the user is now confirmed, in which case login can proceed. 
+  public function continue_with_vipps_before_page_login($sessionkey) {
+        if (!$sessionkey) return;
+        $session = VippsSession::get($sessionkey);
+
+
+        if (!$session  || !$this->checkBrowserCookie($session['cookie'])) return;
+        if (@$session['subaction'] != 'confirm_your_account') return;
+        $userid = @$session['user'];
+        if (!$userid) return; 
+        $userinfo = @$session['userinfo'];
+        if (!$userinfo) return;
+        
+        $vippsphone = get_usermeta($userid,'_vipps_phone');
+        $vippsid = get_usermeta($userid,'_vipps_id');
+
+        if ($vippsphone == $userinfo['phone_number'] && $vippsid == $userinfo['sub']) { 
+               error_log("Going in");
+               $user = get_user_by('id', $userid);
+               $this->actually_login_user($user,$userinfo['sid'],$session);
+               exit();
+        }
+        return false;
+  }
+
+  public function continue_with_vipps_page_login($session)  {
+        if ($session['subaction'] == 'confirm_your_account') {
+        print "<p>";
+        _e("Welcome! As this is your first log-in with Vipps, for safety reasons we require that you must confirm that your account as identified by your registered e-mail belongs to you.", 'login-vipps');
+        print "<p>";
+        print "<p>";
+        _e("We have sent an email to your account with a confirmation link. Press this, and you will be confirmed!");          
+        print "</p>";
+
+        } else {
+           $msg = __("Welcome! If you see this page, an really unexpected error has occur. Unfortunately, we can't do better than to send you to the <a href='%s'>login page</a>", 'login-vipps');
+           printf($msg, wp_login_url()); 
+        }
+  }
 
 
 #### START CONFIRMATION
@@ -325,6 +395,7 @@ All at ###SITENAME###
            }
 
 
+
            // If not we must now check that the browser is actually allowed to do this thing
            if (!isset($session['cookie']) || !$this->checkBrowserCookie($session['cookie'])){
                // The user doesn't have a valid cookie for this session in their browser.
@@ -333,6 +404,7 @@ All at ###SITENAME###
                if ($session) $session->destroy();
                wp_die(__("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
            }
+
 
            // Add action here
            if (!$user && !get_option('users_can_register')) {
@@ -362,27 +434,34 @@ All at ###SITENAME###
 
            // And now we have a user, but we must see if the accounts are connected, and if so, log in
            $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-           $vippsid = get_usermeta($user->id,'_vipps_id',$sub);
+           $vippsid = get_usermeta($user->id,'_vipps_id');
            if ($vippsphone == $phone && $vippsid == $sub) { 
                $this->actually_login_user($user,$sid,$session);
                exit();
             }
 
-            // We are *not* connnected, so we must now redirect to the waiting page
+            // We are *not* connnected, so we must now redirect to the waiting page after sending a confirmation job
 
-            // The user hasn't been connected, so we need to that now
-            // Create a session with a secret word, store this etc.
-            print "'$phone' '$email'<br>";
-            // First check that we didn't already send one to this email, if we did, mark as failed
-            $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
-            if (is_wp_error($requestid)) {
-                   // and -> errors contain ''duplicate_request'
-                   print "<pre>";print_r($requestid); print "</pre>";
+            // First check for existing user requests. This is still no function for this.
+            $requestid = 0;
+            $requests = get_posts(array('post_type' => 'user_request','post_name__in' =>array( 'vipps_connect_login'),'title'=> $email,'post_status'=>array('request-pending')));
+            if (!empty($requests)) {
+               $requestid = $requests[0]->ID;
+            } else {
+               $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
             }
-
+            if (is_wp_error($requestid)) {
+                   // IOK FIXME FIXME HOW TO DO This actually requires the user to log in nomrally, so send to waiting page with password form?
+                   error_log(print_r($requestid,true));
+            }
             wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
             wp_send_user_request($requestid); // ERRORHANDLE!
-            print "This being your first login, we have sent you an email - confirm this and you can continue<br>";
+
+
+            $session->set('subaction','confirm_your_account');
+            $session->set('user',$user->ID);
+            $this->redirect_to_waiting_page('login', $session);
+            exit();
   }
           
 
