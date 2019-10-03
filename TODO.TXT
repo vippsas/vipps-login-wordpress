@@ -16,7 +16,7 @@
 * WOO
 ** Woocommerce login, redirecting to checkout if possible
 ** Handling woocommerce fields: Addresses and so forth. Add any other actions neccessary
-** Turn on/off login-with-vipps and express checkout account creation in Woo settings (if login exists)
+** [DONE] Turn on/off login-with-vipps and express checkout account creation in Woo settings (if login exists)
 ** Ensure we have 'sub' available for express checkout customers newly created. If not..
 *** mobileNumber is different too, as is userID.
 
