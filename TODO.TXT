@@ -19,6 +19,9 @@
 ** [DONE] Turn on/off login-with-vipps and express checkout account creation in Woo settings (if login exists)
 ** Ensure we have 'sub' available for express checkout customers newly created. If not..
 *** mobileNumber is different too, as is userID.
+** IF not woo gateway, add "continue with vipps" to cart page (and mini page)
+** IF gatway but not express checkout do it too
+
 
 * USER HANDLING
 ** Copy on write on changing addresses etc on Vipps users (mark user as originally from vipps and changed)
