@@ -43,5 +43,13 @@ if (is_admin()) {
  add_action('template_redirect',array($VippsLogin,'template_redirect'));
 }
 
+require_once(dirname(__FILE__) . '/WooLogin.class.php');
+$WooLogin=WooLogin::instance();
+register_activation_hook(__FILE__,array($WooLogin,'activate'));
+register_deactivation_hook(__FILE__,array($WooLogin,'deactivate'));
+add_action('init',array($WooLogin,'init'));
+if (is_admin()) {
+ add_action('admin_init',array($WooLogin,'admin_init'));
+}
 
 ?>

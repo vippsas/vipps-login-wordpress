@@ -121,16 +121,17 @@ class VippsLogin {
 
   public function setBrowserCookie() {
      $cookie = base64_encode(hash('sha256',random_bytes(256), true));
-     setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN);
+     setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
      return $cookie;
   }
   public function deleteBrowserCookie() {
      unset($_COOKIE['VippsSessoinKey']);
-     setcookie('VippsSessionKey', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN);
+     setcookie('VippsSessionKey', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
   }
 
   public function checkBrowserCookie($against) {
      if (!isset($_COOKIE['VippsSessionKey'])) return false;
+     if (empty($against)) return false;
      return ($_COOKIE['VippsSessionKey'] == $against);
   }
 
@@ -588,7 +589,6 @@ All at ###SITENAME###
     $continuepageid = $continuepage->ID;
   }
 
-print "Continuepageid = $continuepageid<br>";
 
 ?>
 <?php settings_fields('vipps_login_options2'); ?>

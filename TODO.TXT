@@ -3,8 +3,8 @@
 ** *DELETE* old failed or completed requests after a time
 
 * COOKIES
-** Ensure empty cookies aren't valid
-** Ensure cookies are set using http-only and secure
+** [DONE] Ensure empty cookies aren't valid
+** [DONE] Ensure cookies are set using http-only and secure
 
 * PROFILE
 ** Create profile fields/buttons to *confirm* and *deconfirm* a user from Vipps, as well as welcoming a user logging in with Vipps the first time
@@ -18,6 +18,7 @@
 ** Handling woocommerce fields: Addresses and so forth. Add any other actions neccessary
 ** Turn on/off login-with-vipps and express checkout account creation in Woo settings (if login exists)
 ** Ensure we have 'sub' available for express checkout customers newly created. If not..
+*** mobileNumber is different too, as is userID.
 
 * USER HANDLING
 ** Copy on write on changing addresses etc on Vipps users (mark user as originally from vipps and changed)
