@@ -36,10 +36,6 @@ class WooLogin{
 
   public function init () {
     if (!class_exists( 'WooCommerce' )) return;
-    // Ajax code to get the redir url
-    add_action('wp_ajax_vipps_woo_login_get_link', array($this,'ajax_vipps_login_woo_get_link'));
-    add_action('wp_ajax_nopriv_vipps_woo_login_get_link', array($this,'ajax_vipps_woo_login_get_link'));
-
     
     $options = get_option('vipps_login_woo_options');
     $woologin= $options['woo-login'];
@@ -52,38 +48,17 @@ class WooLogin{
 
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_woo_login_get_link () {
-     check_ajax_referer ('vippslogin','vlnonce',true);
-
+     //NB We are not using a nonce here - the user has not yet logged in, and the page may be cached. To continue logging in, 
+     // the users' browser must retrieve the url from this json value. IOK 2019-10-03
      $url = VippsLogin::instance()->get_vipps_login_link('woocommerce');
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
 
-
   public function login_with_vipps_button() {
 ?>
      <div style='margin:20px;' class='continue-with-vipps'>
-<script>
- function woo_login_with_vipps() {
-     console.log("yayay");
-    var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
-    var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
-    jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_woo_login_get_link', 'vlnonce' : nonce },
-       dataType: 'json',
-       error: function (jqXHR,textStatus,errorThrown) {
-           alert("Error " + textStatus);
-       },
-       success: function(data, textStatus, jqXHR) {
-         if (data && data['url']) {
-           window.location.href = data['url'];
-         }
-       }
-
-    });
- }
-</script>
-<a href='javascript:woo_login_with_vipps();' class='button' style='width:100%'>Login with Vipps yo!</a>
+<a href='javascript:login_with_vipps("woocommerce");' class='button' style='width:100%'>Login with Vipps yo!</a>
 </div>
 <?php
      return true;

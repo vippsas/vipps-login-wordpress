@@ -22,7 +22,6 @@
 ** IF not woo gateway, add "continue with vipps" to cart page (and mini page)
 ** IF gatway but not express checkout do it too
 
-
 * USER HANDLING
 ** Copy on write on changing addresses etc on Vipps users (mark user as originally from vipps and changed)
 ** Require confirmation if $sub and $phone differs? Change text of confirmation? Deny login and require de-confirmation first?

@@ -71,7 +71,7 @@ class VippsLogin {
     add_action('continue_with_vipps_page_login', array($this, 'continue_with_vipps_page_login'), 10, 1);
     add_action('continue_with_vipps_before_page_login', array($this, 'continue_with_vipps_before_page_login') , 10, 1);
 
-
+    add_action('wp_enqueue_scripts', array($this, 'wp_enqueue_scripts'));
 
     // Login form button
     add_action('login_form', array($this, 'login_form_continue_with_vipps'));
@@ -105,7 +105,8 @@ class VippsLogin {
 
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
-     check_ajax_referer ('vippslogin','vlnonce',true);
+     //NB We are not using a nonce here - the user has not yet logged in, and the page may be cached. To continue logging in, 
+     // the users' browser must retrieve the url from this json value. IOK 2019-10-03
      $url = $this->get_vipps_login_link('wordpress');
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
@@ -209,7 +210,6 @@ class VippsLogin {
         $vippsid = get_usermeta($userid,'_vipps_id');
 
         if ($vippsphone == $userinfo['phone_number'] && $vippsid == $userinfo['sub']) { 
-               error_log("Going in");
                $user = get_user_by('id', $userid);
                $this->actually_login_user($user,$userinfo['sid'],$session);
                exit();
@@ -325,6 +325,7 @@ All at ###SITENAME###
   }
 
 #### END CONFIRMATION
+  // IOK FIXME ADD APPLICATION DEFAULTING TO 'wordpress' here
   public function continue_with_vipps_error_login($error,$errordesc,$error_hint) {
     $redir = wp_login_url();
 
@@ -466,6 +467,18 @@ All at ###SITENAME###
                exit();
            } 
 
+           // Allow applications to allow or deny logins for a given user (e.g. to  disallow admin accounts or similar)
+           $allow_login = true;
+           $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, $userinfo, $session);
+           $allow_login= apply_filters("continue_with_vipps_${app}_allow_login", $allow_login, $user,$userinfo,$session);
+ 
+           if (!$allow_login) {
+               if($session) $session->destroy();
+               $this->deleteBrowserCookie();
+               $this->continue_with_vipps_error_login('login_disallowed', __('It is unfortunately not allowed for your account to log-in using Vipps', 'login-vipps'), '');
+               exit();
+           }
+
            // And now we have a user, but we must see if the accounts are connected, and if so, log in
            $vippsphone = get_usermeta($user->ID,'_vipps_phone');
            $vippsid = get_usermeta($user->id,'_vipps_id');
@@ -500,35 +513,22 @@ All at ###SITENAME###
             exit();
   }
           
+  public function wp_enqueue_scripts() {
+    wp_enqueue_script('vipps-login',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
+    wp_localize_script('vipps-login', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+ }
 
   public function login_enqueue_scripts() {
     wp_enqueue_script('jquery');
+    wp_enqueue_script('vipps-login',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
+    wp_localize_script('vipps-login', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
   }
   // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
   public function login_form_continue_with_vipps () {
 ?>
      <div style='margin:20px;' class='continue-with-vipps'>
-<script>
- function login_with_vipps() {
-    var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
-    var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
-    jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_login_get_link', 'vlnonce' : nonce },
-       dataType: 'json',
-       error: function (jqXHR,textStatus,errorThrown) {
-           alert("Error " + textStatus);
-       },
-       success: function(data, textStatus, jqXHR) {
-         if (data && data['url']) {
-           window.location.href = data['url'];
-         }
-       }
-
-    });
- }
-</script>
-<a href='javascript:login_with_vipps();' class='button' style='width:100%'>Login with Vipps yo!</a>
-</div>
+       <a href='javascript:login_with_vipps("wordpress");' class='button' style='width:100%'>Login with Vipps yo!</a>
+    </div>
 <?php
      return true;
   }
