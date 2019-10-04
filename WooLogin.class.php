@@ -45,24 +45,33 @@ class WooLogin{
     } else {
     }
 
-    add_filter('continue_with_vipps_woocommerce_login_redirect', array($this, 'login_redirect'), 10, 2);
-    add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 2);
+    add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
+    add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
     add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
     add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
     add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
-    add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 3);
+    add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
     add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
   }
 
-  public function login_redirect ($redir, $session) {
+  public function add_login_redirect($user, $session) {
+    error_log("Adding a woo redirect");
+    add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
+  }
+  public function login_redirect ($redir, $requested_redir, $user) {
+      error_log("Doing redir, input is $redir");
       if (sizeof( WC()->cart->get_cart() ) > 0 ) {
+         error_log("Got stuff in cart");
          return wc_get_checkout_url();
       } else {
+         error_log("cart empty");
          $link = wc_get_page_permalink( 'myaccount' );
          if ($link) return $link;
+         error_log("no homedir!");
          return $redir;
       }
   }
+
   public function users_can_register($can_register,$userinfo,$session) {
      $options = get_option('vipps_login_woo_options');
      if ($options['woo-create-users']) return true;

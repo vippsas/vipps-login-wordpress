@@ -107,7 +107,14 @@ class VippsLogin {
   public function ajax_vipps_login_get_link () {
      //NB We are not using a nonce here - the user has not yet logged in, and the page may be cached. To continue logging in, 
      // the users' browser must retrieve the url from this json value. IOK 2019-10-03
-     $url = $this->get_vipps_login_link('wordpress');
+     $application = 'wordpress';
+     if (isset($_REQUEST['application'])) {
+       error_log("Got here tho with {$_REQUEST['application']}");
+       $application = sanitize_title($_REQUEST['application']);
+     }
+     error_log("Now $application");
+
+     $url = $this->get_vipps_login_link($application);
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
@@ -348,7 +355,9 @@ All at ###SITENAME###
                   exit();
         }
 
-         $app = sanitize_title(($session && isset($session['applicaton'])) ? $session['application'] : 'wordpress');
+         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
+         error_log("app is $app");
+         print_r($session);
 
          do_action('continue_with_vipps_before_user_login', $user, $session);
          do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
@@ -363,8 +372,11 @@ All at ###SITENAME###
          wp_set_current_user($user->ID,$user->user_login); // 'secure'
          do_action('wp_login', $user->user_login, $user);
          $profile = get_edit_user_link($user->ID);
-         do_action('continue_with_vipps_login_redirect', $user, $session);
-         do_action("continue_with_vipps_{$app}_login_redirect", $user, $session);
+         do_action('continue_with_vipps_before_login_redirect', $user, $session);
+         do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
+
+         error_log("We have done continue_with_vipps_before_{$app}_login_redirect");
+
          $redir = apply_filters('login_redirect', $profile,$profile, $user);
          if($session) $session->destroy();
          $this->deleteBrowserCookie();
@@ -400,7 +412,9 @@ All at ###SITENAME###
            $user = get_user_by('email',$email);
 
            # Defaults to Wordpress, but could be Woocommerce etc IOK 2019-10-04
-           $app = sanitize_title(($session && isset($session['applicaton'])) ? $session['application'] : 'wordpress');
+           $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
+
+           error_log("app is $app");
 
            // MFA plugins may actually redirect here again, in which case we will now be logged in, and we can just redirect
            if (is_user_logged_in() == $user) {
