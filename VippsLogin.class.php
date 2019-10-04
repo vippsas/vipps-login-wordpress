@@ -363,8 +363,8 @@ All at ###SITENAME###
          wp_set_current_user($user->ID,$user->user_login); // 'secure'
          do_action('wp_login', $user->user_login, $user);
          $profile = get_edit_user_link($user->ID);
-         do_action('continue_with_vipps_before_login_redirect', $user, $session);
-         do_action("continue_with_vipps_before_${app}_login_redirect", $user, $session);
+         do_action('continue_with_vipps_login_redirect', $user, $session);
+         do_action("continue_with_vipps_{$app}_login_redirect", $user, $session);
          $redir = apply_filters('login_redirect', $profile,$profile, $user);
          if($session) $session->destroy();
          $this->deleteBrowserCookie();
@@ -406,7 +406,7 @@ All at ###SITENAME###
            if (is_user_logged_in() == $user) {
                $profile = get_edit_user_link($user->ID);
                do_action('continue_with_vipps_before_login_redirect', $user, $session);
-               do_action("continue_with_vipps_before_${app}_login_redirect", $user, $session);
+               do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
                if($session) $session->destroy();
                wp_safe_redirect($redir, 302, 'Vipps');
@@ -425,7 +425,7 @@ All at ###SITENAME###
            // Check if we allow user registrations
            $can_register = apply_filters('option_users_can_register', get_option('users_can_register'));
            $can_register = apply_filters('continue_with_vipps_users_can_register', $can_register, $userinfo, $session);
-           $can_register = apply_filters("continue_with_vipps_${app}_users_can_register", $can_register, $userinfo, $session);
+           $can_register = apply_filters("continue_with_vipps_{$app}_users_can_register", $can_register, $userinfo, $session);
  
            // Add action here
            if (!$user && !$can_register) {
@@ -441,7 +441,7 @@ All at ###SITENAME###
 
                // Fix username here so it's unique, then allow applications to change it
                $newusername = apply_filters('continue_with_vipps_create_username', $username, $userinfo,$session);
-               $newusername = apply_filters("continue_with_vipps_${app}_create_username", $username, $userinfo,$session);
+               $newusername = apply_filters("continue_with_vipps_{$app}_create_username", $username, $userinfo,$session);
 	       $user_id = wp_create_user( $newusername, $random_password, $email);
                // Errorhandling FIXME
 
@@ -451,7 +451,7 @@ All at ###SITENAME###
  
                // Allow applications to modify this, or they can use the hook below
                $userdata = apply_filters('continue_with_vipps_create_userdata', $userdata, $userinfo,$session);
-               $userdata = apply_filters("continue_with_vipps_${app}_create_userdata", $userdata, $userinfo,$session);
+               $userdata = apply_filters("continue_with_vipps_{$app}_create_userdata", $userdata, $userinfo,$session);
 
                wp_update_user($userdata);
 
@@ -459,7 +459,7 @@ All at ###SITENAME###
                update_user_meta($user_id,'_vipps_id',$sub);
 
                do_action('continue_with_vipps_after_create_user', $user, $session);
-               do_action("continue_with_vipps_after_create_${app}_user", $user, $session);
+               do_action("continue_with_vipps_after_create_{$app}_user", $user, $session);
 
                $user = get_user_by('id', $user_id);
 
@@ -470,7 +470,7 @@ All at ###SITENAME###
            // Allow applications to allow or deny logins for a given user (e.g. to  disallow admin accounts or similar)
            $allow_login = true;
            $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, $userinfo, $session);
-           $allow_login= apply_filters("continue_with_vipps_${app}_allow_login", $allow_login, $user,$userinfo,$session);
+           $allow_login= apply_filters("continue_with_vipps_{$app}_allow_login", $allow_login, $user,$userinfo,$session);
  
            if (!$allow_login) {
                if($session) $session->destroy();
@@ -497,7 +497,7 @@ All at ###SITENAME###
             if (!empty($requests)) {
                $requestid = $requests[0]->ID;
             } else {
-               $requestid = wp_create_user_request($email,'vipps_connect_login', array('email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
+               $requestid = wp_create_user_request($email,'vipps_connect_login', array('application'=>$app, 'email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
             }
             if (is_wp_error($requestid)) {
                    // IOK FIXME FIXME HOW TO DO This actually requires the user to log in nomrally, so send to waiting page with password form?

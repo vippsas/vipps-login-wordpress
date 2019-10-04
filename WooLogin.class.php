@@ -44,6 +44,51 @@ class WooLogin{
 //       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
     } else {
     }
+
+    add_filter('continue_with_vipps_woocommerce_login_redirect', array($this, 'login_redirect'), 10, 2);
+    add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 2);
+    add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
+    add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
+    add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
+    add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 3);
+    add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
+  }
+
+  public function login_redirect ($redir, $session) {
+      if (sizeof( WC()->cart->get_cart() ) > 0 ) {
+         return wc_get_checkout_url();
+      } else {
+         $link = wc_get_page_permalink( 'myaccount' );
+         if ($link) return $link;
+         return $redir;
+      }
+  }
+  public function users_can_register($can_register,$userinfo,$session) {
+     $options = get_option('vipps_login_woo_options');
+     if ($options['woo-create-users']) return true;
+     return false;
+  }
+  public function create_userdata($userdata,$userinfo,$session) {
+     $userdata['role'] = 'customer';
+     return $userdata;
+  }
+  // We'll use woocommerces own username functionality here
+  public function create_username($username, $userinfo, $sessio) {
+    return wc_create_new_customer_username($email, array('first_name'=>$userinfo['given_name'],  'last_name' =>  $userinfo['family_name']));
+  }
+  public function after_create_user($user, $session) {
+    $userinfo = @$session['userinfo'];
+    if (!$userinfo) return false;
+    // SET ADDRESS HERE ON THE USER OBJECT DIRECTLY FIXME FIXME
+  } 
+  // IOK FIXME MAKE DISALLOWING ADMIN LOGINS POSSIBLE HERE
+  public function allow_login($allow, $user, $userinfo, $session) {
+     return $allow;
+  }
+  public function before_login($user, $session) {
+    $userinfo = @$session['userinfo'];
+    if (!$userinfo) return false;
+    // IOK FIXME This is where we can update the user with new address-info from Vipps if the user hasn't updated his or her own profile.
   }
 
   // To be used in a POST: returns an URL that can be used to start the login process.
