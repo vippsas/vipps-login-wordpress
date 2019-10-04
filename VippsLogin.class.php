@@ -106,17 +106,24 @@ class VippsLogin {
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
      check_ajax_referer ('vippslogin','vlnonce',true);
+     $url = $this->get_vipps_login_link('wordpress');
+     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+     wp_die();
+  }
 
+  // This method can be used by other applications that want to use this basic class to handle log-in 
+  public function get_vipps_login_link($application='wordpress', $data=array()) {
      // We are going to store a random cookie in the browser so we can verify that this
      // calls' session belongs to a single browser. IOK 2019-10-09
      // Incidentally, this will invalidate any current session as well.
      // Also, this *must* be called with POST to ensure you actually get the cookies, at least if you have
      // caching proxies somewhere in your chain.
      $cookie = $this->setBrowserCookie();
-     $url = ContinueWithVipps::getAuthRedirect('login',array('cookie'=>$cookie));
+     $data['cookie'] = $cookie;
+     $data['application'] = $application;
+     $url = ContinueWithVipps::getAuthRedirect('login',$data);
+     return $url;
 
-     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
-     wp_die();
   }
 
   public function setBrowserCookie() {
@@ -340,7 +347,10 @@ All at ###SITENAME###
                   exit();
         }
 
-         do_action('vipps_before_user_login', $user, $session);
+         $app = sanitize_title(($session && isset($session['applicaton'])) ? $session['application'] : 'wordpress');
+
+         do_action('continue_with_vipps_before_user_login', $user, $session);
+         do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
  
          $this->currentSid = array($user->ID, $sid);
          add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
@@ -352,6 +362,8 @@ All at ###SITENAME###
          wp_set_current_user($user->ID,$user->user_login); // 'secure'
          do_action('wp_login', $user->user_login, $user);
          $profile = get_edit_user_link($user->ID);
+         do_action('continue_with_vipps_before_login_redirect', $user, $session);
+         do_action("continue_with_vipps_before_${app}_login_redirect", $user, $session);
          $redir = apply_filters('login_redirect', $profile,$profile, $user);
          if($session) $session->destroy();
          $this->deleteBrowserCookie();
@@ -386,16 +398,19 @@ All at ###SITENAME###
            }
            $user = get_user_by('email',$email);
 
+           # Defaults to Wordpress, but could be Woocommerce etc IOK 2019-10-04
+           $app = sanitize_title(($session && isset($session['applicaton'])) ? $session['application'] : 'wordpress');
+
            // MFA plugins may actually redirect here again, in which case we will now be logged in, and we can just redirect
            if (is_user_logged_in() == $user) {
                $profile = get_edit_user_link($user->ID);
+               do_action('continue_with_vipps_before_login_redirect', $user, $session);
+               do_action("continue_with_vipps_before_${app}_login_redirect", $user, $session);
                $redir = apply_filters('login_redirect', $profile,$profile, $user);
                if($session) $session->destroy();
                wp_safe_redirect($redir, 302, 'Vipps');
                exit();
            }
-
-
 
            // If not we must now check that the browser is actually allowed to do this thing
            if (!isset($session['cookie']) || !$this->checkBrowserCookie($session['cookie'])){
@@ -403,12 +418,16 @@ All at ###SITENAME###
                // Produce an error page that indicates that cookies *may* be blocked.. 
                // Leave the browser cookie for debugging
                if ($session) $session->destroy();
-               wp_die(__("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
+               $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
            }
 
-
+           // Check if we allow user registrations
+           $can_register = apply_filters('option_users_can_register', get_option('users_can_register'));
+           $can_register = apply_filters('continue_with_vipps_users_can_register', $can_register, $userinfo, $session);
+           $can_register = apply_filters("continue_with_vipps_${app}_users_can_register", $can_register, $userinfo, $session);
+ 
            // Add action here
-           if (!$user && !get_option('users_can_register')) {
+           if (!$user && !$can_register) {
                if($session) $session->destroy();
                $this->deleteBrowserCookie();
                $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
@@ -417,18 +436,32 @@ All at ###SITENAME###
 
            // Here we don't have a user, but we are allowed to register, so let's do that
            if (!$user) {
-               // Fix username here so it's unique
                $pass = wp_generate_password( 32, true);
-	       $user_id = wp_create_user( $username, $random_password, $email);
+
+               // Fix username here so it's unique, then allow applications to change it
+               $newusername = apply_filters('continue_with_vipps_create_username', $username, $userinfo,$session);
+               $newusername = apply_filters("continue_with_vipps_${app}_create_username", $username, $userinfo,$session);
+	       $user_id = wp_create_user( $newusername, $random_password, $email);
                // Errorhandling FIXME
+
                $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 
                                  'nickname'=>$firstname, 'first_name'=>$firstname, 'last_name'=>$lastname,
                                  'user_registered'=>date('Y-m-d H:i:s'));
-               // If Woo here, also set address fields etc.
+ 
+               // Allow applications to modify this, or they can use the hook below
+               $userdata = apply_filters('continue_with_vipps_create_userdata', $userdata, $userinfo,$session);
+               $userdata = apply_filters("continue_with_vipps_${app}_create_userdata", $userdata, $userinfo,$session);
+
                wp_update_user($userdata);
+
                update_user_meta($user_id,'_vipps_phone',$phone);
-               update_user_meta($userid,'_vipps_id',$sub);
+               update_user_meta($user_id,'_vipps_id',$sub);
+
+               do_action('continue_with_vipps_after_create_user', $user, $session);
+               do_action("continue_with_vipps_after_create_${app}_user", $user, $session);
+
                $user = get_user_by('id', $user_id);
+
                $this->actually_login_user($user,$sid,$session);
                exit();
            } 
@@ -441,9 +474,11 @@ All at ###SITENAME###
                exit();
             }
 
+            // IOK FIXME ERROR IF vippsphone and id is set, but to *another* value, send a *different* confirmation message !
+
             // We are *not* connnected, so we must now redirect to the waiting page after sending a confirmation job
 
-            // First check for existing user requests. This is still no function for this.
+            // First check for existing user requests. This is still no function for this, so we inline it. This class should abstract it.
             $requestid = 0;
             $requests = get_posts(array('post_type' => 'user_request','post_name__in' =>array( 'vipps_connect_login'),'title'=> $email,'post_status'=>array('request-pending')));
             if (!empty($requests)) {
@@ -458,7 +493,7 @@ All at ###SITENAME###
             wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
             wp_send_user_request($requestid); // ERRORHANDLE!
 
-
+            // Prepare the redirect page, which will now have 'subaction' and 'application' in session.
             $session->set('subaction','confirm_your_account');
             $session->set('user',$user->ID);
             $this->redirect_to_waiting_page('login', $session);
@@ -466,10 +501,10 @@ All at ###SITENAME###
   }
           
 
-  // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
   public function login_enqueue_scripts() {
     wp_enqueue_script('jquery');
   }
+  // IOK FIXME REPLACE THIS WITH SOME NICE STUFF
   public function login_form_continue_with_vipps () {
 ?>
      <div style='margin:20px;' class='continue-with-vipps'>

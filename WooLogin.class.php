@@ -37,20 +37,28 @@ class WooLogin{
   public function init () {
     if (!class_exists( 'WooCommerce' )) return;
     // Ajax code to get the redir url
-    add_action('wp_ajax_vipps_woo_login_get_link', array($this,'ajax_vipps_login_get_link'));
-    add_action('wp_ajax_nopriv_vipps_woo_login_get_link', array($this,'ajax_vipps_login_get_link'));
+    add_action('wp_ajax_vipps_woo_login_get_link', array($this,'ajax_vipps_login_woo_get_link'));
+    add_action('wp_ajax_nopriv_vipps_woo_login_get_link', array($this,'ajax_vipps_woo_login_get_link'));
 
     
     $options = get_option('vipps_login_woo_options');
     $woologin= $options['woo-login'];
     if ($woologin) {
-       error_log("Yarp");
        add_action( 'woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
 //       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
     } else {
-       error_log("Narp");
     }
   }
+
+  // To be used in a POST: returns an URL that can be used to start the login process.
+  public function ajax_vipps_woo_login_get_link () {
+     check_ajax_referer ('vippslogin','vlnonce',true);
+
+     $url = VippsLogin::instance()->get_vipps_login_link('woocommerce');
+     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+     wp_die();
+  }
+
 
   public function login_with_vipps_button() {
 ?>
@@ -61,7 +69,7 @@ class WooLogin{
     var nonce = '<?php echo wp_create_nonce('vippslogin'); ?>';
     var ajaxUrl = '<?php echo admin_url('/admin-ajax.php'); ?>';
     jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_login_get_link', 'vlnonce' : nonce },
+       data: { 'action': 'vipps_woo_login_get_link', 'vlnonce' : nonce },
        dataType: 'json',
        error: function (jqXHR,textStatus,errorThrown) {
            alert("Error " + textStatus);
@@ -82,20 +90,24 @@ class WooLogin{
   }
 
  function activate () {
-      $default = array('woo-login'=>true);
+
+      $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
+      $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
+
+      $default = array('woo-login'=>true, 'woo-create-users'=>$allowcreatedefault);
       add_option('vipps_login_woo_options',$default,false);
-      error_log(print_r($default,true));
  }
  function deactivate () {
 
  }
 
   public function extra_option_fields () {
-      print "Hey ho\n";
       $options = get_option('vipps_login_woo_options');
       $woologin= $options['woo-login'];
+      $woocreate = $options['woo-create-users'];
 ?>
 <?php settings_fields('vipps_login_woo_options'); ?>
+   <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-vipps'); ?></th></tr>
    <tr>
        <td><?php _e('Use Login With Vipps for Woocommerce', 'login-vipps'); ?></td>
        <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-login]' value=0>
@@ -103,6 +115,15 @@ class WooLogin{
 </td>
        <td>
                       <?php _e('Check this to enable Log in With Vipps on your customers pages in Woocommerce', 'login-vipps'); ?>
+       </td>
+   </tr>
+   <tr>
+       <td><?php _e('Allow users to register as customers in Woocommerce using login with Vipps', 'login-vipps'); ?></td>
+       <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-create-users]' value=0>
+                      <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
+</td>
+       <td>
+                      <?php _e('Check this to allow new users to be created as customers if using Log in With Vipps in a Woocommerce context', 'login-vipps'); ?>
        </td>
    </tr>
 <?php
