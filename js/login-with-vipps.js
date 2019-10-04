@@ -1,7 +1,6 @@
 
 // This can be used in buttons to login for the specified application
 function login_with_vipps(application) {
-    console.log("app is " + application);
     var ajaxUrl = vippsLoginConfig.ajax_url;
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {

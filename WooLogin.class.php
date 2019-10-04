@@ -55,19 +55,14 @@ class WooLogin{
   }
 
   public function add_login_redirect($user, $session) {
-    error_log("Adding a woo redirect");
     add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
   }
   public function login_redirect ($redir, $requested_redir, $user) {
-      error_log("Doing redir, input is $redir");
       if (sizeof( WC()->cart->get_cart() ) > 0 ) {
-         error_log("Got stuff in cart");
          return wc_get_checkout_url();
       } else {
-         error_log("cart empty");
          $link = wc_get_page_permalink( 'myaccount' );
          if ($link) return $link;
-         error_log("no homedir!");
          return $redir;
       }
   }
