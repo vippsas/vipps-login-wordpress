@@ -397,12 +397,6 @@ All at ###SITENAME###
            $sub =  $userinfo['sub'];
            $sid=  $userinfo['sid'];
          
-           $address = $userinfo['address'][0];
-           foreach($userinfo['address'] as $add) {
-              if ($add['address_type'] == 'home') {
-                 $address = $add; break;
-              }
-           }
            $user = get_user_by('email',$email);
 
            # Defaults to Wordpress, but could be Woocommerce etc IOK 2019-10-04

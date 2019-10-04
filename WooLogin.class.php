@@ -83,7 +83,7 @@ class WooLogin{
   public function after_create_user($user, $session) {
     $userinfo = @$session['userinfo'];
     if (!$userinfo) return false;
-    // SET ADDRESS HERE ON THE USER OBJECT DIRECTLY FIXME FIXME
+    $this->maybe_update_address_info($user,$userinfo);
   } 
   // IOK FIXME MAKE DISALLOWING ADMIN LOGINS POSSIBLE HERE
   public function allow_login($allow, $user, $userinfo, $session) {
@@ -92,7 +92,56 @@ class WooLogin{
   public function before_login($user, $session) {
     $userinfo = @$session['userinfo'];
     if (!$userinfo) return false;
-    // IOK FIXME This is where we can update the user with new address-info from Vipps if the user hasn't updated his or her own profile.
+    $this->maybe_update_address_info($user,$userinfo);
+  }
+
+  // IOK 2019-10-04 normally we want to update the users' address every time we log in, because this allows Vipps to be the repository of the users' address.
+  // However, if the user has changed his or her address in woo itself, we will let it stay as it is.
+  public function maybe_update_address_info($user, $userinfo) {
+     $customer = new WC_Customer($user->ID);
+     $address = $userinfo['address'][0];
+     foreach($userinfo['address'] as $add) {
+        if ($add['address_type'] == 'home') {
+                 $address = $add; break;
+        }
+     }
+     if (empty($address)) return;
+     $firstname = $userinfo['given_name'];
+     $lastname =  $userinfo['family_name'];
+     $phone =  $userinfo['phone_number'];
+
+     $country = $address['country'];
+     if (!$country)  $country='NO';
+     $street_address = $address['street_address'];
+     $postal_code = $address['postal_code'];
+     $region = $address['region'];
+
+     // User haven't updated their billing address, so reset it from Vipps now.
+     if (!get_user_meta($user-ID,'_vipps_billing_address_changed', 1)) {
+        $customer->set_billing_email($email);
+        $customer->set_billing_phone($phone);
+        $customer->set_billing_first_name($firstname);
+        $customer->set_billing_last_name($lastname);
+        $customer->set_billing_address_1($street_address);
+//        $customer->set_billing_address_2($addressline2);
+        $customer->set_billing_city($region);
+        $customer->set_billing_state('');
+        $customer->set_billing_postcode($postal_code);
+        $customer->set_billing_country($country);
+      }
+     // Same for shipping adddresses
+     if (!get_user_meta($user-ID,'_vipps_shipping_address_changed', 1)) {
+        $customer->set_shipping_first_name($firstname);
+        $customer->set_shipping_last_name($lastname);
+        $customer->set_shipping_address_1($street_address);
+//        $customer->set_shipping_address_2($addressline2);
+        $customer->set_shipping_city($region);
+        $customer->set_shipping_state('');
+        $customer->set_shipping_postcode($postal_code);
+        $customer->set_shipping_country($country);
+      }
+
+     $customer->save();
   }
 
   // To be used in a POST: returns an URL that can be used to start the login process.
