@@ -19,14 +19,15 @@ class VippsLogin {
   public function admin_init () {
     // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
     // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
+
+
     if (current_user_can('manage_options')) {
          $uid = isset($_REQUEST['user_id']) ? intval($_REQUEST['user_id']) : 0;
          if ($uid>0 && current_user_can('edit_user', $uid)) {
-             add_action( 'edit_user_profile_update', array($this,'save_extra_profile_fields'));
+             add_action( 'edit_user_profile_update', array($this,'profile_update'));
              add_action( 'edit_user_profile', array($this,'show_extra_profile_fields'));
          }
     }
-
      add_action('show_user_profile', array($this,'show_extra_profile_fields'));
 
      // Settings, that will end up on the simple "Login with Vipps" options screen
@@ -50,6 +51,7 @@ class VippsLogin {
    }
    return $valid;
   }
+
 
 
 
@@ -588,11 +590,61 @@ All at ###SITENAME###
  }
 
  function show_extra_profile_fields( $user ) {
-    // Add vipps stuff here
+     $allow_login = true;
+     $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
+     $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
+     $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
+?>
+   <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-vipps'); ?> </h2>
+<?php if ($allow_login): ?>
+<table class="form-table">
+    <tr>
+        <th><?php _e('Use Vipps to login to your account', 'login-vipps'); ?></th>
+        <td>
+<?php if ($vippsphone && $vippsid): ?>
+            <p> <?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></p>
+            <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Press here to disconnect','login-vipps'); ?></button></p>
+            <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-vipps'); ?></span>
+<?php else: ?>
+            <p> <?php _e('You are not connected to any Vipps accounts', 'login-vipps'); ?></p>
+            <p><button class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+            <span class="description"><?php _e("You can connect to your Vipps account if you use the same email address both in the app and on this site. After connecting, you can log in just using Vipps", 'login-vipps'); ?></span>
+<?php endif; ?>
+        </td>
+    </tr>
+</table>
+<?php else: ?>
+<table class="form-table">
+    <tr>
+        <th><?php _e('Vipps login disabled', 'login-vipps'); ?></th>
+        <td>
+            <span class="description"><?php _e("It is unfortunately not possibel for your account to use Vipps to log in to this system due to the site administrators policy."); ?></span>
+        </td>
+    </tr>
+</table>
+<?php endif; ?>
+
+<?php
  }
- function save_extra_profile_fields( $userid ) {
+
+ function profile_update( $userid ) {
     if (!current_user_can('edit_user',$userid)) return false;
+    if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
+       $phone = get_usermeta($userid, '_vipps_phone');
+       delete_user_meta($userid,'_vipps_phone');
+       delete_user_meta($userid,'_vipps_id');
+       $notice = sprintf(__('Connection to Vipps account %s removed.', 'login-vipps'), $phone);
+       $continue = ContinueWithVipps::instance();
+       $continue->add_admin_notice($notice);
+       $continue->store_admin_notices();
+       return true;
+    }
 }
+
+  // If neccessary, add errors et to the profile update.
+  public function user_profile_update_errors($errors,$update,$user) {
+    //None at this time 
+  }
 
   public function authenticate ($user, $username, $password) {
      if (!$user) return $user;
@@ -618,8 +670,8 @@ All at ###SITENAME###
 
   $continuepage = $this->ensure_continue_with_vipps_page();
   if (is_wp_error($continuepage)) {
-     $continuepage->get_error_message();
-     add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-erroris-dismissible'><p>$notice</p></div>"; });
+     $notice = $continuepage->get_error_message();
+     add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-error is-dismissible'><p>$notice</p></div>"; });
   } else {
     $continuepageid = $continuepage->ID;
   }

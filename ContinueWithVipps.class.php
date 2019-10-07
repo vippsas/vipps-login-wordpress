@@ -47,7 +47,7 @@ class ContinueWithVipps {
         ob_start();
         do_action('admin_notices');
         $notices = ob_get_clean();
-        set_transient('_vipps_login__save_admin_notices',$notices, 5*60);
+        set_transient('_vipps_login_save_admin_notices',$notices, 5*60);
   }
 
   // If we have admin-notices that we haven't gotten a chance to show because of
