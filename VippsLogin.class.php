@@ -82,6 +82,8 @@ class VippsLogin {
     // Ajax code to get the redir url
     add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
     add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
+    add_action('wp_ajax_vipps_confirm_get_link', array($this,'ajax_vipps_confirm_get_link'));
+
 
 
     // THE CONFIRM HANDLING IOK FIXME 
@@ -101,9 +103,12 @@ class VippsLogin {
     add_action('continue_with_vipps_login', array($this, 'continue_with_vipps_login'), 10, 2);
     add_action('continue_with_vipps_error_login', array($this, 'continue_with_vipps_error_login'), 10, 4);
 
-
-
+    // Main return handler
+    add_action('continue_with_vipps_confirm', array($this, 'continue_with_vipps_confirm'), 10, 2);
+    add_action('continue_with_vipps_error_confirm', array($this, 'continue_with_vipps_error_confirm'), 10, 4);
   }
+
+
 
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
@@ -131,6 +136,17 @@ class VippsLogin {
      $data['application'] = $application;
      $url = ContinueWithVipps::getAuthRedirect('login',$data);
      return $url;
+  }
+
+  public function ajax_vipps_confirm_get_link () {
+     check_ajax_referer('vippsconfirmnonce','vippsconfirmnonce',true);
+     $application = 'wordpress';
+     if (isset($_REQUEST['application'])) {
+       $application = sanitize_title($_REQUEST['application']);
+     }
+     $url = $this->get_vipps_confirm_link($application);
+     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+     wp_die();
   }
 
   // This is for already logged-in users confirming their account with Vipps.
@@ -524,6 +540,54 @@ All at ###SITENAME###
             $this->redirect_to_waiting_page('login', $session);
             exit();
   }
+
+  public function continue_with_vipps_error_confirm($error,$errordesc,$error_hint) {
+     // IOK FIXME
+     wp_die("Could not confirm: $error $errordesc");
+  }
+
+  public function continue_with_vipps_confirm($userinfo,$session) {
+      if (!is_user_logged_in()) {
+         $this->deleteBrowserCookie();
+         if ($session) $session->destroy();
+         wp_die(__('This can only be called when logged in', 'login-vipps'));
+      }
+
+      $profile = get_edit_user_link($user->ID);
+      do_action('continue_with_vipps_before_login_redirect', $user, $session);
+      do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
+      $redir = apply_filters('login_redirect', $profile,$profile, $user);
+
+      if (!$userinfo) {
+               $this->deleteBrowserCookie();
+               if ($session) $session->destroy();
+               wp_safe_redirect($redir);
+               exit();
+      }
+
+     $userid = get_current_user_id();
+
+     $email = $userinfo['email'];
+     $phone =  $userinfo['phone_number'];
+     $sub =  $userinfo['sub'];
+     $sid=  $userinfo['sid'];
+
+     $user = get_user_by('email',$email);
+     if ($user->ID != $userid) {
+        if($session) $session->destroy();
+        $this->deleteBrowserCookie();
+        $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-account: The email addresses are not the same.', 'login-vipps'), '');
+        exit();
+     }
+
+     update_user_meta($userid, '_vipps_phone', sanitize_text_field($phone));
+     update_user_meta($userid, '_vipps_id', sanitize_text_field($sub));
+     $this->deleteBrowserCookie();
+     if ($session) $session->destroy();
+     wp_safe_redirect($redir);
+     exit();
+
+  }
           
   public function wp_enqueue_scripts() {
     wp_enqueue_script('vipps-login',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
@@ -622,8 +686,29 @@ All at ###SITENAME###
             <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-vipps'); ?></span>
 <?php else: ?>
   <?php if ($its_you): ?>
+<script>
+ function connect_vipps_account(application) {
+    var ajaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
+    var nonce = "<?php echo wp_create_nonce('vippsconfirmnonce'); ?>"; 
+    if (!application) application='wordpress';
+    jQuery.ajax(ajaxUrl, {
+       data: {  'action': 'vipps_confirm_get_link', 'vippsconfirmnonce':nonce, 'application' : application},
+       method: 'POST',
+       dataType: 'json',
+       error: function (jqXHR,textStatus,errorThrown) {
+           alert("Error " + textStatus);
+       },
+       success: function(data, textStatus, jqXHR) {
+         if (data && data['url']) {
+           window.location.href = data['url'];
+         }
+       }
+    });
+    return false;
+ }
+</script>
             <p> <?php _e('You are not connected to any Vipps accounts', 'login-vipps'); ?></p>
-            <p><button class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+            <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
   <?php else: ?>
             <p> <?php _e('The user is not connected to any Vipps accounts', 'login-vipps'); ?></p>
   <?php endif; ?> 

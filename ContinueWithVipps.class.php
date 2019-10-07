@@ -180,7 +180,7 @@ class ContinueWithVipps {
         // be alive so that this can be called repeatedly. The session should be destroyed only when the action is done; that is, completes whatever it tries to do.
         do_action('continue_with_vipps_' .  $forwhat, $userinfo, $session);
         if($session) $session->destroy();
-        wp_die();
+        wp_die(sprintf(__('You successfully completed the action "%s" using Vipps - unfortunately, this website doesn\'t know how to handle that.', 'login-vipps'), $forwhat ));
   }
 
   public function make_callback_url () {

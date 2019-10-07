@@ -5,6 +5,7 @@ function login_with_vipps(application) {
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {
        data: { 'action': 'vipps_login_get_link', 'application' : application},
+       method: 'POST',
        dataType: 'json',
        error: function (jqXHR,textStatus,errorThrown) {
            alert("Error " + textStatus);
