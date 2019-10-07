@@ -131,7 +131,17 @@ class VippsLogin {
      $data['application'] = $application;
      $url = ContinueWithVipps::getAuthRedirect('login',$data);
      return $url;
+  }
 
+  // This is for already logged-in users confirming their account with Vipps.
+  public function get_vipps_confirm_link($application='wordpress') {
+     if (!is_user_logged_in()) return;
+     $cookie = $this->setBrowserCookie();
+     $data['cookie'] = $cookie;
+     $data['application'] = $application;
+     $data['userid'] = get_current_user_id();
+     $url = ContinueWithVipps::getAuthRedirect('confirm',$data);
+     return $url;
   }
 
   public function setBrowserCookie() {
@@ -594,6 +604,7 @@ All at ###SITENAME###
      $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
      $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
      $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
+     $its_you = (get_current_user_id() == $user->ID);
 ?>
    <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-vipps'); ?> </h2>
 <?php if ($allow_login): ?>
@@ -602,12 +613,20 @@ All at ###SITENAME###
         <th><?php _e('Use Vipps to login to your account', 'login-vipps'); ?></th>
         <td>
 <?php if ($vippsphone && $vippsid): ?>
+  <?php if ($its_you): ?>
             <p> <?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></p>
+  <?php else: ?>
+            <p> <?php printf(__('The user is connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></p>
+  <?php endif; ?> 
             <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Press here to disconnect','login-vipps'); ?></button></p>
             <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-vipps'); ?></span>
 <?php else: ?>
+  <?php if ($its_you): ?>
             <p> <?php _e('You are not connected to any Vipps accounts', 'login-vipps'); ?></p>
             <p><button class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+  <?php else: ?>
+            <p> <?php _e('The user is not connected to any Vipps accounts', 'login-vipps'); ?></p>
+  <?php endif; ?> 
             <span class="description"><?php _e("You can connect to your Vipps account if you use the same email address both in the app and on this site. After connecting, you can log in just using Vipps", 'login-vipps'); ?></span>
 <?php endif; ?>
         </td>
@@ -618,7 +637,7 @@ All at ###SITENAME###
     <tr>
         <th><?php _e('Vipps login disabled', 'login-vipps'); ?></th>
         <td>
-            <span class="description"><?php _e("It is unfortunately not possibel for your account to use Vipps to log in to this system due to the site administrators policy."); ?></span>
+            <span class="description"><?php _e("It is unfortunately not possible for your account to use Vipps to log in to this system due to the site administrators policy."); ?></span>
         </td>
     </tr>
 </table>
