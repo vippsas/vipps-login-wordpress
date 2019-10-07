@@ -7,8 +7,12 @@
 ** [DONE] Ensure cookies are set using http-only and secure
 
 * PROFILE
-** Create profile fields/buttons to *confirm* and *deconfirm* a user from Vipps, as well as welcoming a user logging in with Vipps the first time
-** Create action handlier for 'confirm' for connecting Vipps account for logged-in users
+** [DONE] Create profile fields/buttons to *confirm* and *deconfirm* a user from Vipps
+***  And in woo
+** And do errorhandling and cleanup the button
+***  And in woo
+**  as well as welcoming a user logging in with Vipps the first time
+** [DONE] Create action handlier for 'confirm' for connecting Vipps account for logged-in users
 
 * CONFIRM PAGE LOGIN
 ** Create password confirm action for the waiting page
