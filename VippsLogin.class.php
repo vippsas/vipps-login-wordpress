@@ -612,16 +612,9 @@ All at ###SITENAME###
       $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
       $profile = get_edit_user_link($user->ID);
-
-      error_log("app is $app");
-      error_log("continue_with_vipps_{$app}_confirm_redirect");
-     
       $userid = get_current_user_id();
-
       $redir = apply_filters('continue_with_vipps_confirm_redirect', $profile, $userid, $session);
       $redir = apply_filters("continue_with_vipps_{$app}_confirm_redirect", $redir , $userid, $session);
-
-      error_log("redir is $redir ");
 
       if (!$userinfo) {
                $this->deleteBrowserCookie();

@@ -228,11 +228,9 @@ class WooLogin{
   public function confirm_redirect ($redir, $user , $sessiondata) {
          $link = wc_get_page_permalink( 'myaccount' );
          if (isset($sessiondata['referer']) && $sessiondata['referer']) { 
-           error_log("got referer");
              // If possible, report errors on same page we are
              $link = $sessiondata['referer'];
          } else {
-           error_log("No referer");
          }
          if ($link) return $link;
          return $redir;
