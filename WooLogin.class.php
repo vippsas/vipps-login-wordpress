@@ -55,7 +55,11 @@ class WooLogin{
        add_action('woocommerce_account_content', array($this,'account_content'));
 
        add_filter ('woocommerce_account_menu_items', array($this,'account_menu_items' ));
-       add_action( 'woocommerce_account_vipps_endpoint', array($this,'account_vipps_content'));
+       add_action('woocommerce_account_vipps_endpoint', array($this,'account_vipps_content'));
+       add_filter('add_query_vars', array($this, 'add_vipps_endpoint_query_var'));
+       add_filter('the_title', array($this, 'account_vipps_title'), 10,2); // the  woocommerce_endpoint_vipps_filter does not work.
+
+
 
        add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
        add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
@@ -96,8 +100,23 @@ class WooLogin{
    return $items;
   }
   public function account_vipps_content() {
+    add_filter('the_title', function ($title) { return __('Vipps!', 'login-vipps'); });
     print "That hits the spot!";
   }
+ // For some reason we can't do this with woocommerce_endpoint_vipps_title.
+  public function account_vipps_title($title, $id) {
+    if (in_the_loop() && !is_admin() && is_main_query() && is_account_page() ) {
+       global $wp_query;
+       $is_endpoint = isset($wp_query->query_vars['vipps']);
+       if ($is_endpoint) {
+           $title = __('Vipps!', 'login-vipps'); 
+           remove_filter('the_title', array($this, 'account_vipps_title'), 10);
+           return $title;
+       }
+    }
+    return $title;
+  }
+
 
   // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
   public function login_error_create_session($createSession, $sessiondata) {
@@ -238,7 +257,7 @@ class WooLogin{
 
       $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault);
       add_option('vipps_login_woo_options',$default,true);
-      add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
+      $this->add_rewrite_rules();
       $this->maybe_flush_rewrite_rules();
  }
  
@@ -255,6 +274,10 @@ class WooLogin{
           $options['rewriteruleversion'] = $this->rewriteruleversion;
           update_option('vipps_login_woo_options', $options, true);
       }
+ }
+ function add_vipps_endpoint_query_var ($vars) {
+   $vars[]='vipps';
+   return $vars;
  }
 
  function deactivate () {
