@@ -20,6 +20,7 @@ class VippsLogin {
     // This is for creating a page for admins to manage user confirmations. It's not needed here, so this line is just information.
     // add_management_page( 'Show user confirmations', 'Show user confirmations!', 'install_plugins', 'vipps_connect_login', array( $this, 'show_confirmations' ), '' );
 
+    add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'), 10, 1);
 
     if (current_user_can('manage_options')) {
          $uid = isset($_REQUEST['user_id']) ? intval($_REQUEST['user_id']) : 0;
@@ -47,6 +48,12 @@ class VippsLogin {
      } 
   }
 
+  public function admin_enqueue_scripts ($suffix) {
+    if ($suffix == 'profile.php') {
+       wp_enqueue_script('vipps-login-admin',plugins_url('js/vipps-admin.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-admin.js"), 'true');
+       wp_localize_script('vipps-login-admin', 'vippsLoginAdminConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'vippsconfirmnonce'=>wp_create_nonce('vippsconfirmnonce') ) );
+    }
+  }
 
   public function validate ($input) {
    $current =  get_option('vipps_login_options2');
@@ -718,27 +725,6 @@ All at ###SITENAME###
             <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-vipps'); ?></span>
 <?php else: ?>
   <?php if ($its_you): ?>
-<script>
- function connect_vipps_account(application) {
-    var ajaxUrl = "<?php echo admin_url('admin-ajax.php'); ?>";
-    var nonce = "<?php echo wp_create_nonce('vippsconfirmnonce'); ?>"; 
-    if (!application) application='wordpress';
-    jQuery.ajax(ajaxUrl, {
-       data: {  'action': 'vipps_confirm_get_link', 'vippsconfirmnonce':nonce, 'application' : application},
-       method: 'POST',
-       dataType: 'json',
-       error: function (jqXHR,textStatus,errorThrown) {
-           alert("Error " + textStatus);
-       },
-       success: function(data, textStatus, jqXHR) {
-         if (data && data['url']) {
-           window.location.href = data['url'];
-         }
-       }
-    });
-    return false;
- }
-</script>
             <p> <?php _e('You are not connected to any Vipps accounts', 'login-vipps'); ?></p>
             <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
   <?php else: ?>
