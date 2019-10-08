@@ -60,7 +60,6 @@ class WooLogin{
     add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
     add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
     add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
-
   }
 
   // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
@@ -70,13 +69,23 @@ class WooLogin{
 
   public function add_woocommerce_error ($error, $errordesc, $errorhint, $session) {
      // We can add woocommerce already here, as Woocommerce handles the session itself  IOK 2019-10-08
+     // NB: This require that the woocommerce session is active.
+     wc()->session->init();
+     if ( ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+     }
      wc_add_notice(__($errordesc,'login-vipps'),'error');
+     wc()->session->save_data();
   }
 
   // Handle errors for the 'woocommerce' login application on the users home
-  public function error_redirect ($redir, $error, $session) {
+  public function error_redirect ($redir, $error, $sessiondata) {
          // If this happend on the checkout page then redirect there I guess
          $link = wc_get_page_permalink( 'myaccount' );
+         if (isset($sessiondata['referer']) && $sessiondata['referer']) { 
+             // If possible, report errors on same page we are
+             $link = $sessiondata['referer'];
+         }
          if ($link) return $link;
          return $redir;
   }
@@ -157,7 +166,7 @@ class WooLogin{
         $customer->set_billing_country($country);
       }
      // Same for shipping adddresses
-     if (!get_user_meta($user-ID,'_vipps_shipping_address_changed', 1)) {
+     if (!get_user_meta($user->ID,'_vipps_shipping_address_changed', 1)) {
         $customer->set_shipping_first_name($firstname);
         $customer->set_shipping_last_name($lastname);
         $customer->set_shipping_address_1($street_address);
@@ -171,14 +180,6 @@ class WooLogin{
      $customer->save();
   }
 
-  // To be used in a POST: returns an URL that can be used to start the login process.
-  public function ajax_vipps_woo_login_get_link () {
-     //NB We are not using a nonce here - the user has not yet logged in, and the page may be cached. To continue logging in, 
-     // the users' browser must retrieve the url from this json value. IOK 2019-10-03
-     $url = VippsLogin::instance()->get_vipps_login_link('woocommerce');
-     wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
-     wp_die();
-  }
 
   public function login_with_vipps_button() {
      // We'll only show this button once on a page IOK 2019-10-08

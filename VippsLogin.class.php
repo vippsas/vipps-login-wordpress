@@ -126,8 +126,11 @@ class VippsLogin {
      if (isset($_REQUEST['application'])) {
        $application = sanitize_title($_REQUEST['application']);
      }
+     // We need the 'originating page' even when we are doing a POST to ourselves, so use 'raw reverer'. This means that this
+     // must use 'safe redirect' as well.
+     $referer = wp_get_raw_referer();
 
-     $url = $this->get_vipps_login_link($application);
+     $url = $this->get_vipps_login_link($application, array('referer'=>$referer));
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
@@ -374,20 +377,22 @@ All at ###SITENAME###
   public function continue_with_vipps_error_login($error,$errordesc,$error_hint='',$sessiondata=array()) {
     $redir = wp_login_url();
     $app = sanitize_title(($sessiondata && isset($sessiondata['application'])) ? $sessiondata['application'] : 'wordpress');
+    $referer = ($sessiondata && isset($sessiondata['referer'])) ? $sessiondata['referer'] : '';
+
+    // Override error page redirect for your application. No access to the possible new session. IOK 2019-10-08
+    $redir = apply_filters('continue_with_vipps_error_login_redirect', $redir, $error, $sessiondata);
+    $redir = apply_filters("continue_with_vipps_error_{$app}_login_redirect", $redir, $error, $sessiondata);
 
     // Only create a session if your application needs it, to avoid getting messy URLs.
     $createSession = true;
     $createSession = apply_filters("continue_with_vipps_error_{$app}_login_create_session", $createSession, $sessiondata);
 
     $continue = ContinueWithVipps::instance();
-    $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login')) : null;
+    $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login','referer'=>$referer)) : null;
    
     // This would be for an application to extend the session if needed IOK 2019-10-08 
     do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $errorhint, $session);
 
-    // Override error page redirect for your application IOK 2019-10-08
-    $redir = apply_filters('continue_with_vipps_error_login_redirect', $redir, $error, $session);
-    $redir = apply_filters("continue_with_vipps_error_{$app}_login_redirect", $redir, $error, $session);
     
     if ($createSession) $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
     wp_safe_redirect($redir);
