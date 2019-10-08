@@ -359,7 +359,7 @@ All at ###SITENAME###
 
 #### END CONFIRMATION
   // IOK FIXME ADD APPLICATION DEFAULTING TO 'wordpress' here
-  public function continue_with_vipps_error_login($error,$errordesc,$error_hint) {
+  public function continue_with_vipps_error_login($error,$errordesc,$error_hint,$sessiondata=array()) {
     $redir = wp_login_url();
 
     $continue = ContinueWithVipps::instance();
@@ -381,7 +381,6 @@ All at ###SITENAME###
                   exit();
         }
 
-         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
          do_action('continue_with_vipps_before_user_login', $user, $session);
          do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
