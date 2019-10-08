@@ -49,6 +49,9 @@ class WooLogin{
     } else {
     }
 
+    add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
+    add_action('woocommerce_account_content', array($this,'account_content'));
+
     add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
     add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
     add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
@@ -60,6 +63,24 @@ class WooLogin{
     add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
     add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
     add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+  }
+
+  // This is run first on the users' main dashboard, right after menus
+  public function account_dashboard() {
+  }
+  // This is the main content of a users my-account page
+  public function account_content() {
+    $userid = get_current_user_id();
+    if (!$userid) return;
+    $justconnected = get_usermeta($userid,'_vipps_just_connected');
+        if ($justconnected) {
+          delete_user_meta($userid, '_vipps_just_connected');
+          $vippsphone = get_usermeta($userid,'_vipps_phone');
+          $notice = sprintf(__('You are now connected to the Vipps account <b>%s</b>!', 'login-vipps'), $vippsphone);
+?>
+          <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
+<?php
+        }
   }
 
   // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
