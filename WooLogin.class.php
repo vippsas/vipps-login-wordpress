@@ -9,6 +9,9 @@ class WooLogin{
   // We are going to do the Singleton pattern here so 
   // the basic login mechanism will be available in general with the same settings etc.
   protected static $instance = null;
+
+  protected $loginbuttonshown = 0;
+
   public static function instance()  {
         if (!static::$instance) static::$instance = new WooLogin();
         return static::$instance;
@@ -40,8 +43,9 @@ class WooLogin{
     $options = get_option('vipps_login_woo_options');
     $woologin= $options['woo-login'];
     if ($woologin) {
-       add_action( 'woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
-//       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
+       add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
+       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
+       add_action('woocommerce_register_form_start' , array($this, 'login_with_vipps_button'));
     } else {
     }
 
@@ -177,6 +181,10 @@ class WooLogin{
   }
 
   public function login_with_vipps_button() {
+     // We'll only show this button once on a page IOK 2019-10-08
+     if ($this->loginbuttonshown) return;
+     $this->loginbuttonshown=1;
+
 ?>
      <div style='margin:20px;' class='continue-with-vipps'>
 <a href='javascript:login_with_vipps("woocommerce");' class='button' style='width:100%'>Login with Vipps yo!</a>
