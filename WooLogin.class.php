@@ -52,6 +52,16 @@ class WooLogin{
     add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
     add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
     add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
+
+    add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
+
+  }
+
+  // Handle errors for the 'woocommerce' login application on the users home
+  public function error_redirect ($redir, $error, $session) {
+         $link = wc_get_page_permalink( 'myaccount' );
+         if ($link) return $link;
+         return $redir;
   }
 
   public function add_login_redirect($user, $session) {

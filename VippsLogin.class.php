@@ -358,12 +358,23 @@ All at ###SITENAME###
   }
 
 #### END CONFIRMATION
-  // IOK FIXME ADD APPLICATION DEFAULTING TO 'wordpress' here
-  public function continue_with_vipps_error_login($error,$errordesc,$error_hint,$sessiondata=array()) {
+
+  // This is an action handler for all errors for the action 'login'.
+  // The last parameter, 'sessiondata' is not a live session. It is an Array, or any object that can be accessed as such. If you need to 
+  // create a new session here, you should not try to pass it as the new sessions contens - create a new array instead. IOK 2019-10-08
+  public function continue_with_vipps_error_login($error,$errordesc,$error_hint='',$sessiondata=array()) {
     $redir = wp_login_url();
+    $app = sanitize_title(($sessiondata && isset($sessiondata['application'])) ? $sessiondata['application'] : 'wordpress');
 
     $continue = ContinueWithVipps::instance();
-    $session = VippsSession::create(array('error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
+    $session = VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
+   
+    // This would be for an application to extend the session if needed IOK 2019-10-08 
+    do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $errorhint, $session);
+
+    // Override error page redirect for your application IOK 2019-10-08
+    $redir = apply_filters('continue_with_vipps_error_login_redirect', $redir, $error, $session);
+    $redir = apply_filters("continue_with_vipps_error_{$app}_login_redirect", $redir, $error, $session);
 
     $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
     wp_safe_redirect($redir);
@@ -374,14 +385,15 @@ All at ###SITENAME###
   // This function will login your user when appropriate (ie, after 'authenticate' has run and everything is good).
   protected function actually_login_user($user,$sid=null,$session=null) {
         // First, ensure that we interact properly with MFA stuff and so forth
+
         $user = apply_filters('authenticate', $user, '', '');
         if (is_wp_error($user)) {
                   $error = $user;
-                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'');
+                  $this->continue_with_vipps_error_login($error->get_error_code(),$error->get_error_message(),'', $session);
                   exit();
         }
 
-
+         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
          do_action('continue_with_vipps_before_user_login', $user, $session);
          do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
  
@@ -446,7 +458,7 @@ All at ###SITENAME###
                // Produce an error page that indicates that cookies *may* be blocked.. 
                // Leave the browser cookie for debugging
                if ($session) $session->destroy();
-               $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'));
+               $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-vipps'), '', $session);
            }
 
            // Check if we allow user registrations
@@ -458,7 +470,7 @@ All at ###SITENAME###
            if (!$user && !$can_register) {
                if($session) $session->destroy();
                $this->deleteBrowserCookie();
-               $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '');
+               $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-vipps'), '', $session);
                exit();
            }
 
@@ -502,7 +514,7 @@ All at ###SITENAME###
            if (!$allow_login) {
                if($session) $session->destroy();
                $this->deleteBrowserCookie();
-               $this->continue_with_vipps_error_login('login_disallowed', __('It is unfortunately not allowed for your account to log-in using Vipps', 'login-vipps'), '');
+               $this->continue_with_vipps_error_login('login_disallowed', __('It is unfortunately not allowed for your account to log-in using Vipps', 'login-vipps'), '', $session);
                exit();
            }
 
@@ -540,7 +552,7 @@ All at ###SITENAME###
             exit();
   }
 
-  public function continue_with_vipps_error_confirm($error,$errordesc,$error_hint) {
+  public function continue_with_vipps_error_confirm($error,$errordesc,$error_hint='',$sessiondata=array()) {
      // IOK FIXME
      wp_die("Could not confirm: $error $errordesc");
   }

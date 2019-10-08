@@ -4,6 +4,8 @@
 class VippsSession implements ArrayAccess {
   public $sessionkey = null;
   public $contents = null;
+ // We allow read-only access to a destroyed session so that it acts exactly like an array. Except don't try to store it as one.
+  protected $destroyed = false;
 
   public function __construct($sessionkey,$data=array()) {
      $this->sessionkey=$sessionkey;
@@ -57,9 +59,11 @@ class VippsSession implements ArrayAccess {
   }
   public function destroy() {
       global $wpdb;
+      if ($this->destroyed) return;
       $tablename = $wpdb->prefix . 'vipps_login_sessions';
       $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE state = %s ", $this->sessionkey);
       $wpdb->query($q);
+      $this->destroyed = true;
   }
   public static function clean() {
       // Delete old sessions.
@@ -70,6 +74,7 @@ class VippsSession implements ArrayAccess {
   }
   public function extend ($expire) {
     global $wpdb;
+    if ($this->destroyed) return;
     $newexpire = "";
     $newexpire = gmdate('Y-m-d H:i:s', time() + intval($expire));
     $q = $wpdb->prepare("UPDATE `{$tablename}` SET expire=%s WHERE state=%s", $newexpire, $this->sessionkey);
@@ -78,6 +83,7 @@ class VippsSession implements ArrayAccess {
   }
   public function update($data,$expire=0) {
     global $wpdb;
+    if ($this->destroyed) return;
     $newexpire = "";
     if (intval($expire)) $newexpire = gmdate('Y-m-d H:i:s', time() + $expire);
     $newcontent = json_encode($data);

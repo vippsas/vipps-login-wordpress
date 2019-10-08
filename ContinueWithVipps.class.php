@@ -137,7 +137,7 @@ class ContinueWithVipps {
         if ($error) {
           // Delete this - you may need to create a new session in your errorhandler.
           if($session) $session->destroy();
-          do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint);
+          do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
           wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-vipps'), esc_html($forwhat), esc_html($error)));
         }
 
@@ -156,7 +156,7 @@ class ContinueWithVipps {
           } else {
               if($session) $session->destroy();
               if ($forwhat) { 
-               do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-vipps'),'');
+               do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-vipps'),'', $session);
               }
               wp_die($authtoken['headers'][0]);
           }
@@ -166,7 +166,7 @@ class ContinueWithVipps {
             # FIXME ERRORHANDLING 
             if($session) $session->destroy();
             if ($forwhat) { 
-              do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-vipps'),'');
+              do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-vipps'),'', $session);
             }
             wp_die($userinfo['response']);
           }
