@@ -34,11 +34,21 @@ class VippsLogin {
      register_setting('vipps_login_options2','vipps_login_options2', array($this,'validate'));
      add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
 
+     global $pagenow;
+     if ($pagenow == 'profile.php') {
+       $userid = get_current_user_id();
+        $justconnected = get_usermeta($userid,'_vipps_just_connected');
+        if ($justconnected) {
+          delete_user_meta($userid, '_vipps_just_connected');
+          $vippsphone = get_usermeta($userid,'_vipps_phone');
+          $notice = sprintf(__('You are now connected to the Vipps account <b>%s</b>!', 'login-vipps'), $vippsphone);
+          add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
+        }
+     } 
   }
 
 
   public function validate ($input) {
-
    $current =  get_option('vipps_login_options2');
    if (empty($input)) return $current;
 
@@ -51,8 +61,6 @@ class VippsLogin {
    }
    return $valid;
   }
-
-
 
 
   public function init () {
@@ -283,8 +291,9 @@ class VippsLogin {
        $sub = @$data['sub'];
 
        // Check post author, check email etc IOK FIXME
-       $vippsphone = update_user_meta($userid,'_vipps_phone',$phone);
-       $vippsid = update_user_meta($userid,'_vipps_id',$sub);
+       update_user_meta($userid,'_vipps_phone',$phone);
+       update_user_meta($userid,'_vipps_id',$sub);
+       update_user_meta($userid, '_vipps_just_connected', 1);
 
        // We don't need to alert admin, so we don't.
        update_post_meta( $request_id, '_wp_admin_notified', true );
@@ -500,6 +509,7 @@ All at ###SITENAME###
 
                update_user_meta($user_id,'_vipps_phone',$phone);
                update_user_meta($user_id,'_vipps_id',$sub);
+               update_user_meta($userid, '_vipps_just_connected', 1);
 
                do_action('continue_with_vipps_after_create_user', $user, $session);
                do_action("continue_with_vipps_after_create_{$app}_user", $user, $session);
@@ -583,8 +593,8 @@ All at ###SITENAME###
      $userid = get_current_user_id();
 
      $email = $userinfo['email'];
-     $phone =  $userinfo['phone_number'];
-     $sub =  $userinfo['sub'];
+     $phone =  sanitize_text_field($userinfo['phone_number']);
+     $sub =  sanitize_text_field($userinfo['sub']);
      $sid=  $userinfo['sid'];
 
      $user = get_user_by('email',$email);
@@ -595,8 +605,10 @@ All at ###SITENAME###
         exit();
      }
 
-     update_user_meta($userid, '_vipps_phone', sanitize_text_field($phone));
-     update_user_meta($userid, '_vipps_id', sanitize_text_field($sub));
+     update_user_meta($userid, '_vipps_phone', $phone);
+     update_user_meta($userid, '_vipps_id', $sub);
+     update_user_meta($userid, '_vipps_just_connected', 1);
+
      $this->deleteBrowserCookie();
      if ($session) $session->destroy();
      wp_safe_redirect($redir);
@@ -752,7 +764,7 @@ All at ###SITENAME###
        $phone = get_usermeta($userid, '_vipps_phone');
        delete_user_meta($userid,'_vipps_phone');
        delete_user_meta($userid,'_vipps_id');
-       $notice = sprintf(__('Connection to Vipps account %s removed.', 'login-vipps'), $phone);
+       $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
        $continue = ContinueWithVipps::instance();
        $continue->add_admin_notice($notice);
        $continue->store_admin_notices();

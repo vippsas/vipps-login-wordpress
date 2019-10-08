@@ -56,6 +56,7 @@ class WooLogin{
     add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
     add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
     add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+
   }
 
   // Error handling doesn't require an extra session for Woocommerce. 2019-10-08

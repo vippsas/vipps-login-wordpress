@@ -47,7 +47,7 @@ class ContinueWithVipps {
     add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-info is-dismissible'><p>$notice</p></div>"; });
   }
 
-  // Make admin-notices persistent so we can provide error messages whenever possible. IOK 2018-05-11
+  // Make admin-notices persistent so we can provide error messages whenever possible. IOK 2018-10-02
   public function store_admin_notices() {
         ob_start();
         do_action('admin_notices');
