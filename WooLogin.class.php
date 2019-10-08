@@ -81,7 +81,7 @@ class WooLogin{
        add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
        add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
 
-       add_filter("continue_with_vipps_before_woocommerce_confirm_redirect", array($this,'add_confirm_redirect'), 10, 3);
+       add_filter("continue_with_vipps_woocommerce_confirm_redirect", array($this,'confirm_redirect'), 10, 3);
        add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
        add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); // Use this for successful 
 
@@ -156,7 +156,7 @@ class WooLogin{
 </form>
 </p>
 <?php else: ?>
-  <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+  <p><button type="button" onclick="connect_vipps_account('woocommerce');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
 <?php endif; ?>
   <p> <?php _e('With Vipps, logging in is easier than ever - no passwords!', 'login-vipps'); ?> </p>
 <?php
@@ -224,16 +224,15 @@ class WooLogin{
          return $redir;
   }
 
-  public function add_confirm_redirect($user, $session) {
-    add_filter('login_redirect', array($this, 'confirm_redirect'), 99, 3);
-  }
-
   // When confirming, return to the same page
-  public function confirm_redirect ($redir, $error, $sessiondata) {
+  public function confirm_redirect ($redir, $user , $sessiondata) {
          $link = wc_get_page_permalink( 'myaccount' );
          if (isset($sessiondata['referer']) && $sessiondata['referer']) { 
+           error_log("got referer");
              // If possible, report errors on same page we are
              $link = $sessiondata['referer'];
+         } else {
+           error_log("No referer");
          }
          if ($link) return $link;
          return $redir;

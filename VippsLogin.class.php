@@ -163,19 +163,20 @@ class VippsLogin {
      if (isset($_REQUEST['application'])) {
        $application = sanitize_title($_REQUEST['application']);
      }
-     $url = $this->get_vipps_confirm_link($application);
+     $referer = wp_get_raw_referer();
+     $url = $this->get_vipps_confirm_link($application, array('referer'=>$referer));
      wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
      wp_die();
   }
 
   // This is for already logged-in users confirming their account with Vipps.
-  public function get_vipps_confirm_link($application='wordpress') {
+  public function get_vipps_confirm_link($application='wordpress', $sessiondata=array()) {
      if (!is_user_logged_in()) return;
      $cookie = $this->setBrowserCookie();
-     $data['cookie'] = $cookie;
-     $data['application'] = $application;
-     $data['userid'] = get_current_user_id();
-     $url = ContinueWithVipps::getAuthRedirect('confirm',$data);
+     $sessiondata['cookie'] = $cookie;
+     $sessiondata['application'] = $application;
+     $sessiondata['userid'] = get_current_user_id();
+     $url = ContinueWithVipps::getAuthRedirect('confirm',$sessiondata);
      return $url;
   }
 
@@ -608,11 +609,19 @@ All at ###SITENAME###
          if ($session) $session->destroy();
          wp_die(__('This can only be called when logged in', 'login-vipps'));
       }
+      $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
       $profile = get_edit_user_link($user->ID);
-      do_action('continue_with_vipps_before_confirm_redirect', $user, $session);
-      do_action("continue_with_vipps_before_{$app}_confirm_redirect", $user, $session);
-      $redir = apply_filters('login_redirect', $profile,$profile, $user);
+
+      error_log("app is $app");
+      error_log("continue_with_vipps_{$app}_confirm_redirect");
+     
+      $userid = get_current_user_id();
+
+      $redir = apply_filters('continue_with_vipps_confirm_redirect', $profile, $userid, $session);
+      $redir = apply_filters("continue_with_vipps_{$app}_confirm_redirect", $redir , $userid, $session);
+
+      error_log("redir is $redir ");
 
       if (!$userinfo) {
                $this->deleteBrowserCookie();
@@ -620,8 +629,6 @@ All at ###SITENAME###
                wp_safe_redirect($redir);
                exit();
       }
-
-     $userid = get_current_user_id();
 
      $email = $userinfo['email'];
      $phone =  sanitize_text_field($userinfo['phone_number']);
@@ -632,7 +639,7 @@ All at ###SITENAME###
      if ($user->ID != $userid) {
         if($session) $session->destroy();
         $this->deleteBrowserCookie();
-        $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-account: The email addresses are not the same.', 'login-vipps'), '');
+        $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-account: The email addresses are not the same.', 'login-vipps'), '', $session);
         exit();
      }
 
