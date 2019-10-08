@@ -11,7 +11,8 @@ class WooLogin{
   protected static $instance = null;
 
   protected $loginbuttonshown = 0;
-
+  protected $rewriteruleversion = 1;
+ 
   public static function instance()  {
         if (!static::$instance) static::$instance = new WooLogin();
         return static::$instance;
@@ -42,32 +43,40 @@ class WooLogin{
     
     $options = get_option('vipps_login_woo_options');
     $woologin= $options['woo-login'];
+
+    $this->add_rewrite_rules();
+
     if ($woologin) {
        add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
        add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
        add_action('woocommerce_register_form_start' , array($this, 'login_with_vipps_button'));
-    } else {
-    }
 
-    add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
-    add_action('woocommerce_account_content', array($this,'account_content'));
+       add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
+       add_action('woocommerce_account_content', array($this,'account_content'));
 
-    add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
-    add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
-    add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
-    add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
-    add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
-    add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
-    add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
+       add_filter ('woocommerce_account_menu_items', array($this,'account_menu_items' ));
+       add_action( 'woocommerce_account_vipps_endpoint', array($this,'account_vipps_content'));
 
-    add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
-    add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
-    add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+       add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
+       add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
+       add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
+       add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
+       add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
+       add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
+       add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
+
+       add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
+       add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
+       add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+   }
   }
 
   // This is run first on the users' main dashboard, right after menus
   public function account_dashboard() {
+    // This only flushes rewrite rules when necessary. Adds a menu item for Vipps on the customers' My Account page
+    $this->maybe_flush_rewrite_rules();
   }
+
   // This is the main content of a users my-account page
   public function account_content() {
     $userid = get_current_user_id();
@@ -81,6 +90,13 @@ class WooLogin{
           <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
 <?php
         }
+  }
+  public function account_menu_items($items) {
+   $items['vipps'] = __('Vipps', 'login-vipps');
+   return $items;
+  }
+  public function account_vipps_content() {
+    print "That hits the spot!";
   }
 
   // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
@@ -220,9 +236,27 @@ class WooLogin{
       $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
       $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
-      $default = array('woo-login'=>true, 'woo-create-users'=>$allowcreatedefault);
-      add_option('vipps_login_woo_options',$default,false);
+      $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault);
+      add_option('vipps_login_woo_options',$default,true);
+      add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
+      $this->maybe_flush_rewrite_rules();
  }
+ 
+ function add_rewrite_rules() {
+      // This is for the myaccount/vipps endpoint
+      add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
+ }
+
+ function maybe_flush_rewrite_rules() {
+      $options = get_option('vipps_login_woo_options');
+      $rewrite = intval($options['rewriteruleversion']);
+      if ($this->rewriteruleversion > $rewrite) {
+          $this->add_rewrite_rules();
+          $options['rewriteruleversion'] = $this->rewriteruleversion;
+          update_option('vipps_login_woo_options', $options, true);
+      }
+ }
+
  function deactivate () {
 
  }
