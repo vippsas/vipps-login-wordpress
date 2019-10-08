@@ -50,6 +50,7 @@ if(is_plugin_active( 'woocommerce/woocommerce.php')) {
  register_activation_hook(__FILE__,array($WooLogin,'activate'));
  register_deactivation_hook(__FILE__,array($WooLogin,'deactivate'));
  add_action('init',array($WooLogin,'init'));
+ add_action('plugins_loaded',array($WooLogin,'plugins_loaded'));
  if (is_admin()) {
   add_action('admin_init',array($WooLogin,'admin_init'));
  }

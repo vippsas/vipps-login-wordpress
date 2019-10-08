@@ -118,7 +118,7 @@ class VippsLogin {
     add_action('continue_with_vipps_login', array($this, 'continue_with_vipps_login'), 10, 2);
     add_action('continue_with_vipps_error_login', array($this, 'continue_with_vipps_error_login'), 10, 4);
 
-    // Main return handler
+    // Main return handler for 'confirm your account'
     add_action('continue_with_vipps_confirm', array($this, 'continue_with_vipps_confirm'), 10, 2);
     add_action('continue_with_vipps_error_confirm', array($this, 'continue_with_vipps_error_confirm'), 10, 4);
     add_action('continue_with_vipps_error_wordpress_confirm', array($this, 'continue_with_vipps_error_wordpress_confirm'), 10, 4);
@@ -610,8 +610,8 @@ All at ###SITENAME###
       }
 
       $profile = get_edit_user_link($user->ID);
-      do_action('continue_with_vipps_before_login_redirect', $user, $session);
-      do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
+      do_action('continue_with_vipps_before_confirm_redirect', $user, $session);
+      do_action("continue_with_vipps_before_{$app}_confirm_redirect", $user, $session);
       $redir = apply_filters('login_redirect', $profile,$profile, $user);
 
       if (!$userinfo) {

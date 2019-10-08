@@ -37,6 +37,9 @@ class WooLogin{
    return $valid;
   }
 
+  public function plugins_loaded () {
+  }
+
 
   public function init () {
     if (!class_exists( 'WooCommerce' )) return;
@@ -47,6 +50,8 @@ class WooLogin{
     $this->add_rewrite_rules();
 
     if ($woologin) {
+       $this->add_stored_woocommerce_notices();
+
        add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
        add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
        add_action('woocommerce_register_form_start' , array($this, 'login_with_vipps_button'));
@@ -59,7 +64,10 @@ class WooLogin{
        add_filter('add_query_vars', array($this, 'add_vipps_endpoint_query_var'));
        add_filter('the_title', array($this, 'account_vipps_title'), 10,2); // the  woocommerce_endpoint_vipps_filter does not work.
 
-
+       if (is_user_logged_in()) {
+         add_filter('wp_enqueue_scripts', array($this, 'wp_enqueue_account_scripts'));
+       }
+       add_action('admin_post_disconnect_vipps', array($this,'disconnect_vipps_post_handler'));
 
        add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
        add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
@@ -72,7 +80,33 @@ class WooLogin{
        add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
        add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
        add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+
+       add_filter("continue_with_vipps_before_woocommerce_confirm_redirect", array($this,'add_confirm_redirect'), 10, 3);
+       add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
+       add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); // Use this for successful 
+
    }
+  }
+
+  // We can't always add notices to the woo session, because we don't always have Woo loaded. So we'll use a transient to carry over .
+  public function add_stored_woocommerce_notices() {
+       $notices = get_transient('_vipps_woocommerce_stored_notices');
+       if (empty($notices)) return;
+       delete_transient('_vipps_woocommerce_stored_notices');
+       $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
+       if ( ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+       }
+       foreach($notices as $notice) {
+         wc_add_notice($notice['notice'], $notice['type']);
+       }
+  }
+
+  public function wp_enqueue_account_scripts () {
+      if (is_account_page()) {
+        wp_enqueue_script('vipps-login-admin',plugins_url('js/vipps-admin.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-admin.js"), 'true');
+        wp_localize_script('vipps-login-admin', 'vippsLoginAdminConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'vippsconfirmnonce'=>wp_create_nonce('vippsconfirmnonce') ) );
+      }
   }
 
   // This is run first on the users' main dashboard, right after menus
@@ -101,8 +135,53 @@ class WooLogin{
   }
   public function account_vipps_content() {
     add_filter('the_title', function ($title) { return __('Vipps!', 'login-vipps'); });
-    print "That hits the spot!";
+    $userid = get_current_user_id();
+    if (!$userid) print "No user!";
+    $user = new WC_Customer($userid);
+ 
+    $allow_login = true;
+    $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
+    $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
+    $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
+  
+?>
+<?php    if ($vippsphone && $vippsid): ?>
+<h3><?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></h3>
+<p>
+<form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+   <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>
+  <input type="hidden" name="action" value="disconnect_vipps">
+  <input type="hidden" name="data" value="foobarid">
+  <button type="submit" class='button vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-vipps'); ?></button>
+</form>
+</p>
+<?php else: ?>
+  <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+<?php endif; ?>
+  <p> <?php _e('With Vipps, logging in is easier than ever - no passwords!', 'login-vipps'); ?> </p>
+<?php
   }
+
+  public function disconnect_vipps_post_handler () {
+       check_admin_referer('disconnect_vipps', 'disconnect_vipps_nonce');
+       $userid = get_current_user_id();
+       if (!$userid) wp_die(__('You must be logged in to disconnect', 'login-vipps'));
+       $phone = get_usermeta($userid, '_vipps_phone');
+
+       delete_user_meta($userid,'_vipps_phone');
+       delete_user_meta($userid,'_vipps_id');
+       
+       // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
+       // If they were critical, the users' metadata would have worked. IOK 2019-10-08
+       $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
+       $notices = get_transient('_vipps_woocommerce_stored_notices');
+       $notices[]=array('notice'=>$notice, 'type'=>'success');
+       set_transient('_vipps_woocommerce_stored_notices', $notices, 60);
+
+       wp_safe_redirect(wp_get_referer());
+       exit();
+  }
+
  // For some reason we can't do this with woocommerce_endpoint_vipps_title.
   public function account_vipps_title($title, $id) {
     if (in_the_loop() && !is_admin() && is_main_query() && is_account_page() ) {
@@ -126,7 +205,6 @@ class WooLogin{
   public function add_woocommerce_error ($error, $errordesc, $errorhint, $session) {
      // We can add woocommerce already here, as Woocommerce handles the session itself  IOK 2019-10-08
      // NB: This require that the woocommerce session is active.
-     wc()->session->init();
      if ( ! WC()->session->has_session() ) {
         WC()->session->set_customer_session_cookie( true );
      }
@@ -146,9 +224,26 @@ class WooLogin{
          return $redir;
   }
 
+  public function add_confirm_redirect($user, $session) {
+    add_filter('login_redirect', array($this, 'confirm_redirect'), 99, 3);
+  }
+
+  // When confirming, return to the same page
+  public function confirm_redirect ($redir, $error, $sessiondata) {
+         $link = wc_get_page_permalink( 'myaccount' );
+         if (isset($sessiondata['referer']) && $sessiondata['referer']) { 
+             // If possible, report errors on same page we are
+             $link = $sessiondata['referer'];
+         }
+         if ($link) return $link;
+         return $redir;
+  }
+
+
   public function add_login_redirect($user, $session) {
     add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
   }
+
   public function login_redirect ($redir, $requested_redir, $user) {
       if (sizeof( WC()->cart->get_cart() ) > 0 ) {
          return wc_get_checkout_url();
