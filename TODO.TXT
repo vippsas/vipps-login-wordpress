@@ -8,10 +8,10 @@
 
 * PROFILE
 ** [DONE] Create profile fields/buttons to *confirm* and *deconfirm* a user from Vipps
-***  And in woo
-** And do errorhandling and cleanup the button
-***  And in woo
-**  as well as welcoming a user logging in with Vipps the first time
+***  [DONE] And in woo
+** [DONE] And do errorhandling and cleanup the button
+***  [DONE] And in woo
+**  [DONE] as well as welcoming a user logging in with Vipps the first time
 ** [DONE] Create action handlier for 'confirm' for connecting Vipps account for logged-in users
 
 * CONFIRM PAGE LOGIN
@@ -27,8 +27,8 @@
 ** IF not woo gateway, add "continue with vipps" to cart page (and mini page)
 ** IF gatway but not express checkout do it too
 ** Add welcome and nag messages
-** Add login error handling
-** Add 'Vipps' tab on users' profile
+** [DONE] Add login error handling
+** [DONE] Add 'Vipps' tab on users' profile
 
 * USER HANDLING
 ** [IN PROGRESS] Copy on write on changing addresses etc on Vipps users (mark user as originally from vipps and changed)
