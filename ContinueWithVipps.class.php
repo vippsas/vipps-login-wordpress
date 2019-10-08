@@ -18,6 +18,11 @@ class ContinueWithVipps {
         return static::$instance;
   }
 
+  // This function only exists so that gettext will discover these strings so you can edit them in Loco Translate and so forth IOK 2019-10-08
+  private function translation_dummy () {
+    print __('User cancelled the login', 'login-vipps');
+  }
+
   public function admin_init () {
    add_action('admin_notices',array($this,'stored_admin_notices'));
    register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));

@@ -53,12 +53,24 @@ class WooLogin{
     add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
     add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
 
+    add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
     add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
+    add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+  }
 
+  // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
+  public function login_error_create_session($createSession, $sessiondata) {
+    return false;
+  }
+
+  public function add_woocommerce_error ($error, $errordesc, $errorhint, $session) {
+     // We can add woocommerce already here, as Woocommerce handles the session itself  IOK 2019-10-08
+     wc_add_notice(__($errordesc,'login-vipps'),'error');
   }
 
   // Handle errors for the 'woocommerce' login application on the users home
   public function error_redirect ($redir, $error, $session) {
+         // If this happend on the checkout page then redirect there I guess
          $link = wc_get_page_permalink( 'myaccount' );
          if ($link) return $link;
          return $redir;

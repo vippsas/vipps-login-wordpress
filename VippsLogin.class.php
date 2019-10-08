@@ -366,8 +366,12 @@ All at ###SITENAME###
     $redir = wp_login_url();
     $app = sanitize_title(($sessiondata && isset($sessiondata['application'])) ? $sessiondata['application'] : 'wordpress');
 
+    // Only create a session if your application needs it, to avoid getting messy URLs.
+    $createSession = true;
+    $createSession = apply_filters("continue_with_vipps_error_{$app}_login_create_session", $createSession, $sessiondata);
+
     $continue = ContinueWithVipps::instance();
-    $session = VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login'));
+    $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login')) : null;
    
     // This would be for an application to extend the session if needed IOK 2019-10-08 
     do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $errorhint, $session);
@@ -375,8 +379,8 @@ All at ###SITENAME###
     // Override error page redirect for your application IOK 2019-10-08
     $redir = apply_filters('continue_with_vipps_error_login_redirect', $redir, $error, $session);
     $redir = apply_filters("continue_with_vipps_error_{$app}_login_redirect", $redir, $error, $session);
-
-    $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
+    
+    if ($createSession) $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
     wp_safe_redirect($redir);
     exit();
   }
