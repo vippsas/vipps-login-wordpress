@@ -121,6 +121,7 @@ class VippsLogin {
     // Main return handler
     add_action('continue_with_vipps_confirm', array($this, 'continue_with_vipps_confirm'), 10, 2);
     add_action('continue_with_vipps_error_confirm', array($this, 'continue_with_vipps_error_confirm'), 10, 4);
+    add_action('continue_with_vipps_error_wordpress_confirm', array($this, 'continue_with_vipps_error_wordpress_confirm'), 10, 4);
   }
 
 
@@ -579,8 +580,26 @@ All at ###SITENAME###
   }
 
   public function continue_with_vipps_error_confirm($error,$errordesc,$error_hint='',$sessiondata=array()) {
-     // IOK FIXME
-     wp_die("Could not confirm: $error $errordesc");
+    $userid = get_current_user_id();
+    if (!$userid) wp_die(__('You must be logged in to confirm your account', 'login-vipps'));
+    $redir = get_edit_user_link($userid);
+    $app = sanitize_title(($sessiondata && isset($sessiondata['application'])) ? $sessiondata['application'] : 'wordpress');
+    $referer = ($sessiondata && isset($sessiondata['referer'])) ? $sessiondata['referer'] : '';
+
+    // Override error page redirect for your application. No access to the possible new session. IOK 2019-10-08
+    $redir = apply_filters('continue_with_vipps_error_confirm_redirect', $redir, $error, $sessiondata);
+    $redir = apply_filters("continue_with_vipps_error_{$app}_confirm_redirect", $redir, $error, $sessiondata);
+
+    do_action("continue_with_vipps_error_{$app}_confirm", $error, $errordesc, $errorhint, $sessiondata);
+  
+    wp_safe_redirect($redir);
+    exit();
+  }
+
+  public function continue_with_vipps_error_wordpress_confirm ($error, $errordesc, $errorhint, $sessiondata) {
+    // Cannot  use the 'store_admin_notices' of ContinueWithVipps here, because it breaks Woocommerce which will not have been loaded yet 
+    $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps account: ", 'login-vipps') . esc_html($errordesc) . "<p></div>";
+    set_transient('_vipps_login_save_admin_notices',$notices, 5*60);
   }
 
   public function continue_with_vipps_confirm($userinfo,$session) {
