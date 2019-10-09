@@ -49,18 +49,24 @@ class ContinueWithVipps {
 
   // Make admin-notices persistent so we can provide error messages whenever possible. IOK 2018-10-02
   public function store_admin_notices() {
+        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        if (!$cookie) return;
+        $cookiehash =  hash('sha256',$cookie,false);
         ob_start();
         do_action('admin_notices');
         $notices = ob_get_clean();
-        set_transient('_vipps_login_save_admin_notices',$notices, 5*60);
+        set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
   }
 
   // If we have admin-notices that we haven't gotten a chance to show because of
   // a redirect, this method will fetch and show them IOK 2018-05-07
   public function stored_admin_notices() {
-        $stored = get_transient('_vipps_login_save_admin_notices');
+        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        if (!$cookie) return;
+        $cookiehash =  hash('sha256',$cookie,false);
+        $stored = get_transient('_vipps_login_save_admin_notices_' . $cookiehash);
         if ($stored) {
-            delete_transient('_vipps_login_save_admin_notices');
+            delete_transient('_vipps_login_save_admin_notices_' . $cookiehash);
             print $stored;
         }
   }
@@ -131,7 +137,6 @@ class ContinueWithVipps {
         }
         $session = VippsSession::get($sessionkey);
 
-
         $error = @$_REQUEST['error'];
         $errordesc = @$_REQUEST['error_description'];
         $error_hint = @$_REQUEST['error_hint'];
@@ -176,10 +181,14 @@ class ContinueWithVipps {
             wp_die($userinfo['response']);
           }
           $userinfo = @$userinfo['content'];
-          $session->set( 'userinfo', $userinfo);
+          if ($session) {
+              $session->set( 'userinfo', $userinfo);
+          } else {
+              do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry', 'login-vipps'),'', $session);
+              wp_die(__('Session expired - please retry', 'login-vipps'));
+          }
          }
         } 
- 
 
         // Do *not* destroy the session here: this may redirect to other pages (eg. in 'authenticate' that will need to have the session
         // be alive so that this can be called repeatedly. The session should be destroyed only when the action is done; that is, completes whatever it tries to do.

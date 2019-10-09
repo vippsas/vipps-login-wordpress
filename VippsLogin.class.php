@@ -599,8 +599,11 @@ All at ###SITENAME###
 
   public function continue_with_vipps_error_wordpress_confirm ($error, $errordesc, $errorhint, $sessiondata) {
     // Cannot  use the 'store_admin_notices' of ContinueWithVipps here, because it breaks Woocommerce which will not have been loaded yet 
+    $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+    if (!$cookie) return;
+    $cookiehash =  hash('sha256',$cookie,false);
     $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps account: ", 'login-vipps') . esc_html($errordesc) . "<p></div>";
-    set_transient('_vipps_login_save_admin_notices',$notices, 5*60);
+    set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
   }
 
   public function continue_with_vipps_confirm($userinfo,$session) {

@@ -89,10 +89,14 @@ class WooLogin{
   }
 
   // We can't always add notices to the woo session, because we don't always have Woo loaded. So we'll use a transient to carry over .
+  // We are always logged in here, so just use the cookie contents as a quickie session, using a short transient.
   public function add_stored_woocommerce_notices() {
-       $notices = get_transient('_vipps_woocommerce_stored_notices');
+       $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+       if (!$cookie) return;
+       $cookiehash =  hash('sha256',$cookie,false);
+       $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
        if (empty($notices)) return;
-       delete_transient('_vipps_woocommerce_stored_notices');
+       delete_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
        $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
        if ( ! WC()->session->has_session() ) {
         WC()->session->set_customer_session_cookie( true );
@@ -173,10 +177,15 @@ class WooLogin{
        
        // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
        // If they were critical, the users' metadata would have worked. IOK 2019-10-08
-       $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
-       $notices = get_transient('_vipps_woocommerce_stored_notices');
-       $notices[]=array('notice'=>$notice, 'type'=>'success');
-       set_transient('_vipps_woocommerce_stored_notices', $notices, 60);
+       // We are always logged in here, so just use the cookie contents as a quickie session.
+       $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+       if ($cookie) {
+         $cookiehash =  hash('sha256',$cookie,false);
+         $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
+         $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-vipps'), $phone);
+         $notices[]=array('notice'=>$notice, 'type'=>'success');
+         set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
+       }        
 
        wp_safe_redirect(wp_get_referer());
        exit();
