@@ -67,13 +67,21 @@ class WooLogin{
     if (is_user_logged_in()) return false;
     if (!$this->is_active()) return false;
     // IOK CHECKME IF USE
-    $this->continue_with_vipps_banner();
+    $gw = $this->is_gateway_active();
+    if (!$gw) return;
+    $show_continue_with_vipps = !$gw->show_express_checkout();
+    $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', $show_continue_with_vipps);
+    if (!$show_continue_with_vipps) return;
+    $this->cart_continue_with_vipps_button_html();
   }
 
   public function before_checkout_form_login_button () {
     if (is_user_logged_in()) return false;
     if (!$this->is_active()) return false;
-    // IOK CHECKME IF USE
+    $gw = $this->is_gateway_active();
+    if (!$gw) return;
+    $show_continue_with_vipps = !$gw->show_express_checkout();
+    $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_checkout', $show_continue_with_vipps);
     $this->continue_with_vipps_banner();
   }
   public function login_button_html () {
@@ -82,8 +90,9 @@ class WooLogin{
   }
   public function cart_continue_with_vipps_button_html() {
         if (!$this->is_active()) return false;
-        print "<a href='javascript:void()' class='checkout-button button wc-forward vipps continue-with-vipps'>Continue with vipps yo!</a>";
-
+?>
+       <a href='javascript:login_with_vipps("woocommerce");' class='checkout-button button wc-forward vipps continue-with-vipps'>Continue with vipps yo!</a>
+<?php
   }
 
   public function continue_with_vipps_banner() {
@@ -100,7 +109,7 @@ class WooLogin{
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click here to continue', 'login-vipps');
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:void();'>" . $linktext . "</a>";
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
         ?>
             <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
