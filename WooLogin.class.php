@@ -69,8 +69,14 @@ class WooLogin{
     // IOK CHECKME IF USE
     $gw = $this->is_gateway_active();
     if (!$gw) return;
-    $show_continue_with_vipps = !$gw->show_express_checkout();
-    $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', $show_continue_with_vipps);
+
+    $options =  get_option('vipps_login_woo_options');
+    $show_continue_with_vipps = intval($options['woo-checkout-login']);
+    $express_checkout = $gw->show_express_checkout();
+
+    error_log("show  $show_continue_with_vipps  express $express_checkout");
+
+    $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', ($show_continue_with_vipps && !$express_checkout));
     if (!$show_continue_with_vipps) return;
     $this->cart_continue_with_vipps_button_html();
   }
@@ -80,10 +86,16 @@ class WooLogin{
     if (!$this->is_active()) return false;
     $gw = $this->is_gateway_active();
     if (!$gw) return;
-    $show_continue_with_vipps = !$gw->show_express_checkout();
+    $options =  get_option('vipps_login_woo_options');
+    $show_continue_with_vipps = intval($options['woo-checkout-login']);
     $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_checkout', $show_continue_with_vipps);
+    if (!$show_continue_with_vipps) return;
+
+    // Replace expresscheckout here
+    add_action('woo_vipps_show_express_checkout', function ($show) { return false; });
     $this->continue_with_vipps_banner();
   }
+
   public function login_button_html () {
         if (!$this->is_active()) return false;
         print "<button type='button'>BUTTON!</button>";
@@ -431,7 +443,7 @@ class WooLogin{
       $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
       $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
-      $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault);
+      $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
       add_option('vipps_login_woo_options',$default,true);
       $this->add_rewrite_rules();
       $this->maybe_flush_rewrite_rules();
@@ -469,6 +481,8 @@ class WooLogin{
       $options = get_option('vipps_login_woo_options');
       $woologin= $options['woo-login'];
       $woocreate = $options['woo-create-users'];
+      $woocart = $options['woo-cart-login'];
+      $woocheckout = $options['woo-checkout-login'];
 ?>
 <?php settings_fields('vipps_login_woo_options'); ?>
    <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-vipps'); ?></th></tr>
@@ -488,6 +502,24 @@ class WooLogin{
 </td>
        <td>
                       <?php _e('Check this to allow new users to be created as customers if using Log in With Vipps in a Woocommerce context', 'login-vipps'); ?>
+       </td>
+   </tr>
+   <tr>
+       <td><?php _e('Show "Continue with Vipps" in shopping cart', 'login-vipps'); ?></td>
+       <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-cart-login]' value=0>
+                      <input type='checkbox' name='vipps_login_woo_options[woo-cart-login]' value=1 <?php if ( $woocart) echo ' CHECKED '; ?> >
+</td>
+       <td>
+                      <?php _e('Check this to enable "Continue with Vipps" in the Shopping Cart and widgets. If you are using Express checkout, that will be shown instead.', 'login-vipps'); ?>
+       </td>
+   </tr>
+   <tr>
+       <td><?php _e('Show "Continue with Vipps" on the checkout page', 'login-vipps'); ?></td>
+       <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
+                      <input type='checkbox' name='vipps_login_woo_options[woo-checkout-login]' value=1 <?php if ( $woocheckout) echo ' CHECKED '; ?> >
+</td>
+       <td>
+                      <?php _e('Check this to enable "Continue with Vipps" on the checkout page. This will replace express checkout on the checkout page.', 'login-vipps'); ?>
        </td>
    </tr>
 <?php
