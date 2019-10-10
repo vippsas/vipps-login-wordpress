@@ -1,23 +1,33 @@
 /* Styles for wp-login.php */
 #continue-with-vipps-wrapper {
  text-align:center;
+ margin: 20px;
+ display: block;
 }
-#continue-with-vipps-wrapper a.button.continue-with-vipps img {
+#continue-with-vipps-wrapper .button.continue-with-vipps {
+ margin 0 auto;
+ width: 100%;
+}
+
+.continue-with-vipps-wrapper {
+ display:inline-block;
+}
+.continue-with-vipps-wrapper a.button.continue-with-vipps img {
     max-width: 100%;
     margin:0px;
     display:inline;
     height: 2ex;
     vertical-align: text-bottom;
 }
-#continue-with-vipps-wrapper a.button.continue-with-vipps:hover img {
+.continue-with-vipps-wrapper a.button.continue-with-vipps:hover img {
     opacity: 0.9;
 }
-#continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img {
+.continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img {
     opacity: 0.7;
 }
-#continue-with-vipps-wrapper a.button.continue-with-vipps {
+.continue-with-vipps-wrapper a.button.continue-with-vipps {
+ display: inline-block;
  border-radius: 18px;
- margin: 0 auto;
  padding: 5px 15px 4px 15px;
  color: #fff;
  background-color: #fe5b24;
@@ -28,7 +38,7 @@
  cursor: pointer;
  box-sizing: border-box;
 }
-#continue-with-vipps-wrapper a.button.continue-with-vipps:active, #continue-with-vipps-wrapper a.button.continue-with-vipps:active {
+.continue-with-vipps-wrapper a.button.continue-with-vipps:active, #continue-with-vipps-wrapper a.button.continue-with-vipps:active {
  border: 0;
 }
 

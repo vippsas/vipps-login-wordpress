@@ -95,6 +95,9 @@ class VippsLogin {
     add_action('register_form', array($this, 'register_form_continue_with_vipps'));
     add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
 
+
+    $this->add_shortcodes();
+
     // Ajax code to get the redir url
     add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
     add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
@@ -126,6 +129,28 @@ class VippsLogin {
   }
 
 
+  public function add_shortcodes() {
+      add_shortcode('log-in-with-vipps', array($this, 'log_in_with_vipps_shortcode'));
+      add_shortcode('continue-with-vipps', array($this, 'continue_with_vipps_shortcode'));
+  }
+  public function log_in_with_vipps_shortcode($atts, $content, $tag) {
+     if (!isset($atts['text'])) $atts['text'] = __('Log in with', 'login-vipps');
+     return $this->continue_with_vipps_shortcode($atts,$content,$tag);
+  }
+  public function continue_with_vipps_shortcode($atts,$content,$tag) {
+    #if (is_user_logged_in()) return false;
+    $args = shortcode_atts(array('application'=>'wordpress', 'text'=>__('Continue with', 'login-vipps')), $atts);
+    $text = esc_html($args['text']);
+    $application = $args['application'];
+    ob_start();
+?> 
+  <span class='continue-with-vipps-wrapper'>
+   <?php $this->login_button_html($text, $application); ?>
+  </span>
+<?php
+    return ob_get_clean();
+  }
+ 
 
   // To be used in a POST: returns an URL that can be used to start the login process.
   public function ajax_vipps_login_get_link () {
@@ -666,18 +691,31 @@ All at ###SITENAME###
 
   public function login_form_continue_with_vipps () {
      $this->wp_login_button(__('Log in with', 'login-vipps'));
+     $this->move_continue_button_over_login_form();
   }
   public function register_form_continue_with_vipps () {
      $this->wp_login_button(__('Create an account using ', 'login-vipps'));
+     $this->move_continue_button_over_login_form();
   }
 
-  public function wp_login_button($text) {
+  public function wp_login_button($text, $application='wordpress') {
+?>
+<div id='continue-with-vipps-wrapper' class='continue-with-vipps-wrapper'>
+ <?php $this->login_button_html($text, $application); ?>
+ </div>
+<?php 
+ }
+
+  public function login_button_html($text, $application) {
      $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
 ?>
-<div id='continue-with-vipps-wrapper' style='margin:20px;display:none' class='continue-with-vipps-login'>
-  <a href='javascript:login_with_vipps("wordpress");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
+  <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
        alt="<?php _e('Log in without password using Vipps', 'login-vipps'); ?>" src="<?php echo $logo; ?>">!</a>
- </div>
+<?php
+  }
+
+  public function move_continue_button_over_login_form() {
+?>
 <script>
  window.onload = function () {
    var me =  document.getElementById('continue-with-vipps-wrapper');
