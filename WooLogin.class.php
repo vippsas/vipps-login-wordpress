@@ -4,14 +4,15 @@
 class WooLogin{
  
   function __construct() {
-
   }
+
   // We are going to do the Singleton pattern here so 
   // the basic login mechanism will be available in general with the same settings etc.
   protected static $instance = null;
 
   protected $loginbuttonshown = 0;
   protected $rewriteruleversion = 1;
+
  
   public static function instance()  {
         if (!static::$instance) static::$instance = new WooLogin();
@@ -22,6 +23,25 @@ class WooLogin{
      // Settings, that will end up on the simple "Login with Vipps" options screen
      register_setting('vipps_login_woo_options','vipps_login_woo_options', array($this,'validate'));
      add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
+  }
+
+  public function payment_gateway() {
+    $gw = null;
+    if (class_exists('WC_Gateway_Vipps')) {
+       $gw = WC_Gateway_Vipps::instance(); 
+    }
+    // There are more than one Vipps gateway, so allow integration with these as well as the WP-Hosting one. IOK 2019-10-10
+    $gw = apply_filters('continue_with_vipps_payment_gateway', $gw);
+    return $gw;
+  }
+
+  // This is true iff the Vipps gateway is installed and active. Returns the gateway if it is on, so one
+  // can check stuff like express checkout and so forth. IOK 2019-10-10
+  public function is_gateway_active() {
+    $gw = $this->payment_gateway();
+    if ($gw && $gw->enabled != 'yes') return false;
+    if ($gw) return $gw; // Otherwise it is null
+    return false;
   }
 
   public function validate ($input) {
@@ -38,14 +58,60 @@ class WooLogin{
   }
 
   public function plugins_loaded () {
+       add_action('woocommerce_proceed_to_checkout', array($this,'cart_continue_with_vipps'));
+       add_action('woocommerce_widget_shopping_cart_buttons', array($this, 'cart_continue_with_vipps'), 30);
+       add_action('woocommerce_before_checkout_form', array($this, 'before_checkout_form_login_button'), 5);
+  }
+
+  public function cart_continue_with_vipps () {
+    if (is_user_logged_in()) return false;
+    if (!$this->is_active()) return false;
+    // IOK CHECKME IF USE
+    $this->continue_with_vipps_banner();
+  }
+
+  public function before_checkout_form_login_button () {
+    if (is_user_logged_in()) return false;
+    if (!$this->is_active()) return false;
+    // IOK CHECKME IF USE
+    $this->continue_with_vipps_banner();
+  }
+  public function login_button_html () {
+        if (!$this->is_active()) return false;
+        print "<button type='button'>BUTTON!</button>";
+  }
+  public function cart_continue_with_vipps_button_html() {
+        if (!$this->is_active()) return false;
+        print "<a href='javascript:void()' class='checkout-button button wc-forward vipps continue-with-vipps'>Continue with vipps yo!</a>";
+
+  }
+
+  public function continue_with_vipps_banner() {
+        if (!$this->is_active()) return false;
+ 
+        // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
+        $can_register = $this->users_can_register(true, array(), array());
+
+        if ($can_register) {
+           $text = __('Log in or register an account with %s to continue your checkout!', 'login-vipps');
+        } else {
+           $text = __('Are you registered as a customer? Log in with %s to continue your checkout!', 'login-vipps');
+        }
+        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $linktext = __('Click here to continue', 'login-vipps');
+
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:void();'>" . $linktext . "</a>";
+        $message = apply_filters('continue_with_vipps_checkout_banner', $message);
+        ?>
+            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+        <?php
   }
 
 
   public function init () {
     if (!class_exists( 'WooCommerce' )) return;
     
-    $options = get_option('vipps_login_woo_options');
-    $woologin= $options['woo-login'];
+    $woologin= $this->is_active();
 
     $this->add_rewrite_rules();
 
@@ -379,6 +445,11 @@ class WooLogin{
  function add_vipps_endpoint_query_var ($vars) {
    $vars[]='vipps';
    return $vars;
+ }
+
+ function is_active() {
+   $options = get_option('vipps_login_woo_options');
+   return intval($options['woo-login']);
  }
 
  function deactivate () {
