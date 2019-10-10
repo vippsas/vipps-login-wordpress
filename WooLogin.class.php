@@ -59,27 +59,52 @@ class WooLogin{
 
   public function plugins_loaded () {
        add_action('woocommerce_proceed_to_checkout', array($this,'cart_continue_with_vipps'));
-       add_action('woocommerce_widget_shopping_cart_buttons', array($this, 'cart_continue_with_vipps'), 30);
+       add_action('woocommerce_widget_shopping_cart_buttons', array($this, 'cart_widget_continue_with_vipps'), 30);
        add_action('woocommerce_before_checkout_form', array($this, 'before_checkout_form_login_button'), 5);
   }
 
   public function cart_continue_with_vipps () {
+    return $this->continue_with_vipps_button_for_carts('cart');
+  }
+  public function cart_widget_continue_with_vipps () {
+    return $this->continue_with_vipps_button_for_carts('widget');
+  }
+
+  public function continue_with_vipps_button_for_carts($type='widget'){
+    error_log("Aga 2");
     if (is_user_logged_in()) return false;
     if (!$this->is_active()) return false;
-    // IOK CHECKME IF USE
+    error_log("Aga 3");
+    if (is_user_logged_in()) return false;
+    error_log("Aga 4");
+
     $gw = $this->is_gateway_active();
     if (!$gw) return;
+
+    error_log("Aga 7");
 
     $options =  get_option('vipps_login_woo_options');
     $show_continue_with_vipps = intval($options['woo-checkout-login']);
     $express_checkout = $gw->show_express_checkout();
 
-    error_log("show  $show_continue_with_vipps  express $express_checkout");
-
     $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', ($show_continue_with_vipps && !$express_checkout));
+    error_log("Aga 5");
     if (!$show_continue_with_vipps) return;
-    $this->cart_continue_with_vipps_button_html();
+    error_log("Aga 6");
+    $this->cart_continue_with_vipps_button_html($type);
   }
+
+  public function cart_continue_with_vipps_button_html($type) {
+        error_log("Aga 1");
+        if (!$this->is_active()) return false;
+?>
+     <div class='continue-with-vipps-wrapper center-block <?php echo $type; ?>'>
+       <?php VippsLogin::instance()->login_button_html(__('Continue with', 'login-vipps'), 'woocommerce'); ?>
+     </div>
+<?php
+ }
+
+
 
   public function before_checkout_form_login_button () {
     if (is_user_logged_in()) return false;
@@ -94,17 +119,6 @@ class WooLogin{
     // Replace expresscheckout here
     add_action('woo_vipps_show_express_checkout', function ($show) { return false; });
     $this->continue_with_vipps_banner();
-  }
-
-  public function login_button_html () {
-        if (!$this->is_active()) return false;
-        print "<button type='button'>BUTTON!</button>";
-  }
-  public function cart_continue_with_vipps_button_html() {
-        if (!$this->is_active()) return false;
-?>
-       <a href='javascript:login_with_vipps("woocommerce");' class='checkout-button button wc-forward vipps continue-with-vipps'>Continue with vipps yo!</a>
-<?php
   }
 
   public function continue_with_vipps_banner() {
@@ -127,6 +141,47 @@ class WooLogin{
             <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
         <?php
   }
+  public function login_with_vipps_banner() {
+        if (!$this->is_active()) return false;
+        if ($this->loginbuttonshown) return false;
+        $this->loginbuttonshown=1;
+ 
+        // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
+        $can_register = $this->users_can_register(true, array(), array());
+        $text  = '';
+        if ($can_register) {
+           $text = __('Log in or register an account using %s !', 'login-vipps');
+        } else {
+           $text = __('Are you registered as a customer? Log in with %s!', 'login-vipps');
+        }
+        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $linktext = __('Click here to continue', 'login-vipps');
+
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = apply_filters('continue_with_vipps_login_banner', $message);
+        ?>
+            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+        <?php
+  }
+  public function register_with_vipps_banner() {
+        if (!$this->is_active()) return false;
+        if ($this->loginbuttonshown) return false;
+        $this->loginbuttonshown=1;
+        // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
+        $can_register = $this->users_can_register(true, array(), array());
+        if (!$can_register) return;
+
+        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $linktext = __('Click here to continue', 'login-vipps');
+        $text = __('Create an account using ', 'login-vipps');
+
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = apply_filters('continue_with_vipps_register_banner', $message);
+        ?>
+            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+        <?php
+  }
+
 
 
   public function init () {
@@ -139,9 +194,9 @@ class WooLogin{
     if ($woologin) {
        $this->add_stored_woocommerce_notices();
 
-       add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_button'));
-       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_button'));
-       add_action('woocommerce_register_form_start' , array($this, 'login_with_vipps_button'));
+       add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_banner'));
+       add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_banner'));
+       add_action('woocommerce_register_form_start' , array($this, 'register_with_vipps_banner'));
 
        add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
        add_action('woocommerce_account_content', array($this,'account_content'));
@@ -435,21 +490,7 @@ class WooLogin{
   }
 
 
-  public function login_with_vipps_button() {
-     // We'll only show this button once on a page IOK 2019-10-08
-     if ($this->loginbuttonshown) return;
-     $this->loginbuttonshown=1;
-
-?>
-     <div style='margin:20px;' class='continue-with-vipps'>
-<a href='javascript:login_with_vipps("woocommerce");' class='button' style='width:100%'>Login with Vipps yo!</a>
-</div>
-<?php
-     return true;
-  }
-
  function activate () {
-
       $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
       $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 

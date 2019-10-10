@@ -1,14 +1,20 @@
 /* Styles for wp-login.php */
-#continue-with-vipps-wrapper {
+#continue-with-vipps-wrapper, .continue-with-vipps-wrapper.center-block {
  text-align:center;
- margin: 20px;
  display: block;
 }
+#continue-with-vipps-wrapper {
+ margin: 20px;
+}
+
 #continue-with-vipps-wrapper .button.continue-with-vipps {
  margin 0 auto;
  width: 100%;
+} 
+.continue-with-vipps-wrapper.center-block .button.continue-with-vipps {
+ margin 0 auto;
+ width: 100%;
 }
-
 .continue-with-vipps-wrapper {
  display:inline-block;
 }
@@ -27,22 +33,54 @@
 }
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
  display: inline-block;
- border-radius: 18px;
- padding: 5px 15px 4px 15px;
+ border-radius: 17px;
+ padding: 10px 10px 9px 10px;
  color: #fff;
  background-color: #fe5b24;
  border: 0;
- font-size: 15px;
+ font-size: 22px;
  font-weight: 400;
  text-align:center;
  cursor: pointer;
  box-sizing: border-box;
 }
+.continue-with-vipps-wrapper a.button.continue-with-vipps:focus {
+ outline:0; 
+}
 .continue-with-vipps-wrapper a.button.continue-with-vipps:active, #continue-with-vipps-wrapper a.button.continue-with-vipps:active {
  border: 0;
 }
 
-
 .vippsorange {
  background-color: #fe5b24;
 }
+
+/* For woocommerce */
+.widget_shopping_cart .continue-with-vipps-wrapper.center-block, .widget_shopping_cart .continue-with-vipps-wrapper {
+ width:100%
+}
+
+.widget_shopping_cart .continue-with-vipps-wrapper.widget a.button.continue-with-vipps{
+ float: none;
+ color: #fff;
+ background-color: #fe5b24;
+ font-size: 14.5px;
+ padding: 5px 10px 4px 10px;
+ width:80%;
+ margin-top: 0;
+ margin-bottom: 0;
+ margin-left: auto;
+ margin-right: auto;
+ clear: both;
+}
+.widget_shopping_cart .continue-with-vipps-wrapper a.button.continue-with-vipps:hover{
+ color: #fff;
+ background-color: #fe5b24;
+ border: 0;
+}
+
+/* This is for a plugin I'm doing testing with. */
+.woocommerce-cart-tab-container .widget_shopping_cart a.button.continue-with-vipps{
+ min-width: 190px;
+}
+
