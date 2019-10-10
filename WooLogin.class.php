@@ -372,6 +372,16 @@ class WooLogin{
   public function before_login($user, $session) {
     $userinfo = @$session['userinfo'];
     if (!$userinfo) return false;
+    /* Logging in with Vipps, so set that as payment method if possible and if the customer hasn't already chosen one IOK 2019-10-10 */
+    $gw = $this->is_gateway_active();
+    if ($gw) {
+        $set = WC()->session->get('chosen_payment_method') ? false : true;
+        $set = apply_filters('continue_with_vipps_set_default_payment_method', $set);
+        if ($set) {
+          WC()->session->set('chosen_payment_method', $gw->id);
+        }
+    }
+
     $this->maybe_update_address_info($user,$userinfo);
   }
 
