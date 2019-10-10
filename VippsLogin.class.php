@@ -134,6 +134,7 @@ class VippsLogin {
       add_shortcode('continue-with-vipps', array($this, 'continue_with_vipps_shortcode'));
   }
   public function log_in_with_vipps_shortcode($atts, $content, $tag) {
+     if (!is_array($atts)) $atts = array();
      if (!isset($atts['text'])) $atts['text'] = __('Log in with', 'login-vipps');
      return $this->continue_with_vipps_shortcode($atts,$content,$tag);
   }
@@ -144,7 +145,7 @@ class VippsLogin {
     $application = $args['application'];
     ob_start();
 ?> 
-  <span class='continue-with-vipps-wrapper'>
+  <span class='continue-with-vipps-wrapper inline'>
    <?php $this->login_button_html($text, $application); ?>
   </span>
 <?php

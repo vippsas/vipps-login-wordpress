@@ -227,6 +227,7 @@ class WooLogin{
        add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
        add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); // Use this for successful 
 
+       $this->add_shortcodes();
    }
   }
 
@@ -253,6 +254,16 @@ class WooLogin{
         wp_enqueue_script('vipps-login-admin',plugins_url('js/vipps-admin.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-admin.js"), 'true');
         wp_localize_script('vipps-login-admin', 'vippsLoginAdminConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'vippsconfirmnonce'=>wp_create_nonce('vippsconfirmnonce') ) );
       }
+  }
+
+  public function add_shortcodes() {
+     add_shortcode('woo-continue-with-vipps', array($this,'woo_continue_with_vipps_shortcode'));
+  }
+
+  public function woo_continue_with_vipps_shortcode($atts, $content, $tag) {
+     if (!is_array($atts)) $atts = array();
+     if (!isset($atts['application'])) $atts['application'] = 'woocommerce';
+     return VippsLogin::instance()->continue_with_vipps_shortcode($atts,$content,$tag);
   }
 
   // This is run first on the users' main dashboard, right after menus

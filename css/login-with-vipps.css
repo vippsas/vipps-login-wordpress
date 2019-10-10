@@ -44,6 +44,12 @@
  cursor: pointer;
  box-sizing: border-box;
 }
+
+.continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
+ font-size: 1em;
+ padding: 5px 10px 4px 10px;
+}
+
 .continue-with-vipps-wrapper a.button.continue-with-vipps:focus {
  outline:0; 
 }
