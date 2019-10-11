@@ -39,10 +39,17 @@ class VippsLogin {
         if ($pagenow == 'profile.php') {
             $userid = get_current_user_id();
             $justconnected = get_usermeta($userid,'_vipps_just_connected');
+            $justsynched = get_usermeta($userid,'_vipps_just_synched');
             if ($justconnected) {
                 delete_user_meta($userid, '_vipps_just_connected');
                 $vippsphone = get_usermeta($userid,'_vipps_phone');
                 $notice = sprintf(__('You are now connected to the Vipps account <b>%s</b>!', 'login-vipps'), $vippsphone);
+                add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
+            }
+            if ($justsynched) {
+                delete_user_meta($userid, '_vipps_just_synched');
+                $vippsphone = get_usermeta($userid,'_vipps_phone');
+                $notice = sprintf(__('You are now synchronized with the Vipps account <b>%s</b>!', 'login-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
         } 
@@ -102,6 +109,7 @@ class VippsLogin {
         add_action('wp_ajax_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
         add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
         add_action('wp_ajax_vipps_confirm_get_link', array($this,'ajax_vipps_confirm_get_link'));
+        add_action('wp_ajax_vipps_synch_get_link', array($this,'ajax_vipps_synch_get_link'));
 
 
         /* The following actions are for using the confirm-handler to allow users to confirm their account using email with the
@@ -126,6 +134,12 @@ class VippsLogin {
         add_action('continue_with_vipps_confirm', array($this, 'continue_with_vipps_confirm'), 10, 2);
         add_action('continue_with_vipps_error_confirm', array($this, 'continue_with_vipps_error_confirm'), 10, 4);
         add_action('continue_with_vipps_error_wordpress_confirm', array($this, 'continue_with_vipps_error_wordpress_confirm'), 10, 4);
+
+        // And for synching addresses
+        add_action('continue_with_vipps_synch', array($this, 'continue_with_vipps_synch'), 10, 2);
+        add_action('continue_with_vipps_error_synch', array($this, 'continue_with_vipps_error_synch'), 10, 4);
+        add_action('continue_with_vipps_error_wordpress_synch', array($this, 'continue_with_vipps_error_wordpress_synch'), 10, 4);
+
     }
 
 
@@ -195,7 +209,6 @@ class VippsLogin {
         wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
         wp_die();
     }
-
     // This is for already logged-in users confirming their account with Vipps.
     public function get_vipps_confirm_link($application='wordpress', $sessiondata=array()) {
         if (!is_user_logged_in()) return;
@@ -204,6 +217,29 @@ class VippsLogin {
         $sessiondata['application'] = $application;
         $sessiondata['userid'] = get_current_user_id();
         $url = ContinueWithVipps::getAuthRedirect('confirm',$sessiondata);
+        return $url;
+    }
+
+    public function ajax_vipps_synch_get_link () {
+        check_ajax_referer('vippsconfirmnonce','vippsconfirmnonce',true);
+
+        $application = 'wordpress';
+        if (isset($_REQUEST['application'])) {
+            $application = sanitize_title($_REQUEST['application']);
+        }
+        $referer = wp_get_raw_referer();
+        $url = $this->get_vipps_synch_link($application, array('referer'=>$referer));
+        wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
+        wp_die();
+    }
+    //  And this for users that want to synch their address with Vipps
+    public function get_vipps_synch_link($application='wordpress', $sessiondata=array()) {
+        if (!is_user_logged_in()) return;
+        $cookie = $this->setBrowserCookie();
+        $sessiondata['cookie'] = $cookie;
+        $sessiondata['application'] = $application;
+        $sessiondata['userid'] = get_current_user_id();
+        $url = ContinueWithVipps::getAuthRedirect('synch',$sessiondata);
         return $url;
     }
 
@@ -689,6 +725,59 @@ class VippsLogin {
         wp_safe_redirect($redir);
         exit();
 
+    }
+
+    public function continue_with_vipps_error_synch($error,$errordesc,$error_hint='',$sessiondata=array()) {
+        $userid = get_current_user_id();
+        if (!$userid) wp_die(__('You must be logged in to synchronise your account', 'login-vipps'));
+        $redir = get_edit_user_link($userid);
+        $app = sanitize_title(($sessiondata && isset($sessiondata['application'])) ? $sessiondata['application'] : 'wordpress');
+        $referer = ($sessiondata && isset($sessiondata['referer'])) ? $sessiondata['referer'] : '';
+
+        // Override error page redirect for your application. No access to the possible new session. IOK 2019-10-08
+        $redir = apply_filters('continue_with_vipps_error_synch_redirect', $redir, $error, $sessiondata);
+        $redir = apply_filters("continue_with_vipps_error_{$app}_synch_redirect", $redir, $error, $sessiondata);
+        do_action("continue_with_vipps_error_{$app}_synch", $error, $errordesc, $errorhint, $sessiondata);
+        wp_safe_redirect($redir);
+        exit();
+    }
+
+    public function continue_with_vipps_error_wordpress_synch ($error, $errordesc, $errorhint, $sessiondata) {
+        // Cannot  use the 'store_admin_notices' of ContinueWithVipps here, because it breaks Woocommerce which will not have been loaded yet 
+        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        if (!$cookie) return;
+        $cookiehash =  hash('sha256',$cookie,false);
+        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not synchronize your Vipps account: ", 'login-vipps') . esc_html($errordesc) . "<p></div>";
+        set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
+    }
+
+    public function continue_with_vipps_synch($userinfo,$session) {
+        if (!is_user_logged_in()) {
+            $this->deleteBrowserCookie();
+            if ($session) $session->destroy();
+            wp_die(__('This can only be called when logged in', 'login-vipps'));
+        }
+        if (!$userinfo) {
+            $this->deleteBrowserCookie();
+            if ($session) $session->destroy();
+            wp_safe_redirect($redir);
+            exit();
+        }
+        update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+        $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
+
+        $profile = get_edit_user_link($user->ID);
+        $redir = $profile;
+        if (isset($sessiondata['referer']) && $sessiondata['referer']) {
+            $link = $sessiondata['referer'];
+        }
+        $userid = get_current_user_id();
+        $redir = apply_filters('continue_with_vipps_synch_redirect', $profile, $userid, $session);
+        $redir = apply_filters("continue_with_vipps_{$app}_synch_redirect", $redir , $userid, $session);
+        $this->deleteBrowserCookie();
+        if ($session) $session->destroy();
+        wp_safe_redirect($redir);
+        exit();
     }
 
     public function wp_enqueue_scripts() {
