@@ -395,6 +395,7 @@ class WooLogin{
     public function synch_addresses($userid,$userinfo, $session) {
         error_log("Synch addresses");
         update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+        delete_user_meta($user->ID,'_vipps_just_synched', 1);
         // Woocommerce may not have loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
         // We are always logged in here, so just use the cookie contents as a quickie session.

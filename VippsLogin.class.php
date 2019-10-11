@@ -767,9 +767,9 @@ class VippsLogin {
         update_user_meta($userid,'_vipps_synchronize_addresses', 1);
         update_user_meta($userid,'_vipps_just_synched', 1);
 
+        $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
         do_action("continue_with_vipps_{$app}_synch",$userid,$userinfo,$session);
 
-        $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
         $profile = get_edit_user_link($userid);
         $redir = $profile;
