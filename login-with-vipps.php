@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once(dirname(__FILE__) . '/VippsSession.class.php');
+require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
 
 global $ContinueWithVipps;
 require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');

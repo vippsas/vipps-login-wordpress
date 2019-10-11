@@ -861,7 +861,6 @@ All at ###SITENAME###
      if ($this->currentSid) {
         list ($userid, $sid) = $this->currentSid; 
         # If user requries vipps and we have no sid, then return a WP_Error
-        error_log("logging in $userid and $sid for " . $user->ID);
      }
      return $user;
   }

@@ -5,6 +5,7 @@ class ContinueWithVipps {
   public $options = array();
   public $settings = array();
   public $oauthdata = null;
+  public $oauthkeys = array();
   public static $dbversion = 1;
  
   function __construct() {
@@ -35,6 +36,7 @@ class ContinueWithVipps {
   }
 
   public function init () {
+
   }
 
   public function plugins_loaded () {
@@ -86,7 +88,9 @@ class ContinueWithVipps {
 
       $args = array('grant_type'=>'authorization_code', 'code'=>$code, 'redirect_uri'=>$redir);
 
-      return $this->http_call($url,$args,'POST',$headers,'url');
+      $response = $this->http_call($url,$args,'POST',$headers,'url');
+      error_log(print_r($response,true));
+      return $response;
   }
 
   private function get_openid_userinfo($accesstoken) {
@@ -120,6 +124,27 @@ class ContinueWithVipps {
   protected function base_url() {
     return "https://api.vipps.no/access-management-1.0/access/";
   }
+
+  protected function get_oath_keys() {
+    if ($this->oauthkeys) return $this->oauthkeys;
+    $keys = get_transient('_login_with_vipps_oauth_keys');
+    if ($keys) {
+     $this->oauthkeys= $keys;
+     return $keys;
+    }
+    $data =$this->get_oauth_data();
+    if ($data && isset($data['jwks_uri'])) {
+      $keyscontent = @file_get_contents($data['jwks_uri']);
+      $keysdata = array();
+      if (!empty($keyscontent)) $keysdata = json_decode($keyscontent,true);
+      if (!empty($keysdata) && isset($keysdata['keys'])) {
+       $this->oauthkeys = $keysdata['keys']; 
+       set_transient('_login_with_vipps_oauth_keys', $this->oauthkeys, 60*60*24);
+      }
+    }
+    return $this->oauthkeys;
+  }
+
   // Get (and store) the endpoint urls // FIXME HERE IOK
   protected function get_oauth_data() {
     if ($this->oauthdata) return $this->oauthdata;
@@ -136,7 +161,6 @@ class ContinueWithVipps {
     }
     // Store for one day if possible
     set_transient('_login_with_vipps_oauth_data', $wellknowndata, 60*60*24);
-
     $this->oauthdata = $wellknowndata;
     return $wellknowndata;
   }
@@ -199,6 +223,8 @@ class ContinueWithVipps {
         $scope = @$_REQUEST['scope'];
  
         $accesstoken = null;
+        $idtoken = null;
+        $idtoken_sub = null;
     
         if ($session && $session['userinfo']) {
           $userinfo = $session['userinfo'];
@@ -207,6 +233,9 @@ class ContinueWithVipps {
           $authtoken = $this->get_auth_token($code);
           if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
               $accesstoken = $authtoken['content']['access_token'];
+              $idtoken = $authtoken['content']['id_token'];
+
+
           } else {
               if($session) $session->destroy();
               if ($forwhat) { 
