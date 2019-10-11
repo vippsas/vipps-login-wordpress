@@ -4,7 +4,17 @@
    Version: 0.01
    Description: Passwordless login and stuff using Vipps
    Author: WP-Hosting AS
+   Plugin URI: https://wordpress.org/plugins/login-with-vipps/
+   Description: Use Vipps for passwordless login and more
+   Author: WP Hosting
+   Author URI: https://www.wp-hosting.no/
+   Text-domain: login-with-vipps
+   Domain Path: /languages
+   Version: 0.9
+   License: 
  */
+
+
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly

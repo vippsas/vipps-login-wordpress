@@ -22,7 +22,7 @@ class ContinueWithVipps {
 
     // This function only exists so that gettext will discover these strings so you can edit them in Loco Translate and so forth IOK 2019-10-08
     private function translation_dummy () {
-        print __('User cancelled the login', 'login-vipps');
+        print __('User cancelled the login', 'login-with-vipps');
     }
 
     public function admin_init () {
@@ -32,7 +32,7 @@ class ContinueWithVipps {
     }
 
     public function admin_menu () {
-        add_options_page(__('Login with Vipps', 'login-vipps'), __('Login with Vipps','login-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
+        add_options_page(__('Login with Vipps', 'login-with-vipps'), __('Login with Vipps','login-with-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
     }
 
     public function init () {
@@ -40,6 +40,7 @@ class ContinueWithVipps {
     }
 
     public function plugins_loaded () {
+        $ok = load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
         $this->options =  get_option('vipps_login_options'); 
         // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
         $this->dbtables();
@@ -214,7 +215,7 @@ class ContinueWithVipps {
             // Delete this - you may need to create a new session in your errorhandler.
             if($session) $session->destroy();
             do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
-            wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-vipps'), esc_html($forwhat), esc_html($error)));
+            wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-with-vipps'), esc_html($forwhat), esc_html($error)));
         }
 
         $code =  @$_REQUEST['code'];
@@ -240,14 +241,14 @@ class ContinueWithVipps {
                         error_log("Error verifiying the oAuth2 JWT: " . $result['msg']);
                         if($session) $session->destroy();
                         if ($forwhat) { 
-                            do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',sprintf(__('Could not verify your oAuth2 token: %s', 'login-vipps'), esc_html($result['msg'])),'', $session);
+                            do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',sprintf(__('Could not verify your oAuth2 token: %s', 'login-with-vipps'), esc_html($result['msg'])),'', $session);
                         }
-                        wp_die(sprintf(__('Could not verify your oAuth2 token: %s', 'login-vipps'), esc_html($result['msg'])));
+                        wp_die(sprintf(__('Could not verify your oAuth2 token: %s', 'login-with-vipps'), esc_html($result['msg'])));
                     }
                 } else {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-with-vipps'),'', $session);
                     }
                     wp_die($authtoken['headers'][0]);
                 }
@@ -256,24 +257,24 @@ class ContinueWithVipps {
                 if ($userinfo['response'] != 200) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-with-vipps'),'', $session);
                     }
                     wp_die($userinfo['response']);
                 }
                 if ($userinfo['content']['sub'] != $idtoken_sub) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-with-vipps'),'', $session);
                     }
-                    wp_die(__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-vipps'));
+                    wp_die(__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-with-vipps'));
                 }
 
                 $userinfo = @$userinfo['content'];
                 if ($session) {
                     $session->set( 'userinfo', $userinfo);
                 } else {
-                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry', 'login-vipps'),'', $session);
-                    wp_die(__('Session expired - please retry', 'login-vipps'));
+                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry', 'login-with-vipps'),'', $session);
+                    wp_die(__('Session expired - please retry', 'login-with-vipps'));
                 }
             }
         } 
@@ -282,7 +283,7 @@ class ContinueWithVipps {
         // be alive so that this can be called repeatedly. The session should be destroyed only when the action is done; that is, completes whatever it tries to do.
         do_action('continue_with_vipps_' .  $forwhat, $userinfo, $session);
         if($session) $session->destroy();
-        wp_die(sprintf(__('You successfully completed the action "%s" using Vipps - unfortunately, this website doesn\'t know how to handle that.', 'login-vipps'), $forwhat ));
+        wp_die(sprintf(__('You successfully completed the action "%s" using Vipps - unfortunately, this website doesn\'t know how to handle that.', 'login-with-vipps'), $forwhat ));
     }
 
     public function make_callback_url () {
@@ -435,9 +436,9 @@ class ContinueWithVipps {
         }
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
         if($exists != $tablename) {
-            $this->add_admin_notice(__('Could not create session table - Login With Vipps plugin is not correctly installed', 'login-vipps'));
+            $this->add_admin_notice(__('Could not create session table - Login With Vipps plugin is not correctly installed', 'login-with-vipps'));
         } else {
-            error_log(__("Installed database tables for Login With Vipps", 'login-vipps'));
+            error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
             $options['dbversion']=static::$dbversion;
             update_option('vipps_login_options',$options,false);
         }
@@ -447,7 +448,7 @@ class ContinueWithVipps {
 
     public function toolpage () {
         if (!is_admin() || !current_user_can('manage_options')) {
-            die(__("Insufficient privileges",'login-vipps'));
+            die(__("Insufficient privileges",'login-with-vipps'));
         }
         $options = get_option('vipps_login_options'); 
 
@@ -464,12 +465,12 @@ class ContinueWithVipps {
             <table class="form-table" style="width:100%">
 
             <tr>
-            <td><?php _e('Client ID', 'login-vipps'); ?></td>
+            <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" value="<?php echo htmlspecialchars($options['clientid']);?>" type="text"></td>
             <td><?php _e('Your client ID, from the Vipps Portal','vipps-login'); ?></td>
             </tr>
             <tr>
-            <td><?php _e('Client Secret', 'login-vipps'); ?></td>
+            <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" value="<?php echo htmlspecialchars($options['clientsecret']);?>" type="xpassword"></td>
             <td><?php _e('Your client secret, from the Vipps Portal','vipps-login'); ?></td>
             </tr>

@@ -1,0 +1,368 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Login with Vipps\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-11 22:12+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.3.0; wp-5.3-beta3-46458"
+
+#: VippsLogin.class.php:46 WooLogin.class.php:284
+#, php-format
+msgid "You are now connected to the Vipps account <b>%s</b>!"
+msgstr ""
+
+#: VippsLogin.class.php:52
+#, php-format
+msgid "You are now synchronized with the Vipps account <b>%s</b>!"
+msgstr ""
+
+#: VippsLogin.class.php:152 VippsLogin.class.php:802
+msgid "Log in with"
+msgstr ""
+
+#: VippsLogin.class.php:157 WooLogin.class.php:93
+msgid "Continue with"
+msgstr ""
+
+#: VippsLogin.class.php:285
+msgid ""
+"Cannot redirect to Login With Vipps waiting page - it doesn't exist! If you "
+"just tried to log in, check your email."
+msgstr ""
+
+#: VippsLogin.class.php:302
+msgid ""
+"This page is used to handle your requests when continuing from Vipps and "
+"further action is required to complete your task. But in this case, it "
+"doesn't seem to be an open session"
+msgstr ""
+
+#: VippsLogin.class.php:339
+msgid ""
+"Welcome! As this is your first log-in with Vipps, for safety reasons we "
+"require that you must confirm that your account as identified by your "
+"registered e-mail belongs to you."
+msgstr ""
+
+#: VippsLogin.class.php:346
+#, php-format
+msgid ""
+"Welcome! If you see this page, an really unexpected error has occur. "
+"Unfortunately, we can't do better than to send you to the <a href='%s'>login "
+"page</a>"
+msgstr ""
+
+#: VippsLogin.class.php:387
+msgid "Connect your Vipps account"
+msgstr ""
+
+#: VippsLogin.class.php:395
+#, php-format
+msgid "Confirm that you want to connect your Vipps account on %s"
+msgstr ""
+
+#: VippsLogin.class.php:423 ContinueWithVipps.class.php:25
+msgid "User cancelled the login"
+msgstr ""
+
+#: VippsLogin.class.php:552
+msgid ""
+"Your session is invalid. Only one Vipps-session can be active per browser at "
+"a time. Also, ensure that you are not blocking cookies - you will need those "
+"for login!"
+msgstr ""
+
+#: VippsLogin.class.php:564
+msgid "Could not find any user with your registered email - cannot log in"
+msgstr ""
+
+#: VippsLogin.class.php:579
+#, php-format
+msgid "Could not create a new user - an error occured: %s"
+msgstr ""
+
+#: VippsLogin.class.php:614
+msgid "It is unfortunately not allowed for your account to log-in using Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:628
+msgid ""
+"Another Vipps account is already connected to the user with your e-mail "
+"address. Unfortunately we can't log you in"
+msgstr ""
+
+#: VippsLogin.class.php:645
+msgid ""
+"Unfortunately, we could not send a confirmation request to your e-mail "
+"address. You will need to log in with username and password, and connect "
+"your Vipps app on your profile page."
+msgstr ""
+
+#: VippsLogin.class.php:660
+msgid "You must be logged in to confirm your account"
+msgstr ""
+
+#: VippsLogin.class.php:680
+msgid "Could not connect to your Vipps account: "
+msgstr ""
+
+#: VippsLogin.class.php:688 VippsLogin.class.php:758
+msgid "This can only be called when logged in"
+msgstr ""
+
+#: VippsLogin.class.php:713
+msgid ""
+"Unfortunately, you cannot connect to this Vipps-account: The email addresses "
+"are not the same."
+msgstr ""
+
+#: VippsLogin.class.php:732
+msgid "You must be logged in to synchronise your account"
+msgstr ""
+
+#: VippsLogin.class.php:750
+msgid "Could not synchronize your Vipps account: "
+msgstr ""
+
+#: VippsLogin.class.php:806 WooLogin.class.php:166
+msgid "Create an account using "
+msgstr ""
+
+#: VippsLogin.class.php:822
+msgid "Log in without password using Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:885
+msgid "Continue with Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:890
+msgid "Could not find or create the 'continue with Vipps' page"
+msgstr ""
+
+#: VippsLogin.class.php:905
+msgid "Log in with Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:909
+msgid "Use Vipps to login to your account"
+msgstr ""
+
+#: VippsLogin.class.php:917 WooLogin.class.php:313
+msgid "Press here to disconnect"
+msgstr ""
+
+#: VippsLogin.class.php:918
+msgid ""
+"As long as your account is connected to a Vipps account, you can log in just "
+"by using Log in With Vipps using the connected app."
+msgstr ""
+
+#: VippsLogin.class.php:921
+msgid "You are not connected to any Vipps accounts"
+msgstr ""
+
+#: VippsLogin.class.php:922 WooLogin.class.php:318
+msgid "Press here to connect with your app"
+msgstr ""
+
+#: VippsLogin.class.php:924
+msgid "The user is not connected to any Vipps accounts"
+msgstr ""
+
+#: VippsLogin.class.php:926
+msgid ""
+"You can connect to your Vipps account if you use the same email address both "
+"in the app and on this site. After connecting, you can log in just using "
+"Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:934
+msgid "Vipps login disabled"
+msgstr ""
+
+#: VippsLogin.class.php:951 WooLogin.class.php:244 WooLogin.class.php:340
+#, php-format
+msgid "Connection to Vipps account %s <b>removed</b>."
+msgstr ""
+
+#: VippsLogin.class.php:997
+msgid "Continue-with-Vipps page"
+msgstr ""
+
+#: VippsLogin.class.php:999
+msgid "Create a new page"
+msgstr ""
+
+#. Name of the plugin
+#: ContinueWithVipps.class.php:35
+msgid "Login with Vipps"
+msgstr ""
+
+#: ContinueWithVipps.class.php:218
+#, php-format
+msgid "Unhandled error when using Continue with Vipps for action %s: %s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:244 ContinueWithVipps.class.php:246
+#, php-format
+msgid "Could not verify your oAuth2 token: %s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:267 ContinueWithVipps.class.php:269
+msgid ""
+"There is a problem with verifying your ID token from Vipps. Unfortunately, "
+"you cannot continue with Vipps at this time"
+msgstr ""
+
+#: ContinueWithVipps.class.php:276 ContinueWithVipps.class.php:277
+msgid "Session expired - please retry"
+msgstr ""
+
+#: ContinueWithVipps.class.php:286
+#, php-format
+msgid ""
+"You successfully completed the action \"%s\" using Vipps - unfortunately, "
+"this website doesn't know how to handle that."
+msgstr ""
+
+#: ContinueWithVipps.class.php:439
+msgid ""
+"Could not create session table - Login With Vipps plugin is not correctly "
+"installed"
+msgstr ""
+
+#: ContinueWithVipps.class.php:441
+msgid "Installed database tables for Login With Vipps"
+msgstr ""
+
+#: ContinueWithVipps.class.php:451
+msgid "Insufficient privileges"
+msgstr ""
+
+#: ContinueWithVipps.class.php:468
+msgid "Client ID"
+msgstr ""
+
+#: ContinueWithVipps.class.php:473
+msgid "Client Secret"
+msgstr ""
+
+#: WooLogin.class.php:121
+#, php-format
+msgid "Log in or register an account with %s to continue your checkout!"
+msgstr ""
+
+#: WooLogin.class.php:123
+#, php-format
+msgid ""
+"Are you registered as a customer? Log in with %s to continue your checkout!"
+msgstr ""
+
+#: WooLogin.class.php:126 WooLogin.class.php:148 WooLogin.class.php:165
+msgid "Click here to continue"
+msgstr ""
+
+#: WooLogin.class.php:143
+#, php-format
+msgid "Log in or register an account using %s !"
+msgstr ""
+
+#: WooLogin.class.php:145
+#, php-format
+msgid "Are you registered as a customer? Log in with %s!"
+msgstr ""
+
+#: WooLogin.class.php:291
+msgid "Vipps"
+msgstr ""
+
+#: WooLogin.class.php:295 WooLogin.class.php:355
+msgid "Vipps!"
+msgstr ""
+
+#: WooLogin.class.php:314
+msgid "Press here to synchronize your address"
+msgstr ""
+
+#: WooLogin.class.php:320
+msgid "With Vipps, logging in is easier than ever - no passwords!"
+msgstr ""
+
+#: WooLogin.class.php:327
+msgid "You must be logged in to disconnect"
+msgstr ""
+
+#: WooLogin.class.php:415
+#, php-format
+msgid "Your addresses are now synchronized with the Vipps-account %s."
+msgstr ""
+
+#: WooLogin.class.php:584
+msgid "Woocommerce integration"
+msgstr ""
+
+#: WooLogin.class.php:586
+msgid "Use Login With Vipps for Woocommerce"
+msgstr ""
+
+#: WooLogin.class.php:591
+msgid ""
+"Check this to enable Log in With Vipps on your customers pages in Woocommerce"
+msgstr ""
+
+#: WooLogin.class.php:595
+msgid ""
+"Allow users to register as customers in Woocommerce using login with Vipps"
+msgstr ""
+
+#: WooLogin.class.php:600
+msgid ""
+"Check this to allow new users to be created as customers if using Log in "
+"With Vipps in a Woocommerce context"
+msgstr ""
+
+#: WooLogin.class.php:604
+msgid "Show \"Continue with Vipps\" in shopping cart"
+msgstr ""
+
+#: WooLogin.class.php:609
+msgid ""
+"Check this to enable \"Continue with Vipps\" in the Shopping Cart and "
+"widgets. If you are using Express checkout, that will be shown instead."
+msgstr ""
+
+#: WooLogin.class.php:613
+msgid "Show \"Continue with Vipps\" on the checkout page"
+msgstr ""
+
+#: WooLogin.class.php:618
+msgid ""
+"Check this to enable \"Continue with Vipps\" on the checkout page. This will "
+"replace express checkout on the checkout page."
+msgstr ""
+
+#. Description of the plugin
+msgid "Passwordless login and stuff using Vipps"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/login-with-vipps/"
+msgstr ""
+
+#. Author of the plugin
+msgid "WP-Hosting AS"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.wp-hosting.no/"
+msgstr ""
