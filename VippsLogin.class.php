@@ -763,10 +763,15 @@ class VippsLogin {
             wp_safe_redirect($redir);
             exit();
         }
-        update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+        $userid = get_current_user_id();
+        update_user_meta($userid,'_vipps_synchronize_addresses', 1);
+        update_user_meta($userid,'_vipps_just_synched', 1);
+
+        do_action("continue_with_vipps_{$app}_synch",$userid,$userinfo,$session);
+
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
-        $profile = get_edit_user_link($user->ID);
+        $profile = get_edit_user_link($userid);
         $redir = $profile;
         if (isset($sessiondata['referer']) && $sessiondata['referer']) {
             $link = $sessiondata['referer'];

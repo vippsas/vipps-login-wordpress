@@ -216,12 +216,20 @@ class WooLogin{
             add_action("continue_with_vipps_woocommerce_confirm_before_redirect", array($this,'before_confirm_redirect'), 10, 3); 
             add_filter("continue_with_vipps_woocommerce_confirm_redirect", array($this,'confirm_redirect'), 10, 3);
             add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
-            add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); // Use this for successful 
+            add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); 
+ 
+            // And for synching addresses
+           add_action('continue_with_vipps_woocommerce_synch', array($this, 'synch_addresses'), 10, 3);
+           add_filter("continue_with_vipps_woocommerce_synch_redirect", array($this,'confirm_redirect'), 10, 3);
+           add_action('continue_with_vipps_error_woocommerce_synch', array($this, 'add_woocommerce_error'), 10, 4);
+           add_filter("continue_with_vipps_error_woocommerce_synch_redirect", array($this,'error_redirect'), 10, 3); 
+
 
             $this->add_shortcodes();
         }
     }
 
+ 
     // We can't always add notices to the woo session, because we don't always have Woo loaded. So we'll use a transient to carry over .
     // We are always logged in here, so just use the cookie contents as a quickie session, using a short transient.
     public function add_stored_woocommerce_notices() {
@@ -300,11 +308,12 @@ class WooLogin{
             <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>
             <input type="hidden" name="action" value="disconnect_vipps">
             <input type="hidden" name="data" value="foobarid">
-            <button type="submit" class='button vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-vipps'); ?></button>
+            <button type="submit" class='button vippsorange vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-vipps'); ?></button>
+            <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch"><?php _e('Press here to synchronize your address','login-vipps'); ?></button>
             </form>
             </p>
             <?php else: ?>
-            <p><button type="button" onclick="connect_vipps_account('woocommerce');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
+            <p><button type="button" onclick="connect_vipps_account('woocommerce');return false"; class="button vippsorange vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-vipps'); ?></button></p>
             <?php endif; ?>
             <p> <?php _e('With Vipps, logging in is easier than ever - no passwords!', 'login-vipps'); ?> </p>
             <?php
@@ -378,6 +387,27 @@ class WooLogin{
     }
 
     public function before_confirm_redirect( $userid, $userinfo, $session) {
+        $customer = new WC_Customer($userid);
+        $this->maybe_update_address_info($customer,$userinfo);
+        return true;
+    }
+
+    public function synch_addresses($userid,$userinfo, $session) {
+        error_log("Synch addresses");
+        update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+        // Woocommerce may not have loaded yet, so we'll just add the notices in a transient - we can't use the session
+        // If they were critical, the users' metadata would have worked. IOK 2019-10-08
+        // We are always logged in here, so just use the cookie contents as a quickie session.
+        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        if ($cookie) {
+            $phone = $userinfo['phone'];
+            $cookiehash =  hash('sha256',$cookie,false);
+            $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
+            $notice = sprintf(__('Your addresses are now synchronized with the Vipps-account %s.', 'login-vipps'), $phone);
+            $notices[]=array('notice'=>$notice, 'type'=>'success');
+            set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
+        }        
+
         $customer = new WC_Customer($userid);
         $this->maybe_update_address_info($customer,$userinfo);
         return true;

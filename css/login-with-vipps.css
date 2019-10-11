@@ -59,8 +59,9 @@
  border: 0;
 }
 
-.vippsorange {
+.vippsorange, .button.vippsorange, button.vippsorange{
  background-color: #fe5b24;
+ color: #fff;
 }
 
 /* For woocommerce */
@@ -91,7 +92,6 @@
 .woocommerce-cart-tab-container .widget_shopping_cart a.button.continue-with-vipps{
  min-width: 190px;
 }
-
 /* Banner code */
 .woocommerce-info.vipps-info {
  background-color: #fe5b24;
