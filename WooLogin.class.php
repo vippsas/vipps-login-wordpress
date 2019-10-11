@@ -224,6 +224,8 @@ class WooLogin{
            add_action('continue_with_vipps_error_woocommerce_synch', array($this, 'add_woocommerce_error'), 10, 4);
            add_filter("continue_with_vipps_error_woocommerce_synch_redirect", array($this,'error_redirect'), 10, 3); 
 
+           add_action("woocommerce_customer_save_address", array($this,'customer_save_address'), 80);
+
 
             $this->add_shortcodes();
         }
@@ -386,6 +388,13 @@ class WooLogin{
         return $redir;
     }
 
+    // If a user saves their own address on the profile screen, we break the link with Vipps.
+    public function customer_save_address () {
+        $userid = get_current_user_id();
+        if (!$userid) return;
+        delete_user_meta($userid,'_vipps_synchronize_addresses', 1);
+    }
+
     public function before_confirm_redirect( $userid, $userinfo, $session) {
         $customer = new WC_Customer($userid);
         $this->maybe_update_address_info($customer,$userinfo);
@@ -393,7 +402,6 @@ class WooLogin{
     }
 
     public function synch_addresses($userid,$userinfo, $session) {
-        error_log("Synch addresses");
         update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
         delete_user_meta($user->ID,'_vipps_just_synched', 1);
         // Woocommerce may not have loaded yet, so we'll just add the notices in a transient - we can't use the session
@@ -485,7 +493,7 @@ class WooLogin{
     // IOK 2019-10-04 normally we want to update the users' address every time we log in, because this allows Vipps to be the repository of the users' address.
     // However, if the user has changed his or her address in woo itself, we will let it stay as it is.
     public function maybe_update_address_info($user, $userinfo) {
-        if (!get_user_meta($user->ID,'_vipps_synchronize_addresses')) return false;
+        if (!get_user_meta($user->ID,'_vipps_synchronize_addresses',true)) return false;
         $customer = new WC_Customer($user->ID);
         $address = $userinfo['address'][0];
         foreach($userinfo['address'] as $add) {
