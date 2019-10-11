@@ -4,6 +4,7 @@
 class ContinueWithVipps {
   public $options = array();
   public $settings = array();
+  public $oauthdata = null;
   public static $dbversion = 1;
  
   function __construct() {
@@ -78,8 +79,7 @@ class ContinueWithVipps {
       $secret = $this->settings['clientsecret'];
       $redir  = $this->make_callback_url();
 
-      # IOK FIXME better use .wellknown for this
-      $url = $this->backendUrl("oauth2/token");
+      $url = $this->token_endpoint();
 
       $headers = array();
       $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
@@ -92,8 +92,7 @@ class ContinueWithVipps {
   private function get_openid_userinfo($accesstoken) {
       $headers = array();
       $headers['Authorization'] = "Bearer $accesstoken";
-      # IOK FIXME better use .wellknown for this
-      $url = $this->backendUrl("userinfo");
+      $url = $this->userinfo_endpoint();
       $args = array();
 
       return $this->http_call($url,$args,'GET',$headers,'url');
@@ -101,7 +100,7 @@ class ContinueWithVipps {
 
   public static function getAuthRedirect($action,$sessiondata=null,$scope="openid address birthDate email name phoneNumber") {
     $me = static::instance();
-    $url      = $me->backendUrl('oauth2/auth');
+    $url      = $me->authorization_endpoint();
     $redir    = $me->make_callback_url();
     $clientid = $me->settings['clientid'];
     if (is_array($scope)) $scope = join(' ',$scope);
@@ -117,11 +116,56 @@ class ContinueWithVipps {
     return $url . '?' . http_build_query($args);
   }
 
+  // Where we talk with Vipps
+  protected function base_url() {
+    return "https://api.vipps.no/access-management-1.0/access/";
+  }
+  // Get (and store) the endpoint urls // FIXME HERE IOK
+  protected function get_oauth_data() {
+    if ($this->oauthdata) return $this->oauthdata;
+    $data = get_transient('_login_with_vipps_oauth_data');
+    if ($data) {
+     $this->oauthdata = $data;
+     return $data;
+    }
+    $wellknownurl = $this->base_url() . ".well-known/openid-configuration";
+    $wellknowncontents= @file_get_contents($wellknownurl);
+    $wellknowndata=array();
+    if ($wellknowncontents) {
+      $wellknowndata = @json_decode($wellknowncontents,true);
+    }
+    // Store for one day if possible
+    set_transient('_login_with_vipps_oauth_data', $wellknowndata, 60*60*24);
+
+    $this->oauthdata = $wellknowndata;
+    return $wellknowndata;
+  }
   // Return the  URL to the oAuth-backend.
   public function backendUrl ($command) {
-    return "https://api.vipps.no/access-management-1.0/access/" . $command;
-    return "https://apitest.vipps.no/access-management-1.0/access/" . $command;
-//    return "https://api.vipps.no/access-management-1.0/access/" . $command;
+    $oauth = $this->base_url();
+    $url = $oauth . $command ;
+    return $url;
+  } 
+  public function token_endpoint() {
+    // We actually know this is the place, but will use the values from '.well-known' for correctness.
+    $fallback = $this->base_url . "oauth2/token"; 
+    $data = $this->get_oauth_data();
+    if (!empty($data)) return $data['token_endpoint'];
+    return $fallback; 
+  }
+  public function authorization_endpoint() {
+    // We actually know this is the place, but will use the values from '.well-known' for correctness.
+    $fallback = $this->base_url . "oauth2/auth"; 
+    $data = $this->get_oauth_data();
+    if (!empty($data)) return $data['authorization_endpoint'];
+    return $fallback; 
+  }
+  public function userinfo_endpoint() {
+    // We actually know this is the place, but will use the values from '.well-known' for correctness.
+    $fallback = $this->base_url . "userinfo"; 
+    $data = $this->get_oauth_data();
+    if (!empty($data)) return $data['userinfo_endpoint'];
+    return $fallback; 
   }
 
   // This is the actual handler for all returns from Vipps; it's extendable by using standard Wordpress actions/filters
