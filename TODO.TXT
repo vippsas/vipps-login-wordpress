@@ -45,6 +45,9 @@
 * DESIGN
 ** [DONE] Get resources in place
 
+* LANG
+** Norsk
+
 * FORMALITIES
 ** readme.txt
 ** wp.org-resources
