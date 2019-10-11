@@ -71,30 +71,22 @@ class WooLogin{
   }
 
   public function continue_with_vipps_button_for_carts($type='widget'){
-    error_log("Aga 2");
     if (is_user_logged_in()) return false;
     if (!$this->is_active()) return false;
-    error_log("Aga 3");
-    if (is_user_logged_in()) return false;
-    error_log("Aga 4");
 
     $gw = $this->is_gateway_active();
 
-    error_log("Aga 7");
 
     $options =  get_option('vipps_login_woo_options');
     $show_continue_with_vipps = intval($options['woo-checkout-login']);
     $express_checkout = $gw && $gw->show_express_checkout();
 
     $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', ($show_continue_with_vipps && !$express_checkout));
-    error_log("Aga 5");
     if (!$show_continue_with_vipps) return;
-    error_log("Aga 6");
     $this->cart_continue_with_vipps_button_html($type);
   }
 
   public function cart_continue_with_vipps_button_html($type) {
-        error_log("Aga 1");
         if (!$this->is_active()) return false;
 ?>
      <div class='continue-with-vipps-wrapper center-block <?php echo $type; ?>'>
