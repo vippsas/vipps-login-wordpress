@@ -32,14 +32,15 @@
 
 * SECURITY
 **  Add option to not allow admins to use Vipps
-** Require confirmation if $sub and $phone differs? Change text of confirmation? Deny login and require de-confirmation first?
+** [DISALLOWED] Require confirmation if $sub and $phone differs? Change text of confirmation? Deny login and require de-confirmation first?
 
 * USER HANDLING
 ** [IN PROGRESS] Copy on write on changing addresses etc on Vipps users (mark user as originally from vipps and changed)
 
 * API
-** Get URLs via .well-known
-** Verify using the keys provided (libsodium or compat from 5.2 or 7.2 onwards, fallback to openssl, fallback to praying)
+** [DONE] Get URLs via .well-known
+** [DONE] Verify using the keys provided (libsodium or compat from 5.2 or 7.2 onwards, fallback to openssl, fallback to praying) - openssl
+*** ad phpseclib as fallback in compat
 
 * DESIGN
 ** [DONE] Get resources in place
