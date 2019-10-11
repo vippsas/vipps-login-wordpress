@@ -89,7 +89,6 @@ class ContinueWithVipps {
       $args = array('grant_type'=>'authorization_code', 'code'=>$code, 'redirect_uri'=>$redir);
 
       $response = $this->http_call($url,$args,'POST',$headers,'url');
-      error_log(print_r($response,true));
       return $response;
   }
 
@@ -125,7 +124,7 @@ class ContinueWithVipps {
     return "https://api.vipps.no/access-management-1.0/access/";
   }
 
-  protected function get_oath_keys() {
+  protected function get_oauth_keys() {
     if ($this->oauthkeys) return $this->oauthkeys;
     $keys = get_transient('_login_with_vipps_oauth_keys');
     if ($keys) {
@@ -145,7 +144,6 @@ class ContinueWithVipps {
     return $this->oauthkeys;
   }
 
-  // Get (and store) the endpoint urls // FIXME HERE IOK
   protected function get_oauth_data() {
     if ($this->oauthdata) return $this->oauthdata;
     $data = get_transient('_login_with_vipps_oauth_data');
@@ -194,8 +192,8 @@ class ContinueWithVipps {
 
   // This is the actual handler for all returns from Vipps; it's extendable by using standard Wordpress actions/filters
   public function continue_from_vipps () {
+       // We are always going to redirect somewhere from here, so let's start by not caching this. IOK 2019-10-11
         wc_nocache_headers();
-        // Actually, we're totally going to redirect somewhere here. FIXME
 
         $state = @$_REQUEST['state'];
         $action ='';
@@ -234,8 +232,18 @@ class ContinueWithVipps {
           if (isset($authtoken['content']) && isset($authtoken['content']['access_token'])) {
               $accesstoken = $authtoken['content']['access_token'];
               $idtoken = $authtoken['content']['id_token'];
-
-
+              $keys = $this->get_oauth_keys();
+              $result = VippsJWTVerifier::verify_idtoken($idtoken,$keys);
+              if ($result['status'])  {
+                 $idtoken_sub = $result['data']['sub'];
+              } else {
+                 error_log("Error verifiying the oAuth2 JWT: " . $result['msg']);
+                 if($session) $session->destroy();
+                 if ($forwhat) { 
+                     do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',sprintf(__('Could not verify your oAuth2 token: %s', 'login-vipps'), esc_html($result['msg'])),'', $session);
+                 }
+                 wp_die(sprintf(__('Could not verify your oAuth2 token: %s', 'login-vipps'), esc_html($result['msg'])));
+              }
           } else {
               if($session) $session->destroy();
               if ($forwhat) { 
@@ -246,13 +254,20 @@ class ContinueWithVipps {
           $userinfo = $this->get_openid_userinfo($accesstoken);
 
           if ($userinfo['response'] != 200) {
-            # FIXME ERRORHANDLING 
             if($session) $session->destroy();
             if ($forwhat) { 
               do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-vipps'),'', $session);
             }
             wp_die($userinfo['response']);
           }
+          if ($userinfo['content']['sub'] != $idtoken_sub) {
+            if($session) $session->destroy();
+            if ($forwhat) { 
+              do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-vipps'),'', $session);
+            }
+            wp_die(__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-vipps'));
+          }
+
           $userinfo = @$userinfo['content'];
           if ($session) {
               $session->set( 'userinfo', $userinfo);

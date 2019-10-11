@@ -1,5 +1,4 @@
-<?php
-/*
+<?php /*
   This file is based on Firebases and fproject JWT.PHP (https://github.com/fproject/php-jwt/tree/master/src)  which is licensed like this:
 
 
@@ -78,16 +77,16 @@ class VippsJWTVerifier {
        $bodyjson  = static::base64urldecode($bodyb64);
        $crypto = static::base64urldecode($cryptob64);
 
-       $head = @json_decode($headjson, false, 512, JSON_BIGINT_AS_STRING);
-       $body = @json_decode($bodyjson, false, 512, JSON_BIGINT_AS_STRING);
+       $head = @json_decode($headjson, true, 512, JSON_BIGINT_AS_STRING);
+       $body = @json_decode($bodyjson, true, 512, JSON_BIGINT_AS_STRING);
 
        if (!$head  || !$body) return array('status'=>0, 'msg'=>'malformed_head_or_body');
 
-       if (empty($head->alg)) return array('status'=>0,'msg'=>'empty_algorithm', 'data'=>null);
-       if (empty(static::$supported_algs[$head->alg])) array('status'=>0,'msg'=>'unsupported_algorithm', 'data'=>null);
+       if (empty($head['alg'])) return array('status'=>0,'msg'=>'empty_algorithm', 'data'=>null);
+       if (empty(static::$supported_algs[$head['alg']])) return array('status'=>0,'msg'=>'unsupported_algorithm', 'data'=>null);
 
-       $alg = $head->alg;
-       $kid = $head->kid;
+       $alg = $head['alg'];
+       $kid = $head['kid'];
        $key = null;
 
 
@@ -101,17 +100,19 @@ class VippsJWTVerifier {
        }  
 
        $result = static::verify("$headb64.$bodyb64", $crypto, $key, $alg);
+print_r($result); 
+
        if (is_array($result)) return $result;
        if (!$result) {
           return array('status'=>0, 'msg'=>'not_verified','data'=>null);
        }
-       if (isset($body->nbf) && $body->nbf > ($timestamp + static::$leeway)) {
+       if (isset($body['nbf']) && $body['nbf'] > ($timestamp + static::$leeway)) {
          return array('status'=>0, 'msg'=>'too_early','data'=>null);
        }
-       if (isset($body->iat) && $body->iat > ($timestamp + static::$leeway)) {
+       if (isset($body['iat']) && $body['iat'] > ($timestamp + static::$leeway)) {
          return array('status'=>0, 'msg'=>'too_early','data'=>null);
        }
-       if (isset($body->exp) && ($timestamp - static::$leeway) >= $body->exp) {
+       if (isset($body['exp']) && ($timestamp - static::$leeway) >= $body['exp']) {
          return array('status'=>0,'msg'=>'expired','data'=>null);
        }
        return array('status'=>1, 'msg'=>'ok', 'data'=>$body);

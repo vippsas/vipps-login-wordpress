@@ -104,8 +104,8 @@ class VippsLogin {
     add_action('wp_ajax_vipps_confirm_get_link', array($this,'ajax_vipps_confirm_get_link'));
 
 
-
-    // THE CONFIRM HANDLING IOK FIXME 
+    /* The following actions are for using the confirm-handler to allow users to confirm their account using email with the
+       standard WP mechanism for user requests IOK 2019-10-11*/
     // handler
     add_action('user_request_action_confirmed', array($this, 'confirm_vipps_connect_and_login'), 11); // Should happen before 12; the reuest is updated at 10
 
@@ -329,7 +329,8 @@ class VippsLogin {
        $phone = @$data['vippsphone'];
        $sub = @$data['sub'];
 
-       // Check post author, check email etc IOK FIXME
+       // One could here check the post author too. IOK 2019-10-11
+
        update_user_meta($userid,'_vipps_phone',$phone);
        update_user_meta($userid,'_vipps_id',$sub);
        update_user_meta($userid, '_vipps_just_connected', 1);
@@ -536,7 +537,12 @@ All at ###SITENAME###
                $newusername = apply_filters('continue_with_vipps_create_username', $username, $userinfo,$session);
                $newusername = apply_filters("continue_with_vipps_{$app}_create_username", $username, $userinfo,$session);
 	       $user_id = wp_create_user( $newusername, $random_password, $email);
-               // Errorhandling FIXME
+               if (is_wp_error($user_id)) {
+                   if($session) $session->destroy();
+                   $this->deleteBrowserCookie();
+                   $this->continue_with_vipps_error_login('unknown_user', sprintf(__('Could not create a new user - an error occured: %s', 'login-vipps'), esc_html($user_id->get_error_message())), '', $session);
+                   exit();
+               }
 
                $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 
                                  'nickname'=>$firstname, 'first_name'=>$firstname, 'last_name'=>$lastname,
@@ -580,11 +586,15 @@ All at ###SITENAME###
                $this->actually_login_user($user,$sid,$session);
                exit();
             }
+            if ($vippsphone && $vippsid && ($vippsphone != $phone && $vippsid != $sub)) {
+               if($session) $session->destroy();
+               $this->deleteBrowserCookie();
+               $this->continue_with_vipps_error_login('login_disallowed', __('Another Vipps account is already connected to the user with your e-mail address. Unfortunately we can\'t log you in', 'login-vipps'), '', $session);
+               exit();
+            }
 
-            // IOK FIXME ERROR IF vippsphone and id is set, but to *another* value, send a *different* confirmation message !
 
             // We are *not* connnected, so we must now redirect to the waiting page after sending a confirmation job
-
             // First check for existing user requests. This is still no function for this, so we inline it. This class should abstract it.
             $requestid = 0;
             $requests = get_posts(array('post_type' => 'user_request','post_name__in' =>array( 'vipps_connect_login'),'title'=> $email,'post_status'=>array('request-pending')));
@@ -594,8 +604,10 @@ All at ###SITENAME###
                $requestid = wp_create_user_request($email,'vipps_connect_login', array('application'=>$app, 'email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
             }
             if (is_wp_error($requestid)) {
-                   // IOK FIXME FIXME HOW TO DO This actually requires the user to log in nomrally, so send to waiting page with password form?
-                   error_log(print_r($requestid,true));
+               if($session) $session->destroy();
+               $this->deleteBrowserCookie();
+               $this->continue_with_vipps_error_login('confirmation_request_failed', __('Unfortunately, we could not send a confirmation request to your e-mail address. You will need to log in with username and password, and connect your Vipps app on your profile page.', 'login-vipps'), '', $session);
+               exit();
             }
             wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
             wp_send_user_request($requestid); // ERRORHANDLE!
