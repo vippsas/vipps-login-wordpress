@@ -1,57 +1,57 @@
 <?php 
 /*
-      VippsJWTVerifier: This class abstracts out the work needed to verify JWT tokens. Currently, Vipps uses only RSA256, so it implement this using OpenSSL, but in the future, 
-       the class may need to instead use a complete JWT library with support for better algorithms. IOK 2019-10-14
+   VippsJWTVerifier: This class abstracts out the work needed to verify JWT tokens. Currently, Vipps uses only RSA256, so it implement this using OpenSSL, but in the future, 
+   the class may need to instead use a complete JWT library with support for better algorithms. IOK 2019-10-14
 
 
-         This file is based on Firebases and fproject JWT.PHP (https://github.com/fproject/php-jwt/tree/master/src)  which is licensed like this:
+   This file is based on Firebases and fproject JWT.PHP (https://github.com/fproject/php-jwt/tree/master/src)  which is licensed like this:
 
 
-         Copyright (c) 2011, Neuman Vong
+   Copyright (c) 2011, Neuman Vong
 
-         All rights reserved.
+   All rights reserved.
 
-         Redistribution and use in source and binary forms, with or without
-         modification, are permitted provided that the following conditions are met:
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
 
-       * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
+ * Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
 
-       * Redistributions in binary form must reproduce the above
-       copyright notice, this list of conditions and the following
-       disclaimer in the documentation and/or other materials provided
-       with the distribution.
+ * Redistributions in binary form must reproduce the above
+ copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided
+ with the distribution.
 
-       * Neither the name of Neuman Vong nor the names of other
-       contributors may be used to endorse or promote products derived
-       from this software without specific prior written permission.
+ * Neither the name of Neuman Vong nor the names of other
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
 
-       THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-       "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-       LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-       A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-       OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-       SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-       LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-       DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-       THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-       (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-       © 2019 GitHub, Inc.
-       Terms
-       Privacy
-       Security
-       Status
-       Help
+ © 2019 GitHub, Inc.
+ Terms
+ Privacy
+ Security
+ Status
+ Help
 
-       Contact GitHub
-       Pricing
-       API
-       Training
-       Blog
-       About
-       */
+ Contact GitHub
+ Pricing
+ API
+ Training
+ Blog
+ About
+ */
 
 /*
    This is an extremely basic JWT Verifyer, which will only work with
@@ -64,7 +64,7 @@
    containing the values 'status' (true only if successful), 'msg'
    (an error code) and 'data', which if successful will contain the
    contents of the idtoken. IOK 2019-10-14
-*/
+ */
 class VippsJWTVerifier {
     public static $leeway = 0;
     public static $timestamp = null;
