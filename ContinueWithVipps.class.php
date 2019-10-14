@@ -86,9 +86,17 @@ class ContinueWithVipps {
     // The admin-init hook. We add warnings temporarily stored in the database as well as handling options and cleaning out old sessiondata (if any). 2019-10-14
     public function admin_init () {
         add_action('admin_notices',array($this,'stored_admin_notices'));
+        add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
         register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
         VippsSession::clean();
     }
+   
+    public function admin_enqueue_scripts ($suffix) {
+        if ($suffix == 'settings_page_vipps_login_options') {
+          wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
+        }
+    }
+
     public function admin_menu () {
         add_options_page(__('Login with Vipps', 'login-with-vipps'), __('Login with Vipps','login-with-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
     }
@@ -131,7 +139,7 @@ class ContinueWithVipps {
 
         ?>
             <div class='wrap'>
-            <h2><?php _e('Login With Vipps', 'vipps-login'); ?></h2>
+            <h2><?php _e('Login With Vipps', 'login-with-vipps'); ?></h2>
 
 
             <?php do_action('admin_notices'); ?>
@@ -142,13 +150,13 @@ class ContinueWithVipps {
 
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" value="<?php echo htmlspecialchars($options['clientid']);?>" type="text"></td>
-            <td><?php _e('Your client ID, from the Vipps Portal','vipps-login'); ?></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars($options['clientid']);?>" type="password"></td>
+            <td><?php _e('Your client ID, from the Vipps Portal','login-with-vipps'); ?></td>
             </tr>
             <tr>
             <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" value="<?php echo htmlspecialchars($options['clientsecret']);?>" type="xpassword"></td>
-            <td><?php _e('Your client secret, from the Vipps Portal','vipps-login'); ?></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" type="password"></td>
+            <td><?php _e('Your client secret, from the Vipps Portal','login-with-vipps'); ?></td>
             </tr>
 
             <?php do_action('continue_with_vipps_extra_option_fields'); ?>

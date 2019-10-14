@@ -1,3 +1,4 @@
+
 // This is used for logged-in users to connect their account to their Vipps-account
 function connect_vipps_account(application) {
     var ajaxUrl = vippsLoginAdminConfig.ajax_url;

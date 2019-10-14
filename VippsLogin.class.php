@@ -98,16 +98,16 @@ class VippsLogin {
     }
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
     public function wp_enqueue_scripts() {
-        wp_enqueue_script('vipps-login',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
-        wp_localize_script('vipps-login', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-        wp_enqueue_style('vipps-login',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
+        wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
+        wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+        wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
     }
 
     public function login_enqueue_scripts() {
         wp_enqueue_script('jquery');
-        wp_enqueue_script('vipps-login',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
-        wp_localize_script('vipps-login', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-        wp_enqueue_style('vipps-login',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
+        wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
+        wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+        wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
     }
 
 
@@ -277,7 +277,7 @@ class VippsLogin {
             <td width=30%>
             <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-with-vipps'))); ?>
             </td>
-            <td><?php _e('Sometimes when using Vipps Login, the user may need to answer questions, confirm their email or other actions. This page, which you may leave blank, will be used for this purpose','vipps-login'); ?></td>
+            <td><?php _e('Sometimes when using Vipps Login, the user may need to answer questions, confirm their email or other actions. This page, which you may leave blank, will be used for this purpose','login-with-vipps'); ?></td>
             </tr>
             <?php
     }
