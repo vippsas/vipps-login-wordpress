@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Login with Vipps\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-14 14:26+0000\n"
+"POT-Creation-Date: 2019-10-14 15:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -31,6 +31,13 @@ msgstr ""
 
 #: VippsLogin.class.php:278
 msgid "Create a new page"
+msgstr ""
+
+#: VippsLogin.class.php:280
+msgid ""
+"Sometimes when using Vipps Login, the user may need to answer questions, "
+"confirm their email or other actions. This page, which you may leave blank, "
+"will be used for this purpose"
 msgstr ""
 
 #: VippsLogin.class.php:344
@@ -204,53 +211,76 @@ msgid "User cancelled the login"
 msgstr ""
 
 #. Name of the plugin
-#: ContinueWithVipps.class.php:93
+#: ContinueWithVipps.class.php:101
 msgid "Login with Vipps"
 msgstr ""
 
-#: ContinueWithVipps.class.php:127
+#: ContinueWithVipps.class.php:135
 msgid "Insufficient privileges"
 msgstr ""
 
-#: ContinueWithVipps.class.php:144
+#: ContinueWithVipps.class.php:143
+msgid "Login With Vipps"
+msgstr ""
+
+#: ContinueWithVipps.class.php:153
 msgid "Client ID"
 msgstr ""
 
-#: ContinueWithVipps.class.php:149
+#: ContinueWithVipps.class.php:155
+msgid "Your client ID, from the Vipps Portal"
+msgstr ""
+
+#: ContinueWithVipps.class.php:158
 msgid "Client Secret"
 msgstr ""
 
-#: ContinueWithVipps.class.php:229
+#: ContinueWithVipps.class.php:160
+msgid "Your client secret, from the Vipps Portal"
+msgstr ""
+
+#: ContinueWithVipps.class.php:164
+msgid "Your callback URL is:"
+msgstr ""
+
+#: ContinueWithVipps.class.php:166
+msgid ""
+"You will need to register this URL into the Vipps Portal to make Login with "
+"Vipps work. If you change the URL or the permalinks of your site, you will "
+"need to do this again by finding the new URL on this page."
+msgstr ""
+
+#: ContinueWithVipps.class.php:245
 msgid ""
 "Could not create session table - Login With Vipps plugin is not correctly "
 "installed"
 msgstr ""
 
-#: ContinueWithVipps.class.php:231
+#: ContinueWithVipps.class.php:247
 msgid "Installed database tables for Login With Vipps"
 msgstr ""
 
-#: ContinueWithVipps.class.php:267
+#: ContinueWithVipps.class.php:283
 #, php-format
 msgid "Unhandled error when using Continue with Vipps for action %s: %s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:297 ContinueWithVipps.class.php:299
+#: ContinueWithVipps.class.php:313 ContinueWithVipps.class.php:315
 #, php-format
 msgid "Could not verify your oAuth2 token: %s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:320 ContinueWithVipps.class.php:322
+#: ContinueWithVipps.class.php:336 ContinueWithVipps.class.php:338
 msgid ""
 "There is a problem with verifying your ID token from Vipps. Unfortunately, "
 "you cannot continue with Vipps at this time"
 msgstr ""
 
-#: ContinueWithVipps.class.php:329 ContinueWithVipps.class.php:330
+#: ContinueWithVipps.class.php:345 ContinueWithVipps.class.php:346
 msgid "Session expired - please retry"
 msgstr ""
 
-#: ContinueWithVipps.class.php:339
+#: ContinueWithVipps.class.php:355
 #, php-format
 msgid ""
 "You successfully completed the action \"%s\" using Vipps - unfortunately, "

@@ -136,6 +136,7 @@ class ContinueWithVipps {
         }
         $options = get_option('vipps_login_options'); 
 
+        $callback = $this->make_callback_url();
 
         ?>
             <div class='wrap'>
@@ -158,6 +159,13 @@ class ContinueWithVipps {
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" type="password"></td>
             <td><?php _e('Your client secret, from the Vipps Portal','login-with-vipps'); ?></td>
             </tr>
+
+            <tr>
+             <th><?php _e('Your callback URL is:', 'login-with-vipps'); ?></th>
+             <td><b><?php echo esc_html($callback); ?></b>
+             <td><?php _e('You will need to register this URL into the Vipps Portal to make Login with Vipps work. If you change the URL or the permalinks of your site, you will need to do this again by finding the new URL on this page.', 'login-with-vipps'); ?></td>
+           </tr>
+       
 
             <?php do_action('continue_with_vipps_extra_option_fields'); ?>
 
