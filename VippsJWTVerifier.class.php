@@ -100,7 +100,6 @@ class VippsJWTVerifier {
         }  
 
         $result = static::verify("$headb64.$bodyb64", $crypto, $key, $alg);
-        print_r($result); 
 
         if (is_array($result)) return $result;
         if (!$result) {
