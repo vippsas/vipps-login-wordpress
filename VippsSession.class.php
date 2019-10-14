@@ -1,9 +1,15 @@
 <?php 
 /*
       VippsSession:
-        This class implements persistent sessions stored in the database with a timeout value. It implements the ArrayAccess interface so that you can access
-        the stored values as if it was a hash table. You can do this also after the session is 'destroyed'.
- 
+        This class implements persistent sessions stored in the database
+        with a timeout value. It implements the ArrayAccess interface
+        so that you can access the stored values as if it was a hash
+        table. You can do this also after the session is 'destroyed'.
+
+        The reason these sessions are needed is that during the WP login
+        process, you may be redirected multiple times due to MFA plugins,
+        and in this application, to confirmation screens.
+
         Basic usage: 
             VippsSession::create($data, $expiretime); => returns a  new Vipps Session stored in the database with a fresh key.
             $session->sessionkey = The key used to store the session, you can retrieve the session using this key and the method get()
