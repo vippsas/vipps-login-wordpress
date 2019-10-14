@@ -1,30 +1,105 @@
 <?php 
-// WooLogin: This singleton object integrates login-with-vipps with Woocommerce.
+/* 
+   WooLogin: 
+   This class checks that WooCommerce is available, and if so, will add features and buttons for logging in and registering as customers.
+   It will also add a Vipps tab to the customer profile page, and interact with the shopping flow of Woocommerce. It will also interact properly with Vipps payment gateways, if available.  IOK 2019-10-14
 
+   This works by just adding a new 'application' to the actions already handled by VippsLogin, hooking into the actions that allow customizing errorhandling and success-redirects. It also ensures address information is updated (and kept synchronized). IOK 2019-10-14
+
+
+ */
 class WooLogin{
+    protected static $instance = null;
+    protected $loginbuttonshown = 0;    // Ensure we show the login action just once on certain pages.
+    protected $rewriteruleversion = 1;  // Can't avoid rewrite rule modifications for Woo
 
     function __construct() {
     }
 
-    // We are going to do the Singleton pattern here so 
-    // the basic login mechanism will be available in general with the same settings etc.
-    protected static $instance = null;
-
-    protected $loginbuttonshown = 0;
-    protected $rewriteruleversion = 1;
-
-
+    // This is a singleton page, access the single instance just using this method. IOK 2019-10-14
     public static function instance()  {
         if (!static::$instance) static::$instance = new WooLogin();
         return static::$instance;
     }
+
+    // The main init hook. We do nothing withouT Woo being active, but if it is, we hook into loads of things
+    // that happen when logging in using Vipps, and with the Woo order flow. IOK 2019-10-14
+    public function init () {
+        if (!class_exists( 'WooCommerce' )) return;
+
+        $woologin= $this->is_active();
+
+        $this->add_rewrite_rules();
+
+        if ($woologin) {
+            $this->add_stored_woocommerce_notices();
+            // Adding the login / register buttons to the 'myaccount' page IOK 2019-10-14
+            add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_banner'));
+            add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_banner'));
+            add_action('woocommerce_register_form_start' , array($this, 'register_with_vipps_banner'));
+
+            // Adding 'Vipps' to the customer profile page IOK 2019-10-14
+            add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
+            add_action('woocommerce_account_content', array($this,'account_content'));
+            add_filter ('woocommerce_account_menu_items', array($this,'account_menu_items' ));
+            add_action('woocommerce_account_vipps_endpoint', array($this,'account_vipps_content'));
+            add_filter('add_query_vars', array($this, 'add_vipps_endpoint_query_var'));
+            add_filter('the_title', array($this, 'account_vipps_title'), 10,2); // the  woocommerce_endpoint_vipps_filter does not work.
+
+            // 'disconnect' action IOK 2019-10-14
+            if (is_user_logged_in()) {
+                add_filter('wp_enqueue_scripts', array($this, 'wp_enqueue_account_scripts'));
+            }
+            add_action('admin_post_disconnect_vipps', array($this,'disconnect_vipps_post_handler'));
+
+            // Login stuff
+            add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
+            add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
+            add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
+            add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
+            add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
+            add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
+            add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
+            add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
+            add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
+            add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
+
+            // Account confirmation
+            add_action("continue_with_vipps_woocommerce_confirm_before_redirect", array($this,'before_confirm_redirect'), 10, 3); 
+            add_filter("continue_with_vipps_woocommerce_confirm_redirect", array($this,'confirm_redirect'), 10, 3);
+            add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
+            add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); 
+
+            // And for synching addresses
+            add_action('continue_with_vipps_woocommerce_synch', array($this, 'synch_addresses'), 10, 3);
+            add_filter("continue_with_vipps_woocommerce_synch_redirect", array($this,'confirm_redirect'), 10, 3);
+            add_action('continue_with_vipps_error_woocommerce_synch', array($this, 'add_woocommerce_error'), 10, 4);
+            add_filter("continue_with_vipps_error_woocommerce_synch_redirect", array($this,'error_redirect'), 10, 3); 
+
+            // This runs only if the user modifies their own address in Woo. If they do, we break the Vipps connection until next synchronizatoin. IOK 2019-10-14
+            add_action("woocommerce_customer_save_address", array($this,'customer_save_address'), 80);
+
+
+            $this->add_shortcodes();
+        }
+    }
+
+    // The hooks added here add the 'continue_with_vipps' buttons to the order flow - into the cart, the checkout page, and so forth.
+    public function plugins_loaded () {
+        add_action('woocommerce_proceed_to_checkout', array($this,'cart_continue_with_vipps'));
+        add_action('woocommerce_widget_shopping_cart_buttons', array($this, 'cart_widget_continue_with_vipps'), 30);
+        add_action('woocommerce_before_checkout_form', array($this, 'before_checkout_form_login_button'), 5);
+    }
+
+
     public function admin_init () {
         if (!class_exists( 'WooCommerce' )) return;
-        // Settings, that will end up on the simple "Login with Vipps" options screen
+        // Extra ettings that will end up on the simple "Login with Vipps" options screen IOK 2019-10-14
         register_setting('vipps_login_woo_options','vipps_login_woo_options', array($this,'validate'));
         add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
     }
 
+    // Return any Vipps payment gateway if installed. IOK 2019-10-14
     public function payment_gateway() {
         $gw = null;
         if (class_exists('WC_Gateway_Vipps')) {
@@ -44,6 +119,56 @@ class WooLogin{
         return false;
     }
 
+    // We are going to add some extra configuration options here. IOK 2019-10-14
+    public function extra_option_fields () {
+        $options = get_option('vipps_login_woo_options');
+        $woologin= $options['woo-login'];
+        $woocreate = $options['woo-create-users'];
+        $woocart = $options['woo-cart-login'];
+        $woocheckout = $options['woo-checkout-login'];
+        ?>
+            <?php settings_fields('vipps_login_woo_options'); ?>
+            <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-with-vipps'); ?></th></tr>
+            <tr>
+            <td><?php _e('Use Login With Vipps for Woocommerce', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-login]' value=0>
+            <input type='checkbox' name='vipps_login_woo_options[woo-login]' value=1 <?php if ( $woologin ) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Check this to enable Log in With Vipps on your customers pages in Woocommerce', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+            <tr>
+            <td><?php _e('Allow users to register as customers in Woocommerce using login with Vipps', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-create-users]' value=0>
+            <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Check this to allow new users to be created as customers if using Log in With Vipps in a Woocommerce context', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+            <tr>
+            <td><?php _e('Show "Continue with Vipps" in shopping cart', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-cart-login]' value=0>
+            <input type='checkbox' name='vipps_login_woo_options[woo-cart-login]' value=1 <?php if ( $woocart) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Check this to enable "Continue with Vipps" in the Shopping Cart and widgets. If you are using Express checkout, that will be shown instead.', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+            <tr>
+            <td><?php _e('Show "Continue with Vipps" on the checkout page', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
+            <input type='checkbox' name='vipps_login_woo_options[woo-checkout-login]' value=1 <?php if ( $woocheckout) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Check this to enable "Continue with Vipps" on the checkout page. This will replace express checkout on the checkout page.', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+            <?php
+    }
+
+    // Validate the extra options added by this plugin. IOK 2019-10-14
     public function validate ($input) {
         $current =  get_option('vipps_login_woo_options');
         if (empty($input)) return $current;
@@ -57,25 +182,57 @@ class WooLogin{
         return $valid;
     }
 
-    public function plugins_loaded () {
-        add_action('woocommerce_proceed_to_checkout', array($this,'cart_continue_with_vipps'));
-        add_action('woocommerce_widget_shopping_cart_buttons', array($this, 'cart_widget_continue_with_vipps'), 30);
-        add_action('woocommerce_before_checkout_form', array($this, 'before_checkout_form_login_button'), 5);
+    public function activate () {
+        $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
+        $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
+
+        $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
+        add_option('vipps_login_woo_options',$default,true);
+        $this->add_rewrite_rules();
+        $this->maybe_flush_rewrite_rules();
+    }
+    public static function deactivate () {
+        // Nothing to do here. IOK 2019-10-14
     }
 
+    // This is neccessary for the 'Vipps' tab on the myaccount page to work. IOK 2019-10-14
+    public function add_rewrite_rules() {
+        // This is for the myaccount/vipps endpoint
+        add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
+    }
+    public function maybe_flush_rewrite_rules() {
+        $options = get_option('vipps_login_woo_options');
+        $rewrite = intval($options['rewriteruleversion']);
+        if ($this->rewriteruleversion > $rewrite) {
+            $this->add_rewrite_rules();
+            $options['rewriteruleversion'] = $this->rewriteruleversion;
+            update_option('vipps_login_woo_options', $options, true);
+        }
+    }
+    public function add_vipps_endpoint_query_var ($vars) {
+        $vars[]='vipps';
+        return $vars;
+    }
+
+    // We can turn this on and off  for woocommerce in particular. IOK 2019-10-14
+    public function is_active() {
+        $options = get_option('vipps_login_woo_options');
+        return intval($options['woo-login']);
+    }
+
+
+    // Action handlers; basically these just write out a button. IOK 2019-10-14
     public function cart_continue_with_vipps () {
         return $this->continue_with_vipps_button_for_carts('cart');
     }
     public function cart_widget_continue_with_vipps () {
         return $this->continue_with_vipps_button_for_carts('widget');
     }
-
     public function continue_with_vipps_button_for_carts($type='widget'){
         if (is_user_logged_in()) return false;
         if (!$this->is_active()) return false;
 
         $gw = $this->is_gateway_active();
-
 
         $options =  get_option('vipps_login_woo_options');
         $show_continue_with_vipps = intval($options['woo-checkout-login']);
@@ -95,8 +252,7 @@ class WooLogin{
             <?php
     }
 
-
-
+    // This will display a banner  on the top of the checkout page. It will replace the express checkout button if that is used in the gateway. IOK 2019-10-14
     public function before_checkout_form_login_button () {
         if (is_user_logged_in()) return false;
         if (!$this->is_active()) return false;
@@ -106,7 +262,8 @@ class WooLogin{
         $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_checkout', $show_continue_with_vipps);
         if (!$show_continue_with_vipps) return;
 
-        // Replace expresscheckout here
+        // Replace expresscheckout here if using the standard Vipps payment gateway . Logging in with  Vipps is more compatible, and 
+        // at this point, equally quick. IOK 2019-10-14
         add_action('woo_vipps_show_express_checkout', function ($show) { return false; });
         $this->continue_with_vipps_banner();
     }
@@ -173,67 +330,9 @@ class WooLogin{
     }
 
 
-
-    public function init () {
-        if (!class_exists( 'WooCommerce' )) return;
-
-        $woologin= $this->is_active();
-
-        $this->add_rewrite_rules();
-
-        if ($woologin) {
-            $this->add_stored_woocommerce_notices();
-
-            add_action('woocommerce_before_customer_login_form' , array($this, 'login_with_vipps_banner'));
-            add_action('woocommerce_login_form_start' , array($this, 'login_with_vipps_banner'));
-            add_action('woocommerce_register_form_start' , array($this, 'register_with_vipps_banner'));
-
-            add_action('woocommerce_account_dashboard', array($this,'account_dashboard'));
-            add_action('woocommerce_account_content', array($this,'account_content'));
-
-            add_filter ('woocommerce_account_menu_items', array($this,'account_menu_items' ));
-            add_action('woocommerce_account_vipps_endpoint', array($this,'account_vipps_content'));
-            add_filter('add_query_vars', array($this, 'add_vipps_endpoint_query_var'));
-            add_filter('the_title', array($this, 'account_vipps_title'), 10,2); // the  woocommerce_endpoint_vipps_filter does not work.
-
-            if (is_user_logged_in()) {
-                add_filter('wp_enqueue_scripts', array($this, 'wp_enqueue_account_scripts'));
-            }
-            add_action('admin_post_disconnect_vipps', array($this,'disconnect_vipps_post_handler'));
-
-            add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
-            add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
-            add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
-            add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
-            add_filter('continue_with_vipps_after_create_woocommerce_user', array($this, 'after_create_user'), 10, 2);
-            add_filter('continue_with_vipps_woocommerce_allow_login', array($this, 'allow_login'), 10, 4);
-            add_filter('continue_with_vipps_before_woocommerce_user_login', array($this, 'before_login'), 10, 3);
-
-            add_filter("continue_with_vipps_error_woocommerce_login_create_session", array($this,'login_error_create_session'), 10, 2);
-            add_filter("continue_with_vipps_error_woocommerce_login_redirect", array($this,'error_redirect'), 10, 3);
-            add_action("continue_with_vipps_error_woocommerce_login", array($this, 'add_woocommerce_error'), 10, 4);
-
-            add_action("continue_with_vipps_woocommerce_confirm_before_redirect", array($this,'before_confirm_redirect'), 10, 3); 
-            add_filter("continue_with_vipps_woocommerce_confirm_redirect", array($this,'confirm_redirect'), 10, 3);
-            add_action('continue_with_vipps_error_woocommerce_confirm', array($this, 'add_woocommerce_error'), 10, 4);
-            add_filter("continue_with_vipps_error_woocommerce_confirm_redirect", array($this,'error_redirect'), 10, 3); 
- 
-            // And for synching addresses
-           add_action('continue_with_vipps_woocommerce_synch', array($this, 'synch_addresses'), 10, 3);
-           add_filter("continue_with_vipps_woocommerce_synch_redirect", array($this,'confirm_redirect'), 10, 3);
-           add_action('continue_with_vipps_error_woocommerce_synch', array($this, 'add_woocommerce_error'), 10, 4);
-           add_filter("continue_with_vipps_error_woocommerce_synch_redirect", array($this,'error_redirect'), 10, 3); 
-
-           add_action("woocommerce_customer_save_address", array($this,'customer_save_address'), 80);
-
-
-            $this->add_shortcodes();
-        }
-    }
-
- 
     // We can't always add notices to the woo session, because we don't always have Woo loaded. So we'll use a transient to carry over .
-    // We are always logged in here, so just use the cookie contents as a quickie session, using a short transient.
+    // We are always logged in here, so just use the cookie contents as a quickie session, using a short transient. IOK 2019-10-14
+    // Any notices added will be shown on next page load, so this is used for both error handling and success messages. IOK 2019-10-14
     public function add_stored_woocommerce_notices() {
         $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
         if (!$cookie) return;
@@ -250,6 +349,7 @@ class WooLogin{
         }
     }
 
+    // Scripts added to the users' 'my account' page. Same as used on the profile page. IOK 2019-10-14
     public function wp_enqueue_account_scripts () {
         if (is_account_page()) {
             wp_enqueue_script('vipps-login-admin',plugins_url('js/vipps-admin.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-admin.js"), 'true');
@@ -267,13 +367,13 @@ class WooLogin{
         return VippsLogin::instance()->continue_with_vipps_shortcode($atts,$content,$tag);
     }
 
-    // This is run first on the users' main dashboard, right after menus
+    // This is run first on the users' main dashboard, right after menus. We hook into it to ensure the 'Vipps' tab is shown. IOK 2019-10-14
     public function account_dashboard() {
-        // This only flushes rewrite rules when necessary. Adds a menu item for Vipps on the customers' My Account page
+        // This only flushes rewrite rules when necessary. Adds a menu item for Vipps on the customers' My Account page. IOK 2019-10-14
         $this->maybe_flush_rewrite_rules();
     }
 
-    // This is the main content of a users my-account page
+    // This is the main content of a users my-account page. This is the place for welcome messages, or nagging. IOK 2019-10-14
     public function account_content() {
         $userid = get_current_user_id();
         if (!$userid) return;
@@ -287,10 +387,12 @@ class WooLogin{
                 <?php
         }
     }
+    // Add the 'Vipps' tab to the menu on the my account page. IOK 2019-10-14
     public function account_menu_items($items) {
         $items['vipps'] = __('Vipps', 'login-with-vipps');
         return $items;
     }
+    // And add content to the 'Vipps' tab. . IOK 2019-10-14
     public function account_vipps_content() {
         add_filter('the_title', function ($title) { return __('Vipps!', 'login-with-vipps'); });
         $userid = get_current_user_id();
@@ -321,6 +423,7 @@ class WooLogin{
             <?php
     }
 
+    // Disconnect. Done in a normal POST, but check nonce first. IOK 2019-10-14
     public function disconnect_vipps_post_handler () {
         check_admin_referer('disconnect_vipps', 'disconnect_vipps_nonce');
         $userid = get_current_user_id();
@@ -346,7 +449,7 @@ class WooLogin{
         exit();
     }
 
-    // For some reason we can't do this with woocommerce_endpoint_vipps_title.
+    // For some reason we can't do this with woocommerce_endpoint_vipps_title. Set the title of this page to be what we want instead of 'my account'. IOK 2019-10-14
     public function account_vipps_title($title, $id) {
         if (in_the_loop() && !is_admin() && is_main_query() && is_account_page() ) {
             global $wp_query;
@@ -359,13 +462,12 @@ class WooLogin{
         }
         return $title;
     }
-
-
     // Error handling doesn't require an extra session for Woocommerce. 2019-10-08
     public function login_error_create_session($createSession, $sessiondata) {
         return false;
     }
-
+    // Woocommerce errors work sitewide, but we must use the 'wc_add_notice' code. We also need to ensure that
+    // we have a session active (if nothing is in the cart yet). IOK 2019-10-14
     public function add_woocommerce_error ($error, $errordesc, $errorhint, $session) {
         // We can add woocommerce already here, as Woocommerce handles the session itself  IOK 2019-10-08
         // NB: This require that the woocommerce session is active.
@@ -376,7 +478,8 @@ class WooLogin{
         wc()->session->save_data();
     }
 
-    // Handle errors for the 'woocommerce' login application on the users home
+    // Handle errors for the 'woocommerce' login application on the users home. We pretty much always want to redirect to 
+    // the exact same page we came from. IOK 2019-10-14
     public function error_redirect ($redir, $error, $sessiondata) {
         // If this happend on the checkout page then redirect there I guess
         $link = wc_get_page_permalink( 'myaccount' );
@@ -388,19 +491,22 @@ class WooLogin{
         return $redir;
     }
 
-    // If a user saves their own address on the profile screen, we break the link with Vipps.
+    // If a user saves their own address on the profile screen, we break the link with Vipps. This can be re-linked by
+    // pressing the "Synchronize" button. For new users, this is true; and when true, we synch addresses at each login. IOK 2019-10-14
     public function customer_save_address () {
         $userid = get_current_user_id();
         if (!$userid) return;
         delete_user_meta($userid,'_vipps_synchronize_addresses', 1);
     }
 
+    // User has just confirmed their account, so update the address if we can. IOK 2019-10-14
     public function before_confirm_redirect( $userid, $userinfo, $session) {
         $customer = new WC_Customer($userid);
         $this->maybe_update_address_info($customer,$userinfo);
         return true;
     }
 
+    // Note that we want to synchronize addresses from now on . Also, actually do it. IOK 2019-10-14
     public function synch_addresses($userid,$userinfo, $session) {
         update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
         delete_user_meta($user->ID,'_vipps_just_synched', 1);
@@ -422,7 +528,7 @@ class WooLogin{
         return true;
     }
 
-    // When confirming, return to the same page
+    // When confirming, return to the same page we came from. IOK 2019-10-14
     public function confirm_redirect ($redir, $user , $sessiondata) {
         $link = wc_get_page_permalink( 'myaccount' );
         if (isset($sessiondata['referer']) && $sessiondata['referer']) { 
@@ -434,11 +540,11 @@ class WooLogin{
         return $redir;
     }
 
-
+    // For logins, we want to *either* go to 'my account', or if something is in the cart,
+    // to go directly to the checkout page. IOK 2019-10-14
     public function add_login_redirect($user, $session) {
         add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
     }
-
     public function login_redirect ($redir, $requested_redir, $user) {
         if (sizeof( WC()->cart->get_cart() ) > 0 ) {
             return wc_get_checkout_url();
@@ -449,19 +555,23 @@ class WooLogin{
         }
     }
 
+    // Standard Woo has several options for this depending on whether it is done on 'my account' or in the checkout page.
+    // We take the easy way out and just use our own option, settable on the option screen. IOK 2019-10-14
     public function users_can_register($can_register,$userinfo,$session) {
         $options = get_option('vipps_login_woo_options');
         if ($options['woo-create-users']) return true;
         return false;
     }
+    // This is run when creating users. We want our to be 'customer's. IOK 2019-10-14
     public function create_userdata($userdata,$userinfo,$session) {
         $userdata['role'] = 'customer';
         return $userdata;
     }
-    // We'll use woocommerces own username functionality here
+    // We'll use woocommerces own username functionality here. Run when a user is created. IOK 2019-10-14
     public function create_username($username, $userinfo, $sessio) {
         return wc_create_new_customer_username($email, array('first_name'=>$userinfo['given_name'],  'last_name' =>  $userinfo['family_name']));
     }
+    // This is run when a completely new user has been created. We want to note that we want to synchronize addresses (and to do that. IOK 2019-10-19)
     public function after_create_user($user, $session) {
         $userinfo = @$session['userinfo'];
         if (!$userinfo) return false;
@@ -469,11 +579,13 @@ class WooLogin{
         $this->maybe_update_address_info($user,$userinfo);
     } 
 
-    // IOK FIXME MAKE DISALLOWING ADMIN LOGINS POSSIBLE HERE
+    // IOK 2019-10-14 currently, we just say 'yes' here, but we may want to disallow login for e.g. admins in this context.
+    // will only affect Woocommerce logins.
     public function allow_login($allow, $user, $userinfo, $session) {
         return $allow;
     }
 
+    // Run when a user is freshly logged in (using Vipps, in Woocommerce). If the user hasn't chosen a payment method yet, choose Vipps! (if available.) IOK 2019-10-14
     public function before_login($user, $session) {
         $userinfo = @$session['userinfo'];
         if (!$userinfo) return false;
@@ -486,12 +598,11 @@ class WooLogin{
                 WC()->session->set('chosen_payment_method', $gw->id);
             }
         }
-
         $this->maybe_update_address_info($user,$userinfo);
     }
 
     // IOK 2019-10-04 normally we want to update the users' address every time we log in, because this allows Vipps to be the repository of the users' address.
-    // However, if the user has changed his or her address in woo itself, we will let it stay as it is.
+    // However, if the user has changed his or her address in woo itself, we will let it stay as it is. We handle this by a single use meta. IOK 2019-10-14
     public function maybe_update_address_info($user, $userinfo) {
         if (!get_user_meta($user->ID,'_vipps_synchronize_addresses',true)) return false;
         $customer = new WC_Customer($user->ID);
@@ -532,93 +643,6 @@ class WooLogin{
         $customer->set_shipping_postcode($postal_code);
         $customer->set_shipping_country($country);
         $customer->save();
-    }
-
-
-    function activate () {
-        $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
-        $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
-
-        $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
-        add_option('vipps_login_woo_options',$default,true);
-        $this->add_rewrite_rules();
-        $this->maybe_flush_rewrite_rules();
-    }
-
-    function add_rewrite_rules() {
-        // This is for the myaccount/vipps endpoint
-        add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
-    }
-
-    function maybe_flush_rewrite_rules() {
-        $options = get_option('vipps_login_woo_options');
-        $rewrite = intval($options['rewriteruleversion']);
-        if ($this->rewriteruleversion > $rewrite) {
-            $this->add_rewrite_rules();
-            $options['rewriteruleversion'] = $this->rewriteruleversion;
-            update_option('vipps_login_woo_options', $options, true);
-        }
-    }
-    function add_vipps_endpoint_query_var ($vars) {
-        $vars[]='vipps';
-        return $vars;
-    }
-
-    function is_active() {
-        $options = get_option('vipps_login_woo_options');
-        return intval($options['woo-login']);
-    }
-
-    function deactivate () {
-
-    }
-
-    public function extra_option_fields () {
-        $options = get_option('vipps_login_woo_options');
-        $woologin= $options['woo-login'];
-        $woocreate = $options['woo-create-users'];
-        $woocart = $options['woo-cart-login'];
-        $woocheckout = $options['woo-checkout-login'];
-        ?>
-            <?php settings_fields('vipps_login_woo_options'); ?>
-            <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-with-vipps'); ?></th></tr>
-            <tr>
-            <td><?php _e('Use Login With Vipps for Woocommerce', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-login]' value=1 <?php if ( $woologin ) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php _e('Check this to enable Log in With Vipps on your customers pages in Woocommerce', 'login-with-vipps'); ?>
-            </td>
-            </tr>
-            <tr>
-            <td><?php _e('Allow users to register as customers in Woocommerce using login with Vipps', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-create-users]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php _e('Check this to allow new users to be created as customers if using Log in With Vipps in a Woocommerce context', 'login-with-vipps'); ?>
-            </td>
-            </tr>
-            <tr>
-            <td><?php _e('Show "Continue with Vipps" in shopping cart', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-cart-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-cart-login]' value=1 <?php if ( $woocart) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php _e('Check this to enable "Continue with Vipps" in the Shopping Cart and widgets. If you are using Express checkout, that will be shown instead.', 'login-with-vipps'); ?>
-            </td>
-            </tr>
-            <tr>
-            <td><?php _e('Show "Continue with Vipps" on the checkout page', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-checkout-login]' value=1 <?php if ( $woocheckout) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php _e('Check this to enable "Continue with Vipps" on the checkout page. This will replace express checkout on the checkout page.', 'login-with-vipps'); ?>
-            </td>
-            </tr>
-            <?php
     }
 
 
