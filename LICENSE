@@ -1,4 +1,3 @@
-/*
 This file is part of the plugin Login with Vipps
 Copyright (c) 2019 WP-Hosting AS
 
@@ -23,24 +22,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
-// This can be used in buttons to login for the specified application
-function login_with_vipps(application) {
-    var ajaxUrl = vippsLoginConfig.ajax_url;
-    if (!application) application='wordpress';
-    jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_login_get_link', 'application' : application},
-       method: 'POST',
-       dataType: 'json',
-       error: function (jqXHR,textStatus,errorThrown) {
-           alert("Error " + textStatus);
-       },
-       success: function(data, textStatus, jqXHR) {
-         if (data && data['url']) {
-           window.location.href = data['url'];
-         }
-       }
-
-    });
-}

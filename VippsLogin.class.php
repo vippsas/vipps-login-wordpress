@@ -1,18 +1,43 @@
 <?php 
 /*
    VippsLogin
-     This class uses the ContinueWithVipps class to implement *logins* and *confirmations* of user accounts so that a user can link their Vipps and Wordpress accounts and log in using just the app.
-     It is written extensible, so that further 'applications' - like WooCommerce - can use this class to implement specific login rules (for errorhandling, user modification, and end-user pages / profiles).
+   This class uses the ContinueWithVipps class to implement *logins* and *confirmations* of user accounts so that a user can link their Vipps and Wordpress accounts and log in using just the app.
+   It is written extensible, so that further 'applications' - like WooCommerce - can use this class to implement specific login rules (for errorhandling, user modification, and end-user pages / profiles).
 
-     It implements the login actions using Ajax for simplicity, and stores in the session a cookie value stored also in the browser. Any session that does not have the corresponding browser cookie is invalid.
+   It implements the login actions using Ajax for simplicity, and stores in the session a cookie value stored also in the browser. Any session that does not have the corresponding browser cookie is invalid.
 
-     Because Vipps email-addresses aren't verified, we require that a user wanting to use this  to confirm their email address and the connection. This is done using the standard Wordpress 'user request' API if the user hasn't logged in yet.  If they are, they can connect directly from their profile page with another 'action' using ContinueWithVipps.
+   Because Vipps email-addresses aren't verified, we require that a user wanting to use this  to confirm their email address and the connection. This is done using the standard Wordpress 'user request' API if the user hasn't logged in yet.  If they are, they can connect directly from their profile page with another 'action' using ContinueWithVipps.
 
-     Furthermore, and really mostly a Woo application, there is an 'synch' action that lets an existing, connected user syncrhronize their user data with Vipps if it has become separate. If this is done,
-     the address will be synchronized at each login until the user changes the address specifically in the Worpdress instance.
+   Furthermore, and really mostly a Woo application, there is an 'synch' action that lets an existing, connected user syncrhronize their user data with Vipps if it has become separate. If this is done,
+   the address will be synchronized at each login until the user changes the address specifically in the Worpdress instance.
 
 
-*/
+   This file is part of the plugin Login with Vipps
+   Copyright (c) 2019 WP-Hosting AS
+
+   MIT License
+
+   Copyright (c) 2019 WP-Hosting AS
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+ */
 class VippsLogin {
     protected static $instance = null;
 
@@ -308,9 +333,9 @@ class VippsLogin {
         $default = array('continuepageid'=>$continueid);
         add_option('vipps_login_options2',$default,false);
     }
-   
+
     public static function deactivate () {
-       // We don't delete anything however, just in case.
+        // We don't delete anything however, just in case.
     }
 
     // Returns the page object of the 'continue with vipps' page, creating it if neccessary. 2019-10-14
@@ -418,7 +443,7 @@ class VippsLogin {
     }
     // If neccessary, add errors et to the profile update.
     public function user_profile_update_errors($errors,$update,$user) {
-       // Not actually neccessary, yet.
+        // Not actually neccessary, yet.
     }
 
     // At this point, this method does not do anything. However, it is intended to 
@@ -463,7 +488,7 @@ class VippsLogin {
             <?php
             return ob_get_clean();
     }
- 
+
     // The login-button on the front page. Moved up in front of the main form using javascript. IOK 2019-10-14
     public function login_form_continue_with_vipps () {
         $this->wp_login_button(__('Log in with', 'login-with-vipps'));
@@ -784,7 +809,7 @@ class VippsLogin {
         $sid=  $userinfo['sid'];
 
         $user = get_user_by('email',$email);
- 
+
         // Login is parametrized by 'application' stored in the session. Will be 'wordpress', 'woocommerce' etc. IOK 2019-10-14
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 

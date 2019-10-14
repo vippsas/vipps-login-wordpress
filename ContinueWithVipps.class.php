@@ -2,20 +2,55 @@
 /*
    ContinueWithVipps: 
 
-   This singleton class handles the communication with the Vipps Login API and the basic flow of any actions using that API. 
-   The canonical example is 'login', but any action can be made signe-able by Vipps using this.
+   This singleton class handles the communication with the Vipps Login
+   API and the basic flow of any actions using that API.  The canonical
+   example is 'login', but any action can be made signe-able by Vipps
+   using this.
 
-   To use this, you will use this class getAuthRedirect method together witn a (slug-link) action string and arbitrary sessiondata. 
-   On return from Vipps, there will be called a set of actions, "continue_with_vipps_{$action}" or "continue_with_vipps_error_{$action}" if things 
-   go wrong. These hooks will recieve the callback data from Vipps (with userinfo) and the session, and are expected to redirect the user to their
-   final destination. Error-handling will have to interact with whatever page you expect to end up on and what application you integrate against.
+   To use this, you will use this class getAuthRedirect
+   method together witn a (slug-link) action string and
+   arbitrary sessiondata.  On return from Vipps, there will be
+   called a set of actions, "continue_with_vipps_{$action}" or
+   "continue_with_vipps_error_{$action}" if things go wrong. These
+   hooks will recieve the callback data from Vipps (with userinfo) and
+   the session, and are expected to redirect the user to their final
+   destination. Error-handling will have to interact with whatever page
+   you expect to end up on and what application you integrate against.
 
-   A database session will be created to hold the users' session while this happens. The session is destroyed before the error handler is called,
-   but for success callbacks, you need to clean up the session yourself until the final destination is reached.
+   A database session will be created to hold the users' session while
+   this happens. The session is destroyed before the error handler is
+   called, but for success callbacks, you need to clean up the session
+   yourself until the final destination is reached.
 
-   If you store sensitive information in the session, you will need to secure this with a browser cookie as well. Normally the session key gets 
-   passed to and fro Vipps as a GET parameter.
+   If you store sensitive information in the session, you will need to
+   secure this with a browser cookie as well. Normally the session key
+   gets passed to and fro Vipps as a GET parameter.
 
+
+   This file is part of the plugin Login with Vipps
+   Copyright (c) 2019 WP-Hosting AS
+
+   MIT License
+
+   Copyright (c) 2019 WP-Hosting AS
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
 
  */
 
@@ -90,10 +125,10 @@ class ContinueWithVipps {
         register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
         VippsSession::clean();
     }
-   
+
     public function admin_enqueue_scripts ($suffix) {
         if ($suffix == 'settings_page_vipps_login_options') {
-          wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
+            wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
 
@@ -161,11 +196,11 @@ class ContinueWithVipps {
             </tr>
 
             <tr>
-             <th><?php _e('Your callback URL is:', 'login-with-vipps'); ?></th>
-             <td><b><?php echo esc_html($callback); ?></b>
-             <td><?php _e('You will need to register this URL into the Vipps Portal to make Login with Vipps work. If you change the URL or the permalinks of your site, you will need to do this again by finding the new URL on this page.', 'login-with-vipps'); ?></td>
-           </tr>
-       
+            <th><?php _e('Your callback URL is:', 'login-with-vipps'); ?></th>
+            <td><b><?php echo esc_html($callback); ?></b>
+            <td><?php _e('You will need to register this URL into the Vipps Portal to make Login with Vipps work. If you change the URL or the permalinks of your site, you will need to do this again by finding the new URL on this page.', 'login-with-vipps'); ?></td>
+            </tr>
+
 
             <?php do_action('continue_with_vipps_extra_option_fields'); ?>
 

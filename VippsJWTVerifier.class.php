@@ -1,6 +1,8 @@
 <?php 
 /*
-   VippsJWTVerifier: This class abstracts out the work needed to verify JWT tokens. Currently, Vipps uses only RSA256, so it implement this using OpenSSL, but in the future, 
+   VippsJWTVerifier: 
+   This class abstracts out the work needed to verify JWT tokens. Currently, Vipps uses only RSA256, so it implement this using
+   OpenSSL, but in the future,
    the class may need to instead use a complete JWT library with support for better algorithms. IOK 2019-10-14
 
 
