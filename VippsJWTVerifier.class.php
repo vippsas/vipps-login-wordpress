@@ -1,4 +1,9 @@
-<?php /*
+<?php 
+/*
+      VippsJWTVerifier: This class abstracts out the work needed to verify JWT tokens. Currently, Vipps uses only RSA256, so it implement this using OpenSSL, but in the future, 
+       the class may need to instead use a complete JWT library with support for better algorithms. IOK 2019-10-14
+
+
          This file is based on Firebases and fproject JWT.PHP (https://github.com/fproject/php-jwt/tree/master/src)  which is licensed like this:
 
 
@@ -48,10 +53,18 @@
        About
        */
 
-/* This is an *extremely basic* JWT identifier, which only supports 'none' hashes and the RSA256 method, which is what Vipps is currently using. It causes a dependency on OpenSSL.
-   It should in the future modified to use https://web-token.spomky-labs.com/' JWT Framework, which implements EdDSA and ECDH-ES. However, this will require php 7.2+  and several other
-   dependencies as well as OpenSSL. This file can be extended to use phpseclib as a possible replacement for OpenSSL to ensure compatibility. IOK 2019-10-11
- */
+/*
+   This is an extremely basic JWT Verifyer, which will only work with
+   the RSA algorithms used by Vipps (and hash algorithms, I guess). It
+   uses code from Firebase and has similar features, but can only verify
+   JWT tokens, not create them. 
+
+   The only entry point is
+   "verify_idtoken(<idtoken>,<list-of-keys>)" - it will return an array
+   containing the values 'status' (true only if successful), 'msg'
+   (an error code) and 'data', which if successful will contain the
+   contents of the idtoken. IOK 2019-10-14
+*/
 class VippsJWTVerifier {
     public static $leeway = 0;
     public static $timestamp = null;
@@ -68,6 +81,8 @@ class VippsJWTVerifier {
     public static function verify_idtoken($idtoken, $keys) {
         $timestamp = is_null(static::$timestamp) ? time() : static::$timestamp;
 
+
+        // First decode the header, body and signature. IOK 2019-10-14
         @list($headb64,$bodyb64,$cryptob64) = explode('.', $idtoken);
         if (!$headb64 or !$bodyb64 or !$cryptob64) {
             return array('status'=>0, 'msg'=>'malformed_idtoken','data'=>null);
@@ -90,6 +105,7 @@ class VippsJWTVerifier {
         $key = null;
 
 
+        // Get the key specified in the header, or fail. IOK 2019-10-14
         foreach ($keys  as $candidate) {
             if ($candidate['kid'] == $kid) {
                 $key = $candidate; break;
@@ -99,12 +115,16 @@ class VippsJWTVerifier {
             return array('status'=>0, 'msg'=>'missing_or_wrong_key','data'=>null); 
         }  
 
+        // Verify  the signature . If this fails, returns an error-info array as described above. IOK 2019-10-14
         $result = static::verify("$headb64.$bodyb64", $crypto, $key, $alg);
-
         if (is_array($result)) return $result;
+
+        // ... or false if the signature is wrong. 2019-10-14
         if (!$result) {
             return array('status'=>0, 'msg'=>'not_verified','data'=>null);
         }
+
+        // .... or if true, check that time constraints are met. IOK 2019-10-14
         if (isset($body['nbf']) && $body['nbf'] > ($timestamp + static::$leeway)) {
             return array('status'=>0, 'msg'=>'too_early','data'=>null);
         }
@@ -114,6 +134,7 @@ class VippsJWTVerifier {
         if (isset($body['exp']) && ($timestamp - static::$leeway) >= $body['exp']) {
             return array('status'=>0,'msg'=>'expired','data'=>null);
         }
+
         return array('status'=>1, 'msg'=>'ok', 'data'=>$body);
     }
 
@@ -134,7 +155,7 @@ class VippsJWTVerifier {
         return pack('Ca*', 0x80 | strlen($temp), $temp);
     }
 
-
+    // Since we use OpenSSL, we need to create a PEM format public key from the modulus + exponent. IOK 2019-10-14
     public static function createPemFromModulusAndExponent($n, $e) {
         $modulus = static::base64urldecode($n);
         $publicExponent = static::base64urldecode($e);
@@ -165,11 +186,12 @@ class VippsJWTVerifier {
         return $RSAPublicKey;
     }
 
+    // This uses and requires openssl, specifically openssl_verify. It is possible to 
+    // add support for phpseclib here. Sodium does not support RSA. IOK 2019-10-14
     public static function verify_rsa($message,$signature,$key,$algorithm) {
         if (!function_exists('openssl_verify')) {
             return array('status'=>0,'msg'=>'openssl_missing','data'=>null);
         }
-
         $pem = null;
         $n = $key['n'];
         $e = $key['e'];
