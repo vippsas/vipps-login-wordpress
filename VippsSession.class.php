@@ -1,5 +1,17 @@
 <?php 
-// Encapsulate the temporary sessions used for logging in
+/*
+      VippsSession:
+        This class implements persistent sessions stored in the database with a timeout value. It implements the ArrayAccess interface so that you can access
+        the stored values as if it was a hash table. You can do this also after the session is 'destroyed'.
+ 
+        Basic usage: 
+            VippsSession::create($data, $expiretime); => returns a  new Vipps Session stored in the database with a fresh key.
+            $session->sessionkey = The key used to store the session, you can retrieve the session using this key and the method get()
+            VippsSession::get($sessionkey) = returns a session given a key.
+            $session->destroy()  = Delete a session from the database (but let it live on as an array)
+            VipssSession::clean() = Delete all old sessions
+
+*/
 
 class VippsSession implements ArrayAccess {
     public $sessionkey = null;
@@ -72,6 +84,14 @@ class VippsSession implements ArrayAccess {
         $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE expire < %s ", gmdate('Y-m-d H:i:s', time()));
         $wpdb->query($q);
     }
+    public static function destroy_all() {
+        // Delete ALL sessions. This would be for cleanup . IOK 2019-10-14
+        global $wpdb;
+        $tablename = $wpdb->prefix . 'vipps_login_sessions';
+        $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE 1");
+        $wpdb->query($q);
+    }
+
     public function extend ($expire) {
         global $wpdb;
         if ($this->destroyed) return;
