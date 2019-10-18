@@ -101,6 +101,7 @@ class WooLogin{
             add_filter("continue_with_vipps_woocommerce_synch_redirect", array($this,'confirm_redirect'), 10, 3);
             add_action('continue_with_vipps_error_woocommerce_synch', array($this, 'add_woocommerce_error'), 10, 4);
             add_filter("continue_with_vipps_error_woocommerce_synch_redirect", array($this,'error_redirect'), 10, 3); 
+            add_action('woocommerce_after_edit_account_address_form', array($this, 'synch_address_button'));
 
             // This runs only if the user modifies their own address in Woo. If they do, we break the Vipps connection until next synchronizatoin. IOK 2019-10-14
             add_action("woocommerce_customer_save_address", array($this,'customer_save_address'), 80);
@@ -445,8 +446,8 @@ class WooLogin{
             <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>
             <input type="hidden" name="action" value="disconnect_vipps">
             <input type="hidden" name="data" value="foobarid">
-            <button type="submit" class='button vippsorange vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-with-vipps'); ?></button>
-            <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch"><?php _e('Press here to synchronize your address','login-with-vipps'); ?></button>
+            <button style="margin-bottom:5px" type="submit" class='button vippsorange vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-with-vipps'); ?></button>
+            <?php $this->synch_address_button(); ?>
             </form>
             </p>
             <?php else: ?>
@@ -454,6 +455,15 @@ class WooLogin{
             <?php endif; ?>
             <p> <?php _e('With Vipps, logging in is easier than ever - no passwords!', 'login-with-vipps'); ?> </p>
             <?php
+    }
+
+    public function  synch_address_button () {
+            $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+    ?>
+            <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
+             <?php printf(__('Press here to synchronize your address with %s','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
+            </button> 
+    <?php
     }
 
     // Disconnect. Done in a normal POST, but check nonce first. IOK 2019-10-14
