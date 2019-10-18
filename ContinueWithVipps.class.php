@@ -99,7 +99,6 @@ class ContinueWithVipps {
         $sessionkey = $session->sessionkey;
         $state = $action . "::" . $sessionkey;
 
-        if (!$clientid) return "";
         $args = array('client_id'=>$clientid, 'response_type'=>'code', 'scope'=>$scope, 'state'=>$state, 'redirect_uri'=>$redir);
         return $url . '?' . http_build_query($args);
     }

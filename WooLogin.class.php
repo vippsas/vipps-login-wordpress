@@ -248,6 +248,7 @@ class WooLogin{
 
     // We can turn this on and off  for woocommerce in particular. IOK 2019-10-14
     public function is_active() {
+        if (!VippsLogin::is_active()) return false;
         $options = get_option('vipps_login_woo_options');
         return intval($options['woo-login']);
     }

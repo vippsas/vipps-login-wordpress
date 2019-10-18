@@ -40,6 +40,7 @@
  */
 class VippsLogin {
     protected static $instance = null;
+    protected static $isactive = null;
 
     function __construct() {
     }
@@ -52,9 +53,24 @@ class VippsLogin {
     // We use this to annotate the users' login session with a a current Vipps session. Not in use now, but can be used to require Vipps logins for instance. IOK 2019-10-14
     protected $currentSid = null;
 
+    static public function is_active() {
+       if (static::$isactive !== null) return static::$isactive;
+       $settings  = ContinueWithVipps::instance()->settings;
+       if (!$settings || empty($settings['clientid']) || empty($settings['clientsecret'])) {
+          static::$isactive = 0;
+          return 0;
+       }
+       $options = get_option('vipps_login_options2');
+       $usevipps = $options['use_vipps_login'];
+       static::$isactive   = $usevipps;
+       return $usevipps;
+    }
+
     // The main init hook. We are going to hook into authentication, logout, error handling, the hooks defined by ContinueWithVipps and to the UserRequest handlers
     // for connecting accounts. IOK 2019-10-14
     public function init () {
+        if (!static::is_active()) return;
+
         // Hook into standard auth and logout, but do so after the secure signon bits and so forth.
         add_filter('authenticate', array($this,'authenticate'),50,3); 
         // Can be used to manage sessions later it is hoped.
@@ -123,12 +139,14 @@ class VippsLogin {
     }
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
     public function wp_enqueue_scripts() {
+        if (!static::is_active()) return;
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
     }
 
     public function login_enqueue_scripts() {
+        if (!static::is_active()) return;
         wp_enqueue_script('jquery');
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
@@ -293,13 +311,26 @@ class VippsLogin {
         } else {
             $continuepageid = $continuepage->ID;
         }
-
+        $usevipps = $options['use_vipps_login'];
 
         ?>
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options2'); ?>
             <table class="form-table" style="width:100%">
              <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
+       
+            <tr>
+             <td><?php _e('Enable login with Vipps', 'login-with-vipps'); ?></td>
+             <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
+            <input type='checkbox' name='vipps_login_options2[use_vipps_login]' value=1 <?php if ( $usevipps) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Check this to enable Log in With Vipps on the Wordpress login page', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+
+        
+ 
             <tr>
             <td><?php _e('Continue-with-Vipps page', 'login-with-vipps'); ?></td>
             <td width=30%>
@@ -336,7 +367,7 @@ class VippsLogin {
         if (!is_wp_error($continuepage)) {
             $continueid = $continuepage->ID;
         }
-        $default = array('continuepageid'=>$continueid);
+        $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true);
         add_option('vipps_login_options2',$default,false);
     }
 
