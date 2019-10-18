@@ -54,8 +54,8 @@
 ** Graphics and videos
 
 * ACCOUNT CREATION AND MANAGEMENT
-** If Woo installed, get clientid and clientsecret from that
+** [WONTFIX] If Woo installed, get clientid and clientsecret from that
 ** [DONE] Provide 'returnurl' on settings-page if not fixed by Vipps
 ** Instructions for getting this thing active
-** On/Off button
+** [DONE] On/Off button
 
