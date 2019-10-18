@@ -186,12 +186,12 @@ class ContinueWithVipps {
 
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars($options['clientid']);?>" type="password"></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars($options['clientid']);?>" autocomplete="off" type="password"></td>
             <td><?php _e('Your client ID, from the Vipps Portal','login-with-vipps'); ?></td>
             </tr>
             <tr>
             <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" type="password"></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" autocomplete="off"  type="password"></td>
             <td><?php _e('Your client secret, from the Vipps Portal','login-with-vipps'); ?></td>
             </tr>
 
@@ -202,14 +202,13 @@ class ContinueWithVipps {
             </tr>
 
 
-            <?php do_action('continue_with_vipps_extra_option_fields'); ?>
 
             </table>
-            <div>
-            <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" />
-            </div>
-            </div>
+            <div> <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
+
             </form>
+
+            <?php  do_action('continue_with_vipps_extra_option_fields'); ?>
 
 
             </div>

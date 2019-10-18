@@ -153,7 +153,10 @@ class WooLogin{
         $woocart = $options['woo-cart-login'];
         $woocheckout = $options['woo-checkout-login'];
         ?>
+
+            <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_woo_options'); ?>
+            <table class="form-table" style="width:100%">
             <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-with-vipps'); ?></th></tr>
             <tr>
             <td><?php _e('Use Login With Vipps for Woocommerce', 'login-with-vipps'); ?></td>
@@ -191,6 +194,9 @@ class WooLogin{
             <?php _e('Check this to enable "Continue with Vipps" on the checkout page. This will replace express checkout on the checkout page.', 'login-with-vipps'); ?>
             </td>
             </tr>
+            </table>
+            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
+            </form>
             <?php
     }
 
@@ -432,7 +438,7 @@ class WooLogin{
 
         ?>
             <?php    if ($vippsphone && $vippsid): ?>
-            <h3><?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></h3>
+            <h3><?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></h3>
             <p>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
             <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>

@@ -296,7 +296,10 @@ class VippsLogin {
 
 
         ?>
+            <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options2'); ?>
+            <table class="form-table" style="width:100%">
+             <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
             <tr>
             <td><?php _e('Continue-with-Vipps page', 'login-with-vipps'); ?></td>
             <td width=30%>
@@ -304,6 +307,9 @@ class VippsLogin {
             </td>
             <td><?php _e('Sometimes when using Vipps Login, the user may need to answer questions, confirm their email or other actions. This page, which you may leave blank, will be used for this purpose','login-with-vipps'); ?></td>
             </tr>
+           </table>
+            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
+            </form>
             <?php
     }
 
@@ -395,9 +401,9 @@ class VippsLogin {
             <td>
             <?php if ($vippsphone && $vippsid): ?>
             <?php if ($its_you): ?>
-            <p> <?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
             <?php else: ?>
-            <p> <?php printf(__('The user is connected to the Vipps account with the phone number <b>%s</b>', 'login_vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('The user is connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
             <?php endif; ?> 
             <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Press here to disconnect','login-with-vipps'); ?></button></p>
             <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-with-vipps'); ?></span>
