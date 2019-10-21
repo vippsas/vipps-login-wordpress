@@ -851,7 +851,7 @@ class VippsLogin {
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
         // MFA plugins may actually redirect here again, in which case we will now be logged in, and we can just redirect. Destroy session first of course. IOK 2019-10-14
-        if (is_user_logged_in() == $user) {
+        if ($user && (is_user_logged_in() == $user)) {
             $profile = get_edit_user_link($user->ID);
             do_action('continue_with_vipps_before_login_redirect', $user, $session);
             do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
