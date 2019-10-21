@@ -896,7 +896,7 @@ class VippsLogin {
                 exit();
             }
 
-            $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 
+            $userdata = array('ID'=>$user_id, 'user_nicename'=>$name, 'display_name'=>"$firstname $lastname",
                     'nickname'=>$firstname, 'first_name'=>$firstname, 'last_name'=>$lastname,
                     'user_registered'=>date('Y-m-d H:i:s'));
 
