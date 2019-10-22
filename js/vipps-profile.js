@@ -30,8 +30,8 @@ SOFTWARE.
 
 // This is used for logged-in users to connect their account to their Vipps-account
 function connect_vipps_account(application) {
-    var ajaxUrl = vippsLoginAdminConfig.ajax_url;
-    var nonce = vippsLoginAdminConfig.vippsconfirmnonce;
+    var ajaxUrl = vippsLoginProfileConfig.ajax_url;
+    var nonce = vippsLoginProfileConfig.vippsconfirmnonce;
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {
        data: {  'action': 'vipps_confirm_get_link', 'vippsconfirmnonce':nonce, 'application' : application},
@@ -50,8 +50,8 @@ function connect_vipps_account(application) {
 }
 // This is used for logged-in users to synchronize their address with Vipps. Mostly useful for appliciatons  like Woo
 function vipps_synch_address(application) {
-    var ajaxUrl = vippsLoginAdminConfig.ajax_url;
-    var nonce = vippsLoginAdminConfig.vippsconfirmnonce;
+    var ajaxUrl = vippsLoginProfileConfig.ajax_url;
+    var nonce = vippsLoginProfileConfig.vippsconfirmnonce;
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {
        data: {  'action': 'vipps_synch_get_link', 'vippsconfirmnonce':nonce, 'application' : application},
