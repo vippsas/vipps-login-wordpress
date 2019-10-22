@@ -279,13 +279,13 @@ class VippsLogin {
             if ($justconnected) {
                 delete_user_meta($userid, '_vipps_just_connected');
                 $vippsphone = get_usermeta($userid,'_vipps_phone');
-                $notice = sprintf(__('You are now connected to the Vipps account <b>%s</b>!', 'login-with-vipps'), $vippsphone);
+                $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
             if ($justsynched) {
                 delete_user_meta($userid, '_vipps_just_synched');
                 $vippsphone = get_usermeta($userid,'_vipps_phone');
-                $notice = sprintf(__('You are now synchronized with the Vipps account <b>%s</b>!', 'login-with-vipps'), $vippsphone);
+                $notice = sprintf(__('You are now synchronized with the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
         } 
@@ -320,23 +320,23 @@ class VippsLogin {
              <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
        
             <tr>
-             <td><?php _e('Enable login with Vipps', 'login-with-vipps'); ?></td>
+             <td><?php _e('Enable Login with Vipps', 'login-with-vipps'); ?></td>
              <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
             <input type='checkbox' name='vipps_login_options2[use_vipps_login]' value=1 <?php if ( $usevipps) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Check this to enable Log in With Vipps on the Wordpress login page', 'login-with-vipps'); ?>
+            <?php _e('Log in with Vipps on the Wordpress login page', 'login-with-vipps'); ?>
             </td>
             </tr>
 
         
  
             <tr>
-            <td><?php _e('Continue-with-Vipps page', 'login-with-vipps'); ?></td>
+            <td><?php _e('Continue with Vipps page', 'login-with-vipps'); ?></td>
             <td width=30%>
             <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-with-vipps'))); ?>
             </td>
-            <td><?php _e('Sometimes when using Vipps Login, the user may need to answer questions, confirm their email or other actions. This page, which you may leave blank, will be used for this purpose','login-with-vipps'); ?></td>
+            <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose.','login-with-vipps'); ?></td>
             </tr>
            </table>
             <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
@@ -408,7 +408,7 @@ class VippsLogin {
         $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
         $newid = wp_insert_post($pagedata);
         if (is_wp_error($newid)) {
-            return new WP_Error(__("Could not find or create the 'continue with Vipps' page", 'login-with-vipps') . ": " .  $newid->get_error_message());
+            return new WP_Error(__("Could not find or create the \"Continue with Vipps\" page.", 'login-with-vipps') . ": " .  $newid->get_error_message());
         }
 
         $options['continuepageid'] = $newid;
@@ -432,20 +432,20 @@ class VippsLogin {
             <td>
             <?php if ($vippsphone && $vippsid): ?>
             <?php if ($its_you): ?>
-            <p> <?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('You are connected to the Vipps profile with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
             <?php else: ?>
-            <p> <?php printf(__('The user is connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('The user is connected to the Vipps profile with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
             <?php endif; ?> 
-            <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Press here to disconnect','login-with-vipps'); ?></button></p>
-            <span class="description"><?php _e("As long as your account is connected to a Vipps account, you can log in just by using Log in With Vipps using the connected app.",'login-with-vipps'); ?></span>
+            <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Unlink account','login-with-vipps'); ?></button></p>
+            <span class="description"><?php _e("As long as your profile is connected to Vipps, you can log in with Vipps.",'login-with-vipps'); ?></span>
             <?php else: ?>
             <?php if ($its_you): ?>
-            <p> <?php _e('You are not connected to any Vipps accounts', 'login-with-vipps'); ?></p>
+            <p> <?php _e('You are not connected to any Vipps profile', 'login-with-vipps'); ?></p>
             <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-with-vipps'); ?></button></p>
             <?php else: ?>
-            <p> <?php _e('The user is not connected to any Vipps accounts', 'login-with-vipps'); ?></p>
+            <p> <?php _e('The user is not connected to a Vipps profile.', 'login-with-vipps'); ?></p>
             <?php endif; ?> 
-            <span class="description"><?php _e("You can connect to your Vipps account if you use the same email address both in the app and on this site. After connecting, you can log in just using Vipps", 'login-with-vipps'); ?></span>
+            <span class="description"><?php _e("You can connect to your Vipps profile if you use the same email address in the Vipps app and on this site.", 'login-with-vipps'); ?></span>
             <?php endif; ?>
             </td>
             </tr>
@@ -453,7 +453,7 @@ class VippsLogin {
             <?php else: ?>
             <table class="form-table">
             <tr>
-            <th><?php _e('Vipps login disabled', 'login-with-vipps'); ?></th>
+            <th><?php _e('Login with Vipps is disabled', 'login-with-vipps'); ?></th>
             <td>
             <span class="description"><?php _e("It is unfortunately not possible for your account to use Vipps to log in to this system due to the site administrators policy."); ?></span>
             </td>
@@ -471,7 +471,7 @@ class VippsLogin {
             $phone = get_usermeta($userid, '_vipps_phone');
             delete_user_meta($userid,'_vipps_phone');
             delete_user_meta($userid,'_vipps_id');
-            $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-with-vipps'), $phone);
+            $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
             $continue = ContinueWithVipps::instance();
             $continue->add_admin_notice($notice);
             $continue->store_admin_notices();
@@ -597,7 +597,7 @@ class VippsLogin {
         $state = $forwhat . "::" . $session->sessionkey;
         $continuepage = $this->ensure_continue_with_vipps_page();
         if (is_wp_error($continuepage)) {
-            wp_die(__("Cannot redirect to Login With Vipps waiting page - it doesn't exist! If you just tried to log in, check your email.", 'login-with-vipps'));
+            wp_die(__("Cannot redirect to Vipps waiting page as it doesn't exist. If you just tried to log in, check your email.", 'login-with-vipps'));
         }
         $waiturl = get_permalink($continuepage);
         $redir = add_query_arg(array('state'=>urlencode($state)), $waiturl);
@@ -708,7 +708,7 @@ class VippsLogin {
     }
     public function confirm_vipps_connect_and_login_email_subject ($subject,$sitename,$email_data) {
         if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
-        return sprintf(__('Confirm that you want to connect your Vipps account on %s', 'login-with-vipps'), $sitename); 
+        return sprintf(__('Confirm that you want to connect your Vipps profile on %s', 'login-with-vipps'), $sitename); 
     }
     // Admin emails, not used but still
     public function user_confirmed_vipps_connection_email_content ($email_text, $email_data) {
@@ -866,7 +866,7 @@ class VippsLogin {
             // The user doesn't have a valid cookie for this session in their browser.
             // Leave the browser cookie for debugging. IOK 2019-10-14
             if ($session) $session->destroy();
-            $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies - you will need those for login!", 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies – you will need those to log in.", 'login-with-vipps'), '', $session);
         }
 
         // Check if we allow user registrations
@@ -877,7 +877,7 @@ class VippsLogin {
         if (!$user && !$can_register) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email - cannot log in', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email. Cannot log in.', 'login-with-vipps'), '', $session);
             exit();
         }
 
@@ -941,7 +941,7 @@ class VippsLogin {
         if ($vippsphone && $vippsid && ($vippsphone != $phone && $vippsid != $sub)) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('login_disallowed', __('Another Vipps account is already connected to the user with your e-mail address. Unfortunately we can\'t log you in', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('login_disallowed', __('Another Vipps profile is connected to a user with your email address. Unfortunately, we can\'t log you in.', 'login-with-vipps'), '', $session);
             exit();
         }
 
@@ -958,7 +958,7 @@ class VippsLogin {
         if (is_wp_error($requestid)) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('confirmation_request_failed', __('Unfortunately, we could not send a confirmation request to your e-mail address. You will need to log in with username and password, and connect your Vipps app on your profile page.', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('confirmation_request_failed', __('Unfortunately, we could not send a confirmation request to your email address. You will need to log in with your username and password and connect with Vipps on your profile page.', 'login-with-vipps'), '', $session);
             exit();
         }
         // Mark the request with the users' id. IOK 2019-10-14
@@ -996,7 +996,7 @@ class VippsLogin {
         $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
-        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps account: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
+        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
         set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
     }
 
@@ -1030,7 +1030,7 @@ class VippsLogin {
         if ($user->ID != $userid) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-account: The email addresses are not the same.', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-profile: The email addresses are not the same.', 'login-with-vipps'), '', $session);
             exit();
         }
 
@@ -1068,7 +1068,7 @@ class VippsLogin {
         $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
-        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not synchronize your Vipps account: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
+        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not synchronize your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
         set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
     }
 

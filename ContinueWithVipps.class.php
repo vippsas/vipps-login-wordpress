@@ -174,7 +174,7 @@ class ContinueWithVipps {
 
         ?>
             <div class='wrap'>
-            <h2><?php _e('Login With Vipps', 'login-with-vipps'); ?></h2>
+            <h2><?php _e('Login with Vipps', 'login-with-vipps'); ?></h2>
 
 
             <?php do_action('admin_notices'); ?>
@@ -186,18 +186,18 @@ class ContinueWithVipps {
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars($options['clientid']);?>" autocomplete="off" type="password"></td>
-            <td><?php _e('Your client ID, from the Vipps Portal','login-with-vipps'); ?></td>
+            <td><?php _e('You find this in the Vipps Portal.','login-with-vipps'); ?></td>
             </tr>
             <tr>
             <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" autocomplete="off"  type="password"></td>
-            <td><?php _e('Your client secret, from the Vipps Portal','login-with-vipps'); ?></td>
+            <td><?php _e('You find this in the Vipps Portal.','login-with-vipps'); ?></td>
             </tr>
 
             <tr>
             <th><?php _e('Your callback URL is:', 'login-with-vipps'); ?></th>
             <td><b><?php echo esc_html($callback); ?></b>
-            <td><?php _e('You will need to register this URL into the Vipps Portal to make Login with Vipps work. If you change the URL or the permalinks of your site, you will need to do this again by finding the new URL on this page.', 'login-with-vipps'); ?></td>
+            <td><?php _e('You will need to register this URL in the Vipps Portal. If you change the URL or the permalinks of your site, you will need to do this again by finding the new URL on this page.', 'login-with-vipps'); ?></td>
             </tr>
 
 
@@ -275,7 +275,7 @@ class ContinueWithVipps {
         }
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
         if($exists != $tablename) {
-            $this->add_admin_notice(__('Could not create session table - Login With Vipps plugin is not correctly installed', 'login-with-vipps'));
+            $this->add_admin_notice(__('Could not create session table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
         } else {
             error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
             $options['dbversion']=static::$dbversion;
@@ -366,7 +366,7 @@ class ContinueWithVipps {
                 if ($userinfo['content']['sub'] != $idtoken_sub) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-with-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time.', 'login-with-vipps'),'', $session);
                     }
                     wp_die(__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-with-vipps'));
                 }
@@ -375,8 +375,8 @@ class ContinueWithVipps {
                 if ($session) {
                     $session->set( 'userinfo', $userinfo);
                 } else {
-                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry', 'login-with-vipps'),'', $session);
-                    wp_die(__('Session expired - please retry', 'login-with-vipps'));
+                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry.', 'login-with-vipps'),'', $session);
+                    wp_die(__('Session expired - please retry.', 'login-with-vipps'));
                 }
             }
         } 

@@ -160,41 +160,41 @@ class WooLogin{
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_woo_options'); ?>
             <table class="form-table" style="width:100%">
-            <tr><th colspan=3><h3><?php _e('Woocommerce integration', 'login-with-vipps'); ?></th></tr>
+            <tr><th colspan=3><h3><?php _e('WooCommerce options', 'login-with-vipps'); ?></th></tr>
             <tr>
-            <td><?php _e('Use Login With Vipps for Woocommerce', 'login-with-vipps'); ?></td>
+            <td><?php _e('Enable Login with Vipps for WooCommerce', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-login]' value=0>
             <input type='checkbox' name='vipps_login_woo_options[woo-login]' value=1 <?php if ( $woologin ) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Check this to enable Log in With Vipps on your customers pages in Woocommerce', 'login-with-vipps'); ?>
+            <?php _e('Enable Login with Vipps on your customer\'s pages in WooCommerce', 'login-with-vipps'); ?>
             </td>
             </tr>
             <tr>
-            <td><?php _e('Allow users to register as customers in Woocommerce using login with Vipps', 'login-with-vipps'); ?></td>
+            <td><?php _e('Allow users to register as customers in WooCommerce using Login with Vipps', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-create-users]' value=0>
             <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Check this to allow new users to be created as customers if using Log in With Vipps in a Woocommerce context', 'login-with-vipps'); ?>
+            <?php _e('Enable new users to be created as customers if using Login with Vipps with WooCommerce.', 'login-with-vipps'); ?>
             </td>
             </tr>
             <tr>
-            <td><?php _e('Show "Continue with Vipps" in shopping cart', 'login-with-vipps'); ?></td>
+            <td><?php _e('Show "Continue with Vipps" in Cart page and widgets', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-cart-login]' value=0>
             <input type='checkbox' name='vipps_login_woo_options[woo-cart-login]' value=1 <?php if ( $woocart) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Check this to enable "Continue with Vipps" in the Shopping Cart and widgets. If you are using Express checkout, that will be shown instead.', 'login-with-vipps'); ?>
+            <?php _e('If you are using Vipps Express Checkout, that will be shown instead.', 'login-with-vipps'); ?>
             </td>
             </tr>
             <tr>
-            <td><?php _e('Show "Continue with Vipps" on the checkout page', 'login-with-vipps'); ?></td>
+            <td><?php _e('Show "Continue with Vipps" on the Checkout page', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
             <input type='checkbox' name='vipps_login_woo_options[woo-checkout-login]' value=1 <?php if ( $woocheckout) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Check this to enable "Continue with Vipps" on the checkout page. This will replace express checkout on the checkout page.', 'login-with-vipps'); ?>
+            <?php _e('This will replace Vipps Express Checkout on the checkout page.', 'login-with-vipps'); ?>
             </td>
             </tr>
             </table>
@@ -312,12 +312,12 @@ class WooLogin{
         $can_register = $this->users_can_register(true, array(), array());
 
         if ($can_register) {
-            $text = __('Log in or register an account with %s to continue your checkout!', 'login-with-vipps');
+            $text = __('Log in or register an account with %s to continue your checkout.', 'login-with-vipps');
         } else {
-            $text = __('Are you registered as a customer? Log in with %s to continue your checkout!', 'login-with-vipps');
+            $text = __('Are you registered as a customer? Log in with %s to continue your checkout.', 'login-with-vipps');
         }
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
-        $linktext = __('Click here to continue', 'login-with-vipps');
+        $linktext = __('Click to continue', 'login-with-vipps');
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
@@ -334,9 +334,9 @@ class WooLogin{
         $can_register = $this->users_can_register(true, array(), array());
         $text  = '';
         if ($can_register) {
-            $text = __('Log in or register an account using %s !', 'login-with-vipps');
+            $text = __('Log in or register an account using %s.', 'login-with-vipps');
         } else {
-            $text = __('Are you registered as a customer? Log in with %s!', 'login-with-vipps');
+            $text = __('Are you registered as a customer? Log in with %s.', 'login-with-vipps');
         }
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click here to continue', 'login-with-vipps');
@@ -377,7 +377,7 @@ class WooLogin{
         $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
         if (empty($notices)) return;
         delete_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-        $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-with-vipps'), $phone);
+        $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
         if ( ! WC()->session->has_session() ) {
             WC()->session->set_customer_session_cookie( true );
         }
@@ -418,7 +418,7 @@ class WooLogin{
         if ($justconnected) {
             delete_user_meta($userid, '_vipps_just_connected');
             $vippsphone = get_usermeta($userid,'_vipps_phone');
-            $notice = sprintf(__('You are now connected to the Vipps account <b>%s</b>!', 'login-with-vipps'), $vippsphone);
+            $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>!', 'login-with-vipps'), $vippsphone);
             ?>
                 <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
                 <?php
@@ -443,20 +443,20 @@ class WooLogin{
 
         ?>
             <?php    if ($vippsphone && $vippsid): ?>
-            <h3><?php printf(__('You are connected to the Vipps account with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></h3>
+            <h3><?php printf(__('You are connected to the Vipps profile with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></h3>
             <p>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
             <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>
             <input type="hidden" name="action" value="disconnect_vipps">
             <input type="hidden" name="data" value="foobarid">
-            <button style="margin-bottom:5px" type="submit" class='button vippsorange vipps-button vipps-disconnect'><?php _e('Press here to disconnect', 'login-with-vipps'); ?></button>
+            <button style="margin-bottom:5px" type="submit" class='button vippsorange vipps-button vipps-disconnect'><?php _e('Unlink account', 'login-with-vipps'); ?></button>
             <?php $this->synch_address_button(); ?>
             </form>
             </p>
             <?php else: ?>
             <p><button type="button" onclick="connect_vipps_account('woocommerce');return false"; class="button vippsorange vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-with-vipps'); ?></button></p>
             <?php endif; ?>
-            <p> <?php _e('With Vipps, logging in is easier than ever - no passwords!', 'login-with-vipps'); ?> </p>
+            <p> <?php _e('The easiest way to sign in. Anyone with Vipps can use Vipps to sign in. No need to remember passwords ever again. Vipps, and you are logged in.','login-with-vipps'); ?> </p>
             <?php
     }
 
@@ -464,7 +464,7 @@ class WooLogin{
             $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
     ?>
             <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
-             <?php printf(__('Press here to synchronize your address with %s','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
+             <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
             </button> 
     <?php
     }
@@ -486,7 +486,7 @@ class WooLogin{
         if ($cookie) {
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-            $notice = sprintf(__('Connection to Vipps account %s <b>removed</b>.', 'login-with-vipps'), $phone);
+            $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
             $notices[]=array('notice'=>$notice, 'type'=>'success');
             set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
         }        
