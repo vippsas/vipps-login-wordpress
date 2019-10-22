@@ -129,9 +129,10 @@ class WooLogin{
     // Return any Vipps payment gateway if installed. IOK 2019-10-14
     public function payment_gateway() {
         $gw = null;
+        WC()->payment_gateways(); // Ensure gateways are loaded.
         if (class_exists('WC_Gateway_Vipps')) {
             $gw = WC_Gateway_Vipps::instance(); 
-        }
+        } 
         // There are more than one Vipps gateway, so allow integration with these as well as the WP-Hosting one. IOK 2019-10-10
         $gw = apply_filters('continue_with_vipps_payment_gateway', $gw);
         return $gw;
@@ -141,6 +142,7 @@ class WooLogin{
     // can check stuff like express checkout and so forth. IOK 2019-10-10
     public function is_gateway_active() {
         $gw = $this->payment_gateway();
+
         if ($gw && $gw->enabled != 'yes') return false;
         if ($gw) return $gw; // Otherwise it is null
         return false;
@@ -265,6 +267,7 @@ class WooLogin{
     public function continue_with_vipps_button_for_carts($type='widget'){
         if (is_user_logged_in()) return false;
         if (!$this->is_active()) return false;
+        if (WC()->cart->get_cart_contents_count() == 0) return false;
 
         $gw = $this->is_gateway_active();
 
