@@ -909,11 +909,12 @@ class VippsLogin {
             update_user_meta($user_id,'_vipps_phone',$phone);
             update_user_meta($user_id,'_vipps_id',$sub);
             update_user_meta($userid, '_vipps_just_connected', 1);
-
-            do_action('continue_with_vipps_after_create_user', $user, $session);
-            do_action("continue_with_vipps_after_create_{$app}_user", $user, $session);
+            // This is currently mostly for Woo, but in general: User has no address, so please update addresses when logging in. IOK 2019-10-25
+            update_user_meta($userid,'_vipps_synchronize_addresses', 1);
 
             $user = get_user_by('id', $user_id);
+            do_action('continue_with_vipps_after_create_user', $user, $session);
+            do_action("continue_with_vipps_after_create_{$app}_user", $user, $session);
 
             $this->actually_login_user($user,$sid,$session);
             exit();

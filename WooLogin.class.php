@@ -644,6 +644,25 @@ class WooLogin{
                 WC()->session->set('chosen_payment_method', $gw->id);
             }
         }
+        $customer = new WC_Customer($user->ID);
+        if ($customer && !is_wp_error($customer)) {
+          $billing = $customer->get_billing();
+          $shipping = $customer->get_shipping();
+          $all_empty = true;
+          foreach($billing as $key=>$value) {
+            if (!empty($value)) { $all_empty = false; break; }
+          }
+          foreach($shipping as $key=>$value) {
+            if (!empty($value)) { $all_empty = false; break; }
+          }
+          // No address at all: Synch.
+          if ($all_empty) {
+            update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+          }
+        } else { 
+          error("no customer");
+        }
+
         $this->maybe_update_address_info($user,$userinfo);
     }
 
