@@ -616,7 +616,11 @@ class WooLogin{
     }
     // We'll use woocommerces own username functionality here. Run when a user is created. IOK 2019-10-14
     public function create_username($username, $userinfo, $sessio) {
-        return wc_create_new_customer_username($email, array('first_name'=>$userinfo['given_name'],  'last_name' =>  $userinfo['family_name']));
+        if (function_exists('wc_create_new_customer_username')) {
+            return wc_create_new_customer_username($email, array('first_name'=>$userinfo['given_name'],  'last_name' =>  $userinfo['family_name']));
+        } else {
+            return $username;
+        }
     }
     // This is run when a completely new user has been created. We want to note that we want to synchronize addresses (and to do that. IOK 2019-10-19)
     public function after_create_user($user, $session) {
