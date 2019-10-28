@@ -54,18 +54,18 @@ class VippsLogin {
     protected $currentSid = null;
 
     static public function is_active() {
-       if (static::$isactive !== null) return static::$isactive;
-       $settings  = ContinueWithVipps::instance()->settings;
-       if (!$settings || empty($settings['clientid']) || empty($settings['clientsecret'])) {
-          static::$isactive = 0;
-          return 0;
-       }
-       $options = get_option('vipps_login_options2');
-       $usevipps = $options['use_vipps_login'];
-       static::$isactive   = $usevipps;
-       return $usevipps;
+        if (static::$isactive !== null) return static::$isactive;
+        $settings  = ContinueWithVipps::instance()->settings;
+        if (!$settings || empty($settings['clientid']) || empty($settings['clientsecret'])) {
+            static::$isactive = 0;
+            return 0;
+        }
+        $options = get_option('vipps_login_options2');
+        $usevipps = $options['use_vipps_login'];
+        static::$isactive   = $usevipps;
+        return $usevipps;
     }
- 
+
     public function log ($what,$type='info') {
         ContinueWithVipps::instance()->log($what,$type);
     }
@@ -150,6 +150,8 @@ class VippsLogin {
 
     public function login_enqueue_scripts() {
         if (!static::is_active()) return;
+        $options = get_option('vipps_login_options2');
+        if (!$options['login_page']) return;
         wp_enqueue_script('jquery');
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
@@ -316,25 +318,37 @@ class VippsLogin {
             $continuepageid = $continuepage->ID;
         }
         $usevipps = $options['use_vipps_login'];
+        $loginpage = $options['login_page'];
 
         ?>
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options2'); ?>
             <table class="form-table" style="width:100%">
-             <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
-       
+            <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
+
             <tr>
-             <td><?php _e('Enable Login with Vipps', 'login-with-vipps'); ?></td>
-             <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
+            <td><?php _e('Enable Login with Vipps', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
             <input type='checkbox' name='vipps_login_options2[use_vipps_login]' value=1 <?php if ( $usevipps) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Turn Login with Vipps on and off', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+
+
+            <tr>
+            <td><?php _e('Add Vipps to login page', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_options2[login_page]' value=0>
+            <input type='checkbox' name='vipps_login_options2[login_page]' value=1 <?php if ( $loginpage) echo ' CHECKED '; ?> >
             </td>
             <td>
             <?php _e('Log in with Vipps on the Wordpress login page', 'login-with-vipps'); ?>
             </td>
             </tr>
 
-        
- 
+
+
             <tr>
             <td><?php _e('Continue with Vipps page', 'login-with-vipps'); ?></td>
             <td width=30%>
@@ -342,7 +356,7 @@ class VippsLogin {
             </td>
             <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose.','login-with-vipps'); ?></td>
             </tr>
-           </table>
+            </table>
             <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
             </form>
             <?php
@@ -371,7 +385,7 @@ class VippsLogin {
         if (!is_wp_error($continuepage)) {
             $continueid = $continuepage->ID;
         }
-        $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true);
+        $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true,'login_page'=>true);
         add_option('vipps_login_options2',$default,false);
     }
 
@@ -532,10 +546,14 @@ class VippsLogin {
 
     // The login-button on the front page. Moved up in front of the main form using javascript. IOK 2019-10-14
     public function login_form_continue_with_vipps () {
+        $options = get_option('vipps_login_options2');
+        if (!$options['login_page']) return;
         $this->wp_login_button(__('Log in with', 'login-with-vipps'));
         $this->move_continue_button_over_login_form();
     }
     public function register_form_continue_with_vipps () {
+        $options = get_option('vipps_login_options2');
+        if (!$options['login_page']) return;
         $this->wp_login_button(__('Create an account using ', 'login-with-vipps'));
         $this->move_continue_button_over_login_form();
     }

@@ -436,8 +436,9 @@ class WooLogin{
         if (!$userid) print "No user!";
         $user = new WC_Customer($userid);
 
-        $allow_login = true;
-        $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
+        $options = get_option('vipps_login_woo_options');
+        $allow_login = $options['woo-login'];
+        $allow_login = apply_filters('continue_with_vipps_woocommerce_allow_login', $allow_login, $user, array(), array());
         $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
         $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
 
@@ -461,12 +462,12 @@ class WooLogin{
     }
 
     public function  synch_address_button () {
-            $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
-    ?>
+        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        ?>
             <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
-             <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
+            <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
             </button> 
-    <?php
+            <?php
     }
 
     // Disconnect. Done in a normal POST, but check nonce first. IOK 2019-10-14
@@ -628,6 +629,8 @@ class WooLogin{
     // IOK 2019-10-14 currently, we just say 'yes' here, but we may want to disallow login for e.g. admins in this context.
     // will only affect Woocommerce logins.
     public function allow_login($allow, $user, $userinfo, $session) {
+        $options = get_option('vipps_login_woo_options');
+        $allow= $options['woo-login'];
         return $allow;
     }
 
@@ -646,21 +649,21 @@ class WooLogin{
         }
         $customer = new WC_Customer($user->ID);
         if ($customer && !is_wp_error($customer)) {
-          $billing = $customer->get_billing();
-          $shipping = $customer->get_shipping();
-          $all_empty = true;
-          foreach($billing as $key=>$value) {
-            if (!empty($value)) { $all_empty = false; break; }
-          }
-          foreach($shipping as $key=>$value) {
-            if (!empty($value)) { $all_empty = false; break; }
-          }
-          // No address at all: Synch.
-          if ($all_empty) {
-            update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
-          }
+            $billing = $customer->get_billing();
+            $shipping = $customer->get_shipping();
+            $all_empty = true;
+            foreach($billing as $key=>$value) {
+                if (!empty($value)) { $all_empty = false; break; }
+            }
+            foreach($shipping as $key=>$value) {
+                if (!empty($value)) { $all_empty = false; break; }
+            }
+            // No address at all: Synch.
+            if ($all_empty) {
+                update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+            }
         } else { 
-          error("no customer");
+            error("no customer");
         }
 
         $this->maybe_update_address_info($user,$userinfo);
