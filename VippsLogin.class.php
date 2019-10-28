@@ -65,12 +65,15 @@ class VippsLogin {
        static::$isactive   = $usevipps;
        return $usevipps;
     }
+ 
+    public function log ($what,$type='info') {
+        ContinueWithVipps::instance()->log($what,$type);
+    }
 
     // The main init hook. We are going to hook into authentication, logout, error handling, the hooks defined by ContinueWithVipps and to the UserRequest handlers
     // for connecting accounts. IOK 2019-10-14
     public function init () {
         if (!static::is_active()) return;
-
         // Hook into standard auth and logout, but do so after the secure signon bits and so forth.
         add_filter('authenticate', array($this,'authenticate'),50,3); 
         // Can be used to manage sessions later it is hoped.
@@ -237,11 +240,12 @@ class VippsLogin {
     // This ensures that a session is valid for the browser we are interacting with, using this cookie as a one-time password. 2019-10-14
     public function setBrowserCookie() {
         $cookie = base64_encode(hash('sha256',random_bytes(256), true));
+        $_COOKIE['VippsSessionKey'] = $cookie;
         setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
         return $cookie;
     }
     public function deleteBrowserCookie() {
-        unset($_COOKIE['VippsSessoinKey']);
+        unset($_COOKIE['VippsSessionKey']);
         setcookie('VippsSessionKey', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
     }
     public function checkBrowserCookie($against) {
@@ -654,7 +658,7 @@ class VippsLogin {
             _e("Welcome! As this is your first log-in with Vipps, for safety reasons we require that you must confirm that your account as identified by your registered e-mail belongs to you.", 'login-with-vipps');
             print "<p>";
             print "<p>";
-            _e("We have sent an email to your account with a confirmation link. Press this, and you will be confirmed!");          
+            _e("We have sent an email to your account with a confirmation link. Press this, and you will be confirmed!",'login-with-vipps');          
             print "</p>";
 
         } else {
@@ -814,6 +818,7 @@ class VippsLogin {
         wp_set_current_user($user->ID,$user->user_login); // 'secure'
         do_action('wp_login', $user->user_login, $user);
         $profile = get_edit_user_link($user->ID);
+
         do_action('continue_with_vipps_before_login_redirect', $user, $session);
         do_action("continue_with_vipps_before_{$app}_login_redirect", $user, $session);
 

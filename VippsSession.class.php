@@ -121,7 +121,7 @@ class VippsSession implements ArrayAccess {
         // Delete ALL sessions. This would be for cleanup . IOK 2019-10-14
         global $wpdb;
         $tablename = $wpdb->prefix . 'vipps_login_sessions';
-        $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE 1");
+        $q = $wpdb->prepare("DELETE FROM `{$tablename}` WHERE %d",1);
         $wpdb->query($q);
     }
 

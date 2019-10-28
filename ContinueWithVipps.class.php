@@ -83,6 +83,17 @@ class ContinueWithVipps {
     }
 
 
+    public function log ($what,$type='info') {
+        if (function_exists('wc_get_logger')) {
+          $logger = wc_get_logger();
+          $context = array('source'=>'login-with-vipps');
+          $logger->log($type,$what,$context);
+        } else {
+          error_log($what);
+        }
+   }
+
+
     // IOK 2019-10-14 This is the main entry-point for this class and for logging in and doing stuff with the Vipps oauth API. Call this with an action-name (like 'login') and sessiondata,
     // and you will get an URL back to which you can redirect the user. You should do this in a POST request so that you can start a session by setting a cookie.
     // The login-session will be stored in the database and is retrievable by the 'state' argument passed to and from Vipps. If sensitive, you may need to secure this session with a private (cookie-stored) value as well.
@@ -292,7 +303,14 @@ class ContinueWithVipps {
     // and finally dispatching via the action hooks to the end-result. Default actions implemented with wp_die() just so a result can be shown. IOK 2019-10-14
     public function continue_from_vipps () {
         // We are always going to redirect somewhere from here, so let's start by not caching this. IOK 2019-10-11
-        wc_nocache_headers();
+        if (function_exists('wc_nocache_headers')) {
+            wc_nocache_headers();
+        } else {
+            header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
+            header('Cache-Control: no-store, no-cache, must-revalidate');
+            header('Cache-Control: post-check=0, pre-check=0', FALSE);
+            header('Pragma: no-cache');
+        }
         // The 'state' value passed to and from Vipps will conttain both the action and the session key. IOK 2019-10-14
         $state = @$_REQUEST['state'];
         $action ='';
