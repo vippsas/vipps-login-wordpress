@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Login with Vipps\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-22 15:34+0000\n"
-"PO-Revision-Date: 2019-10-22 15:36+0000\n"
-"Last-Translator: Iver Odin Kvello <iverodin@gmail.com>\n"
+"POT-Creation-Date: 2019-10-28 12:52+0000\n"
+"PO-Revision-Date: 2019-10-28 12:53+0000\n"
+"Last-Translator: Iver Odin Kvello <iver@wp-hosting.no>\n"
 "Language-Team: Norsk bokmål\n"
 "Language: nb_NO\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
@@ -12,39 +12,47 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.3.0; wp-5.3-RC1-46566"
+"X-Loco-Version: 2.3.1; wp-5.3-RC2-46575"
 
-#: VippsLogin.class.php:282
+#: VippsLogin.class.php:288
 #, php-format
 msgid "You are now connected to the Vipps profile <b>%s</b>."
 msgstr "Du er nå koblet til Vipps-profilen <b>%s</b>."
 
-#: VippsLogin.class.php:288
+#: VippsLogin.class.php:294
 #, php-format
 msgid "You are now synchronized with the Vipps profile <b>%s</b>."
 msgstr "Du er nå synkronisert med Vipps-profilen %s."
 
-#: VippsLogin.class.php:320
+#: VippsLogin.class.php:327
 msgid "Login settings"
 msgstr "Instillinger for innlogging"
 
-#: VippsLogin.class.php:323
+#: VippsLogin.class.php:330
 msgid "Enable Login with Vipps"
 msgstr "Skru på Logg inn med Vipps"
 
-#: VippsLogin.class.php:328
+#: VippsLogin.class.php:335
+msgid "Turn Login with Vipps on and off"
+msgstr "Skru Logg in med Vipps av og på"
+
+#: VippsLogin.class.php:341
+msgid "Add Vipps to login page"
+msgstr "Legg Vipps til innloggingssiden"
+
+#: VippsLogin.class.php:346
 msgid "Log in with Vipps on the Wordpress login page"
 msgstr "Logg inn med Vipps på Wordpress sin innloggingsside"
 
-#: VippsLogin.class.php:335
+#: VippsLogin.class.php:353
 msgid "Continue with Vipps page"
 msgstr "Fortsett med Vipps-side"
 
-#: VippsLogin.class.php:337
+#: VippsLogin.class.php:355
 msgid "Create a new page"
 msgstr "Lag ny side"
 
-#: VippsLogin.class.php:339
+#: VippsLogin.class.php:357
 msgid ""
 "Sometimes, the user may need to confirm their email or answer follow up "
 "questions to complete sign in. This page, which you may leave blank, will be "
@@ -54,56 +62,56 @@ msgstr ""
 "posten sin eller svare på spørsmål for å logge inn. Denne siden, som du kan "
 "la være tom, vil bli brukt til dette."
 
-#: VippsLogin.class.php:406
+#: VippsLogin.class.php:424
 msgid "Continue with Vipps"
 msgstr "Fortsett med Vipps"
 
-#: VippsLogin.class.php:411
+#: VippsLogin.class.php:429
 msgid "Could not find or create the \"Continue with Vipps\" page."
 msgstr "Fant ikke er kunne ikke opprette \"Fortsett med Vipps\"-siden."
 
-#: VippsLogin.class.php:427
+#: VippsLogin.class.php:445
 msgid "Log in with Vipps"
 msgstr "Logg inn med Vipps"
 
-#: VippsLogin.class.php:431
+#: VippsLogin.class.php:449
 msgid "Use Vipps to login to your account"
 msgstr "Bruk Vipps til å logge inn til din konto"
 
-#: VippsLogin.class.php:435 WooLogin.class.php:446
+#: VippsLogin.class.php:453 WooLogin.class.php:447
 #, php-format
 msgid "You are connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr "Du er tilkoblet Vipps-profilen med telefonnummer <b>%s</b>"
 
-#: VippsLogin.class.php:437
+#: VippsLogin.class.php:455
 #, php-format
 msgid ""
 "The user is connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr "Brukeren er koblet til Vipps-profilen med telefonnummer <b>%s</b>"
 
-#: VippsLogin.class.php:439 WooLogin.class.php:452
+#: VippsLogin.class.php:457 WooLogin.class.php:453
 msgid "Unlink account"
 msgstr "Fjern tilknytningen"
 
-#: VippsLogin.class.php:440
+#: VippsLogin.class.php:458
 msgid ""
 "As long as your profile is connected to Vipps, you can log in with Vipps."
 msgstr ""
 "Så lenge kontoen din er koblet til Vipps, kan du bruke Vipps til å logge inn."
 
-#: VippsLogin.class.php:443
+#: VippsLogin.class.php:461
 msgid "You are not connected to any Vipps profile"
 msgstr "Du er ikke koblet til noen Vipps-profil."
 
-#: VippsLogin.class.php:444 WooLogin.class.php:457
+#: VippsLogin.class.php:462 WooLogin.class.php:458
 msgid "Press here to connect with your app"
 msgstr "Trykk her for å koble til med appen din"
 
-#: VippsLogin.class.php:446
+#: VippsLogin.class.php:464
 msgid "The user is not connected to a Vipps profile."
 msgstr "Brukeren er ikke koblet til en Vipps-profil."
 
-#: VippsLogin.class.php:448
+#: VippsLogin.class.php:466
 msgid ""
 "You can connect to your Vipps profile if you use the same email address in "
 "the Vipps app and on this site."
@@ -111,32 +119,32 @@ msgstr ""
 "Du kan koble til din Vipps-profil hvis du bruker samme e-postadresse i Vipps "
 "og på denne nettsiden. Etter å ha koblet sammen, kan du logge inn med Vipps."
 
-#: VippsLogin.class.php:456
+#: VippsLogin.class.php:474
 msgid "Login with Vipps is disabled"
 msgstr "Logg inn med Vipps er skrudd av"
 
-#: VippsLogin.class.php:474 WooLogin.class.php:380 WooLogin.class.php:489
+#: VippsLogin.class.php:492 WooLogin.class.php:380 WooLogin.class.php:490
 #, php-format
 msgid "Connection to Vipps profile %s <b>removed</b>."
 msgstr "Forbindelsen til Vipps-profilen %s <b>fjernet</b>."
 
-#: VippsLogin.class.php:513 VippsLogin.class.php:531
+#: VippsLogin.class.php:531 VippsLogin.class.php:551
 msgid "Log in with"
 msgstr "Logg inn med"
 
-#: VippsLogin.class.php:517 WooLogin.class.php:287
+#: VippsLogin.class.php:535 WooLogin.class.php:287
 msgid "Continue with"
 msgstr "Fortsett med"
 
-#: VippsLogin.class.php:535 WooLogin.class.php:360
+#: VippsLogin.class.php:557 WooLogin.class.php:360
 msgid "Create an account using "
 msgstr "Lag en ny konto med"
 
-#: VippsLogin.class.php:551
+#: VippsLogin.class.php:573
 msgid "Log in without password using Vipps"
 msgstr "Logg inn uten passord med Vipps"
 
-#: VippsLogin.class.php:600
+#: VippsLogin.class.php:622
 msgid ""
 "Cannot redirect to Vipps waiting page as it doesn't exist. If you just tried "
 "to log in, check your email."
@@ -144,7 +152,7 @@ msgstr ""
 "Kan ikke redirigere til ventesiden til Logg inn med Vipps siden den ikke "
 "eksisterer. Hvis du nettopp prøvde å logge inn, sjekk e-posten din."
 
-#: VippsLogin.class.php:617
+#: VippsLogin.class.php:639
 msgid ""
 "This page is used to handle your requests when continuing from Vipps and "
 "further action is required to complete your task. But in this case, it "
@@ -154,7 +162,7 @@ msgstr ""
 "ytterligere handling for å bekrefte og fullføre handlingen din. I dette "
 "tilfellet ser det ut som om økten har utløpt."
 
-#: VippsLogin.class.php:654
+#: VippsLogin.class.php:676
 msgid ""
 "Welcome! As this is your first log-in with Vipps, for safety reasons we "
 "require that you must confirm that your account as identified by your "
@@ -164,7 +172,15 @@ msgstr ""
 "sikkerhetsgrunner bekrefte at kontoen som du er registrert med e-post til "
 "faktisk eies av deg. "
 
-#: VippsLogin.class.php:661
+#: VippsLogin.class.php:679
+msgid ""
+"We have sent an email to your account with a confirmation link. Press this, "
+"and you will be confirmed!"
+msgstr ""
+"Vi har nå sendt en epost til din konto med en bekreftelseslenke. Trykk på "
+"den, og kontoen din blir bekreftet!"
+
+#: VippsLogin.class.php:683
 #, php-format
 msgid ""
 "Welcome! If you see this page, an really unexpected error has occur. "
@@ -175,16 +191,16 @@ msgstr ""
 "Uheldigvis kan vi da ikke gjøre bedre enn å sende deg til <a href='%s'>"
 "innloggingssiden</a>"
 
-#: VippsLogin.class.php:703
+#: VippsLogin.class.php:725
 msgid "Connect your Vipps account"
 msgstr "Koble til din Vipps-konto"
 
-#: VippsLogin.class.php:711
+#: VippsLogin.class.php:733
 #, php-format
 msgid "Confirm that you want to connect your Vipps profile on %s"
 msgstr "Bekreft at du vil koble sammen din Vipps-profil på %s"
 
-#: VippsLogin.class.php:869
+#: VippsLogin.class.php:892
 msgid ""
 "Your session is invalid. Only one Vipps-session can be active per browser at "
 "a time. Also, ensure that you are not blocking cookies – you will need those "
@@ -194,24 +210,24 @@ msgstr ""
 "gangen. Sørg for at du ikke blokkerer informasjonskapsler (\"cookies\"). Du "
 "trenger disse for å kunne logge inn."
 
-#: VippsLogin.class.php:880
+#: VippsLogin.class.php:903
 msgid "Could not find any user with your registered email. Cannot log in."
 msgstr ""
 "Kunne ikke finne noen bruker med din registrerte e-postadresse. Kan ikke "
 "logge deg inn."
 
-#: VippsLogin.class.php:895
+#: VippsLogin.class.php:918
 #, php-format
 msgid "Could not create a new user - an error occured: %s"
 msgstr "Kunne ikke opprette en ny bruker - det oppsto en feil: %s"
 
-#: VippsLogin.class.php:930
+#: VippsLogin.class.php:954
 msgid "It is unfortunately not allowed for your account to log-in using Vipps"
 msgstr ""
 "Det er uheldigvis ikke tillatt for din konto å bruke Vipps til å logge inn "
 "med"
 
-#: VippsLogin.class.php:944
+#: VippsLogin.class.php:968
 msgid ""
 "Another Vipps profile is connected to a user with your email address. "
 "Unfortunately, we can't log you in."
@@ -219,7 +235,7 @@ msgstr ""
 "En annen Vipps-profil er allerede koblet til brukeren med din e-postadresse. "
 "Vi kan dessverre ikke logge deg inn."
 
-#: VippsLogin.class.php:961
+#: VippsLogin.class.php:985
 msgid ""
 "Unfortunately, we could not send a confirmation request to your email "
 "address. You will need to log in with your username and password and connect "
@@ -229,30 +245,30 @@ msgstr ""
 "logge inn med brukernavn og passord, og så koble til Vipps på profil-siden "
 "din."
 
-#: VippsLogin.class.php:978
+#: VippsLogin.class.php:1002
 msgid "You must be logged in to confirm your account"
 msgstr "Du må være logget inn for å bekrefte din konto"
 
-#: VippsLogin.class.php:999
+#: VippsLogin.class.php:1023
 msgid "Could not connect to your Vipps profile: "
 msgstr "Kunne ikke koble med Vipps-profilen: "
 
-#: VippsLogin.class.php:1008 VippsLogin.class.php:1080
+#: VippsLogin.class.php:1032 VippsLogin.class.php:1104
 msgid "This can only be called when logged in"
 msgstr "Dette er bare mulig å gjøre når du er logget inn."
 
-#: VippsLogin.class.php:1033
+#: VippsLogin.class.php:1057
 msgid ""
 "Unfortunately, you cannot connect to this Vipps-profile: The email addresses "
 "are not the same."
 msgstr ""
 "Du kan ikke koble med denne Vipps-profilen. E-postadressene er ikke like."
 
-#: VippsLogin.class.php:1053
+#: VippsLogin.class.php:1077
 msgid "You must be logged in to synchronise your account"
 msgstr "Du må være logget inn for å kunne synkronisere kontoen din"
 
-#: VippsLogin.class.php:1071
+#: VippsLogin.class.php:1095
 msgid "Could not synchronize your Vipps profile: "
 msgstr "Kunne ikke synkronisere med din Vipps-profil: "
 
@@ -261,31 +277,31 @@ msgid "User cancelled the login"
 msgstr "Brukeren avbryt innloggingen"
 
 #. Name of the plugin
-#: ContinueWithVipps.class.php:135 ContinueWithVipps.class.php:177
+#: ContinueWithVipps.class.php:146 ContinueWithVipps.class.php:188
 msgid "Login with Vipps"
 msgstr "Logg inn med Vipps"
 
-#: ContinueWithVipps.class.php:169
+#: ContinueWithVipps.class.php:180
 msgid "Insufficient privileges"
 msgstr "Ikke tilstrekkelige tillatelser"
 
-#: ContinueWithVipps.class.php:187
+#: ContinueWithVipps.class.php:198
 msgid "Client ID"
 msgstr "Client ID"
 
-#: ContinueWithVipps.class.php:189 ContinueWithVipps.class.php:194
+#: ContinueWithVipps.class.php:200 ContinueWithVipps.class.php:205
 msgid "You find this in the Vipps Portal."
 msgstr "Du finner dette i VippsPortalen."
 
-#: ContinueWithVipps.class.php:192
+#: ContinueWithVipps.class.php:203
 msgid "Client Secret"
 msgstr "Client Secret"
 
-#: ContinueWithVipps.class.php:198
+#: ContinueWithVipps.class.php:209
 msgid "Your callback URL is:"
 msgstr "Callback-URL-en din er:"
 
-#: ContinueWithVipps.class.php:200
+#: ContinueWithVipps.class.php:211
 msgid ""
 "You will need to register this URL in the Vipps Portal. If you change the "
 "URL or the permalinks of your site, you will need to do this again by "
@@ -295,7 +311,7 @@ msgstr ""
 "permalinker på nettsiden din, må du registrere disse på nytt ved å gå til "
 "denne siden og finne den nye URLen."
 
-#: ContinueWithVipps.class.php:278
+#: ContinueWithVipps.class.php:289
 msgid ""
 "Could not create session table. The Login with Vipps plugin is not correctly "
 "installed."
@@ -303,23 +319,23 @@ msgstr ""
 "Kunne ikke opprette session table. Logg inn med Vipps-pluginen er ikke "
 "korrekt innstallert."
 
-#: ContinueWithVipps.class.php:280
+#: ContinueWithVipps.class.php:291
 msgid "Installed database tables for Login With Vipps"
 msgstr "Installerte databasetabeller for Logg inn med Vipps"
 
-#: ContinueWithVipps.class.php:316
+#: ContinueWithVipps.class.php:334
 #, php-format
 msgid "Unhandled error when using Continue with Vipps for action %s: %s"
 msgstr ""
 "En feil oppsto men ble ikke håndtert under \"Fortsett med Vipps\" for "
 "handling %s: %s"
 
-#: ContinueWithVipps.class.php:346 ContinueWithVipps.class.php:348
+#: ContinueWithVipps.class.php:364 ContinueWithVipps.class.php:366
 #, php-format
 msgid "Could not verify your oAuth2 token: %s"
 msgstr "Kunne ikke verifisere din oAuth2 token: %s"
 
-#: ContinueWithVipps.class.php:369
+#: ContinueWithVipps.class.php:387
 msgid ""
 "There is a problem with verifying your ID token from Vipps. Unfortunately, "
 "you cannot continue with Vipps at this time."
@@ -327,7 +343,7 @@ msgstr ""
 "Et problem har oppstått mens vi verifiserte ID-token fra Vipps. Du kan "
 "dessverre ikke fortsette med Vipps."
 
-#: ContinueWithVipps.class.php:371
+#: ContinueWithVipps.class.php:389
 msgid ""
 "There is a problem with verifying your ID token from Vipps. Unfortunately, "
 "you cannot continue with Vipps at this time"
@@ -335,11 +351,11 @@ msgstr ""
 "Det er et problem med å få verifisert ID-token fra Vipps. Du kan desverre "
 "ikke fortsette med Vipps for øyeblikket."
 
-#: ContinueWithVipps.class.php:378 ContinueWithVipps.class.php:379
+#: ContinueWithVipps.class.php:396 ContinueWithVipps.class.php:397
 msgid "Session expired - please retry."
 msgstr "Økten er utløpt - vennligst forsøk på nytt"
 
-#: ContinueWithVipps.class.php:388
+#: ContinueWithVipps.class.php:406
 #, php-format
 msgid ""
 "You successfully completed the action \"%s\" using Vipps - unfortunately, "
@@ -428,11 +444,11 @@ msgstr "Du er nå tilkoblet Vipps-profilen <b>%s</b>!"
 msgid "Vipps"
 msgstr "Vipps"
 
-#: WooLogin.class.php:434 WooLogin.class.php:504
+#: WooLogin.class.php:434 WooLogin.class.php:505
 msgid "Vipps!"
 msgstr "Vipps!"
 
-#: WooLogin.class.php:459
+#: WooLogin.class.php:460
 msgid ""
 "The easiest way to sign in. Anyone with Vipps can use Vipps to sign in. No "
 "need to remember passwords ever again. Vipps, and you are logged in."
@@ -441,15 +457,15 @@ msgstr ""
 "Vipps. Aldri mer brukernavn og passord. Vipps, så er du logget inn."
 
 # Used to be: Press here to synchronize your address
-#: WooLogin.class.php:467
+#: WooLogin.class.php:468
 msgid "Get addresses"
 msgstr "Hent adresser"
 
-#: WooLogin.class.php:476
+#: WooLogin.class.php:477
 msgid "You must be logged in to disconnect"
 msgstr "Du må være logget inn for å kunne koble fra"
 
-#: WooLogin.class.php:567
+#: WooLogin.class.php:568
 #, php-format
 msgid "Your addresses are now synchronized with the Vipps-account %s."
 msgstr "Addressene dine er nå synkronisert med Vipps-kontoen %s."
