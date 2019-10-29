@@ -56,10 +56,8 @@ require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
 global $ContinueWithVipps;
 require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');
 $ContinueWithVipps = ContinueWithVipps::instance();
-
 register_activation_hook(__FILE__,array($ContinueWithVipps,'activate'));
-register_deactivation_hook(__FILE__,array($ContinueWithVipps,'deactivate'));
-
+register_deactivation_hook(__FILE__,array('ContinueWithVipps','deactivate'));
 add_action('init',array($ContinueWithVipps,'init'));
 add_action('plugins_loaded', array($ContinueWithVipps,'plugins_loaded'));
 if (is_admin()) {
@@ -71,11 +69,10 @@ if (is_admin()) {
 
 // This class implements all login logic. IOK 2019-10-14
 global $VippsLogin;
-register_activation_hook(__FILE__,array($VippsLogin,'activate'));
-register_deactivation_hook(__FILE__,array($VippsLogin,'deactivate'));
-
 require_once(dirname(__FILE__) . '/VippsLogin.class.php');
 $VippsLogin=VippsLogin::instance();
+register_activation_hook(__FILE__,array($VippsLogin,'activate'));
+register_deactivation_hook(__FILE__,array('VippsLogin','deactivate'));
 register_activation_hook(__FILE__,array($VippsLogin,'activate'));
 register_deactivation_hook(__FILE__,array($VippsLogin,'deactivate'));
 add_action('init',array($VippsLogin,'init'));
@@ -85,13 +82,14 @@ if (is_admin()) {
     add_action('template_redirect',array($VippsLogin,'template_redirect'));
 }
 
+
 // And if WooCommerce is installed, integrate with that with another class. IOK 2019-10-14
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-if(is_plugin_active( 'woocommerce/woocommerce.php')) { 
+if(false && is_plugin_active( 'woocommerce/woocommerce.php')) { 
     require_once(dirname(__FILE__) . '/WooLogin.class.php');
     $WooLogin=WooLogin::instance();
     register_activation_hook(__FILE__,array($WooLogin,'activate'));
-    register_deactivation_hook(__FILE__,array($WooLogin,'deactivate'));
+    register_deactivation_hook(__FILE__,array('WooLogin','deactivate'));
     add_action('init',array($WooLogin,'init'));
     add_action('plugins_loaded',array($WooLogin,'plugins_loaded'));
     if (is_admin()) {

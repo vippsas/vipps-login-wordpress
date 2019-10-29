@@ -8,7 +8,6 @@
 
    This file is based on Firebases and fproject JWT.PHP (https://github.com/fproject/php-jwt/tree/master/src)  which is licensed like this:
 
-
    Copyright (c) 2011, Neuman Vong
 
    All rights reserved.
@@ -39,21 +38,6 @@
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
- © 2019 GitHub, Inc.
- Terms
- Privacy
- Security
- Status
- Help
-
- Contact GitHub
- Pricing
- API
- Training
- Blog
- About
- */
 
 /*
    This is an extremely basic JWT Verifyer, which will only work with
