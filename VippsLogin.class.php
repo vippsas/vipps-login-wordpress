@@ -554,7 +554,7 @@ class VippsLogin {
     public function register_form_continue_with_vipps () {
         $options = get_option('vipps_login_options2');
         if (!$options['login_page']) return;
-        $this->wp_login_button(__('Create an account using ', 'login-with-vipps'));
+        $this->wp_login_button(__('Continue with', 'login-with-vipps'));
         $this->move_continue_button_over_login_form();
     }
     public function wp_login_button($text, $application='wordpress') {
