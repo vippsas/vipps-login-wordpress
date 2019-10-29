@@ -85,7 +85,7 @@ if (is_admin()) {
 
 // And if WooCommerce is installed, integrate with that with another class. IOK 2019-10-14
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-if(false && is_plugin_active( 'woocommerce/woocommerce.php')) { 
+if(is_plugin_active( 'woocommerce/woocommerce.php')) { 
     require_once(dirname(__FILE__) . '/WooLogin.class.php');
     $WooLogin=WooLogin::instance();
     register_activation_hook(__FILE__,array($WooLogin,'activate'));

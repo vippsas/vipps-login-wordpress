@@ -377,7 +377,6 @@ class WooLogin{
         $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
         if (empty($notices)) return;
         delete_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-        $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
         if ( ! WC()->session->has_session() ) {
             WC()->session->set_customer_session_cookie( true );
         }
@@ -414,10 +413,10 @@ class WooLogin{
     public function account_content() {
         $userid = get_current_user_id();
         if (!$userid) return;
-        $justconnected = get_usermeta($userid,'_vipps_just_connected');
+        $justconnected = get_user_meta($userid,'_vipps_just_connected',true);
         if ($justconnected) {
             delete_user_meta($userid, '_vipps_just_connected');
-            $vippsphone = get_usermeta($userid,'_vipps_phone');
+            $vippsphone = get_user_meta($userid,'_vipps_phone',true);
             $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>!', 'login-with-vipps'), $vippsphone);
             ?>
                 <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
@@ -439,8 +438,8 @@ class WooLogin{
         $options = get_option('vipps_login_woo_options');
         $allow_login = $options['woo-login'];
         $allow_login = apply_filters('continue_with_vipps_woocommerce_allow_login', $allow_login, $user, array(), array());
-        $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
-        $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
+        $vippsphone = trim(get_user_meta($user->get_id(),'_vipps_phone',true));
+        $vippsid = trim(get_user_meta($user->get_id(),'_vipps_id',true));
 
         ?>
             <?php    if ($vippsphone && $vippsid): ?>
@@ -475,7 +474,7 @@ class WooLogin{
         check_admin_referer('disconnect_vipps', 'disconnect_vipps_nonce');
         $userid = get_current_user_id();
         if (!$userid) wp_die(__('You must be logged in to disconnect', 'login-with-vipps'));
-        $phone = get_usermeta($userid, '_vipps_phone');
+        $phone = get_user_meta($userid, '_vipps_phone',true);
 
         delete_user_meta($userid,'_vipps_phone');
         delete_user_meta($userid,'_vipps_id');

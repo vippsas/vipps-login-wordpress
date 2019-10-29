@@ -280,17 +280,17 @@ class VippsLogin {
         global $pagenow;
         if ($pagenow == 'profile.php') {
             $userid = get_current_user_id();
-            $justconnected = get_usermeta($userid,'_vipps_just_connected');
-            $justsynched = get_usermeta($userid,'_vipps_just_synched');
+            $justconnected = get_user_meta($userid,'_vipps_just_connected',true);
+            $justsynched = get_user_meta($userid,'_vipps_just_synched',true);
             if ($justconnected) {
                 delete_user_meta($userid, '_vipps_just_connected');
-                $vippsphone = get_usermeta($userid,'_vipps_phone');
+                $vippsphone = get_user_meta($userid,'_vipps_phone',true);
                 $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
             if ($justsynched) {
                 delete_user_meta($userid, '_vipps_just_synched');
-                $vippsphone = get_usermeta($userid,'_vipps_phone');
+                $vippsphone = get_user_meta($userid,'_vipps_phone',true);
                 $notice = sprintf(__('You are now synchronized with the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
@@ -438,8 +438,8 @@ class VippsLogin {
     function show_extra_profile_fields( $user ) {
         $allow_login = true;
         $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
-        $vippsphone = trim(get_usermeta($user->ID,'_vipps_phone'));
-        $vippsid = trim(get_usermeta($user->id,'_vipps_id'));
+        $vippsphone = trim(get_user_meta($user->ID,'_vipps_phone',true));
+        $vippsid = trim(get_user_meta($user->id,'_vipps_id',true));
         $its_you = (get_current_user_id() == $user->ID);
         ?>
             <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-with-vipps'); ?> </h2>
@@ -486,7 +486,7 @@ class VippsLogin {
     function profile_update( $userid ) {
         if (!current_user_can('edit_user',$userid)) return false;
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
-            $phone = get_usermeta($userid, '_vipps_phone');
+            $phone = get_user_meta($userid, '_vipps_phone',true);
             delete_user_meta($userid,'_vipps_phone');
             delete_user_meta($userid,'_vipps_id');
             $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
@@ -659,8 +659,8 @@ class VippsLogin {
         $userinfo = @$session['userinfo'];
         if (!$userinfo) return;
 
-        $vippsphone = get_usermeta($userid,'_vipps_phone');
-        $vippsid = get_usermeta($userid,'_vipps_id');
+        $vippsphone = get_user_meta($userid,'_vipps_phone',true);
+        $vippsid = get_user_meta($userid,'_vipps_id',true);
 
         if ($vippsphone == $userinfo['phone_number'] && $vippsid == $userinfo['sub']) { 
             $user = get_user_by('id', $userid);
@@ -956,8 +956,8 @@ class VippsLogin {
         }
 
         // And now we have a user, but we must see if the accounts are connected, and if so, log in IOK 2019-10-14
-        $vippsphone = get_usermeta($user->ID,'_vipps_phone');
-        $vippsid = get_usermeta($user->id,'_vipps_id');
+        $vippsphone = get_user_meta($user->ID,'_vipps_phone',true);
+        $vippsid = get_user_meta($user->id,'_vipps_id',true);
         if ($vippsphone == $phone && $vippsid == $sub) { 
             $this->actually_login_user($user,$sid,$session);
             exit();
