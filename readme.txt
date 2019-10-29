@@ -55,5 +55,12 @@ You can use the framework of this plugin to implement other signed actions, such
 2. Registerering your redirect URI 
 3. Activating Login with Vipps at the [Vipps Portal](https://portal.vipps.no)
 
+== Frequently Asked Questions ==
+= How do you customize the plugin? =
+You can add your own actions to be completed by using Vipps to continue by defining an 'action' and adding two action-hooks to handle success and error for the action. More information about this will be provided in the future.
+
+== Upgrade Notice ==
+This is the very first version of this plugin
+
 == Changelog ==
 v1.0.0 First release
