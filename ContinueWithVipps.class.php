@@ -345,7 +345,7 @@ class ContinueWithVipps {
         $idtoken = null;
         $idtoken_sub = null;
 
-        if ($session && $session['userinfo']) {
+        if ($session && isset($session['userinfo'])) {
             $userinfo = $session['userinfo'];
         }  else {
             if ($code) {
@@ -519,19 +519,19 @@ class ContinueWithVipps {
     }
     // Returns the endpoint from which we get access and idtokens from the Vipps oAuth2 api IOK 2019-10-14 
     protected function token_endpoint() {
-        $fallback = $this->base_url . "oauth2/token";  // Just in case, this is acctually the address, but let's check .well-known
+        $fallback = $this->base_url() . "oauth2/token";  // Just in case, this is acctually the address, but let's check .well-known
         $data = $this->get_oauth_data();
         if (!empty($data)) return $data['token_endpoint'];
         return $fallback; 
     }
     protected function authorization_endpoint() {
-        $fallback = $this->base_url . "oauth2/auth"; 
+        $fallback = $this->base_url() . "oauth2/auth"; 
         $data = $this->get_oauth_data();
         if (!empty($data)) return $data['authorization_endpoint'];
         return $fallback; 
     }
     protected function userinfo_endpoint() {
-        $fallback = $this->base_url . "userinfo"; 
+        $fallback = $this->base_url() . "userinfo"; 
         $data = $this->get_oauth_data();
         if (!empty($data)) return $data['userinfo_endpoint'];
         return $fallback; 

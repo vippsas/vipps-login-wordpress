@@ -439,7 +439,7 @@ class VippsLogin {
         $allow_login = true;
         $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
         $vippsphone = trim(get_user_meta($user->ID,'_vipps_phone',true));
-        $vippsid = trim(get_user_meta($user->id,'_vipps_id',true));
+        $vippsid = trim(get_user_meta($user->ID,'_vipps_id',true));
         $its_you = (get_current_user_id() == $user->ID);
         ?>
             <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-with-vipps'); ?> </h2>
@@ -725,16 +725,19 @@ class VippsLogin {
         return __('Connect your Vipps account', 'login-with-vipps');
     }
     public function confirm_vipps_connect_and_login_email_content ($email_text, $email_data) {
-        if ($email_data->request->action_name !== 'vipps_connect_login') return $email_text;
-        return $email_text; // Bleh
+        if (empty($email_data)) return $email_text;
+        if ($email_data['request']->action_name !== 'vipps_connect_login') return $email_text;
+        return $email_text; 
     }
     public function confirm_vipps_connect_and_login_email_subject ($subject,$sitename,$email_data) {
-        if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
+        if (empty($email_data)) return $subject;
+        if ($email_data['request']->action_name !== 'vipps_connect_login') return $subject;
         return sprintf(__('Confirm that you want to connect your Vipps profile on %s', 'login-with-vipps'), $sitename); 
     }
     // Admin emails, not used but still
     public function user_confirmed_vipps_connection_email_content ($email_text, $email_data) {
-        if ($email_data->request->action_name !== 'vipps_connect_login') return $email_text;
+        if (empty($email_data)) return $email_text;
+        if ($email_data['request']->action_name !== 'vipps_connect_login') return $email_text;
         $email_text = __(
                 'Hei,
 
@@ -752,7 +755,7 @@ class VippsLogin {
         return $email_text; 
     }
     public function user_confirmed_vipps_connection_email_subject ($subject, $sitename, $email_data) {
-        if ($email_data->request->action_name !== 'vipps_connect_login') return $subject;
+        if ($email_data['request']->action_name !== 'vipps_connect_login') return $subject;
     }
 
 
@@ -799,7 +802,7 @@ class VippsLogin {
         $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login','referer'=>$referer)) : null;
 
         // This would be for an application to extend the session if needed IOK 2019-10-08 
-        do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $errorhint, $session);
+        do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $error_hint, $session);
 
 
         if ($createSession) $redir = add_query_arg(array('vippsstate'=>urlencode($session->sessionkey), 'vippserror'=>urlencode($error)), $redir);
@@ -911,7 +914,7 @@ class VippsLogin {
             // Fix username here so it's unique, then allow applications to change it
             $newusername = apply_filters('continue_with_vipps_create_username', $username, $userinfo,$session);
             $newusername = apply_filters("continue_with_vipps_{$app}_create_username", $username, $userinfo,$session);
-            $user_id = wp_create_user( $newusername, $random_password, $email);
+            $user_id = wp_create_user( $newusername, $pass, $email);
             if (is_wp_error($user_id)) {
                 if($session) $session->destroy();
                 $this->deleteBrowserCookie();
@@ -931,9 +934,9 @@ class VippsLogin {
 
             update_user_meta($user_id,'_vipps_phone',$phone);
             update_user_meta($user_id,'_vipps_id',$sub);
-            update_user_meta($userid, '_vipps_just_connected', 1);
+            update_user_meta($user_id, '_vipps_just_connected', 1);
             // This is currently mostly for Woo, but in general: User has no address, so please update addresses when logging in. IOK 2019-10-25
-            update_user_meta($userid,'_vipps_synchronize_addresses', 1);
+            update_user_meta($user_id,'_vipps_synchronize_addresses', 1);
 
             $user = get_user_by('id', $user_id);
             do_action('continue_with_vipps_after_create_user', $user, $session);
@@ -957,7 +960,7 @@ class VippsLogin {
 
         // And now we have a user, but we must see if the accounts are connected, and if so, log in IOK 2019-10-14
         $vippsphone = get_user_meta($user->ID,'_vipps_phone',true);
-        $vippsid = get_user_meta($user->id,'_vipps_id',true);
+        $vippsid = get_user_meta($user->ID,'_vipps_id',true);
         if ($vippsphone == $phone && $vippsid == $sub) { 
             $this->actually_login_user($user,$sid,$session);
             exit();
@@ -1033,8 +1036,8 @@ class VippsLogin {
         }
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
 
-        $profile = get_edit_user_link($user->ID);
         $userid = get_current_user_id();
+        $profile = get_edit_user_link($userid);
         $redir = apply_filters('continue_with_vipps_confirm_redirect', $profile, $userid, $session);
         $redir = apply_filters("continue_with_vipps_{$app}_confirm_redirect", $redir , $userid, $session);
 

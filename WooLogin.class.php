@@ -554,14 +554,14 @@ class WooLogin{
 
     // Note that we want to synchronize addresses from now on . Also, actually do it. IOK 2019-10-14
     public function synch_addresses($userid,$userinfo, $session) {
-        update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
-        delete_user_meta($user->ID,'_vipps_just_synched', 1);
+        update_user_meta($userid,'_vipps_synchronize_addresses', 1);
+        delete_user_meta($userid,'_vipps_just_synched', 1);
         // Woocommerce may not have loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
         // We are always logged in here, so just use the cookie contents as a quickie session.
         $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
         if ($cookie) {
-            $phone = $userinfo['phone'];
+            $phone =  $userinfo['phone_number'];
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
             $notice = sprintf(__('Your addresses are now synchronized with the Vipps-account %s.', 'login-with-vipps'), $phone);
@@ -616,6 +616,7 @@ class WooLogin{
     // We'll use woocommerces own username functionality here. Run when a user is created. IOK 2019-10-14
     public function create_username($username, $userinfo, $sessio) {
         if (function_exists('wc_create_new_customer_username')) {
+            $email = $userinfo['email'];
             return wc_create_new_customer_username($email, array('first_name'=>$userinfo['given_name'],  'last_name' =>  $userinfo['family_name']));
         } else {
             return $username;
@@ -626,7 +627,8 @@ class WooLogin{
         $userinfo = @$session['userinfo'];
         if (!$userinfo) return false;
         update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
-        $this->maybe_update_address_info($user,$userinfo);
+        $customer = new WC_Customer($user->ID);
+        $this->maybe_update_address_info($customer,$userinfo);
     } 
 
     // IOK 2019-10-14 currently, we just say 'yes' here, but we may want to disallow login for e.g. admins in this context.
@@ -669,14 +671,13 @@ class WooLogin{
             error("no customer");
         }
 
-        $this->maybe_update_address_info($user,$userinfo);
+        $this->maybe_update_address_info($customer,$userinfo);
     }
 
     // IOK 2019-10-04 normally we want to update the users' address every time we log in, because this allows Vipps to be the repository of the users' address.
     // However, if the user has changed his or her address in woo itself, we will let it stay as it is. We handle this by a single use meta. IOK 2019-10-14
-    public function maybe_update_address_info($user, $userinfo) {
-        if (!get_user_meta($user->ID,'_vipps_synchronize_addresses',true)) return false;
-        $customer = new WC_Customer($user->ID);
+    public function maybe_update_address_info($customer, $userinfo) {
+        if (!get_user_meta($customer->get_id(),'_vipps_synchronize_addresses',true)) return false;
         $address = $userinfo['address'][0];
         foreach($userinfo['address'] as $add) {
             if ($add['address_type'] == 'home') {
@@ -684,6 +685,7 @@ class WooLogin{
             }
         }
         if (empty($address)) return;
+        $email = $userinfo['email'];
         $firstname = $userinfo['given_name'];
         $lastname =  $userinfo['family_name'];
         $phone =  $userinfo['phone_number'];
