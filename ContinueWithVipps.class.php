@@ -97,7 +97,7 @@ class ContinueWithVipps {
     // IOK 2019-10-14 This is the main entry-point for this class and for logging in and doing stuff with the Vipps oauth API. Call this with an action-name (like 'login') and sessiondata,
     // and you will get an URL back to which you can redirect the user. You should do this in a POST request so that you can start a session by setting a cookie.
     // The login-session will be stored in the database and is retrievable by the 'state' argument passed to and from Vipps. If sensitive, you may need to secure this session with a private (cookie-stored) value as well.
-    public static function getAuthRedirect($action,$sessiondata=null,$scope="openid address birthDate email name phoneNumber") {
+    public static function getAuthRedirect($action,$sessiondata=null,$scope="openid address email name phoneNumber") {
         $me = static::instance();
         $url      = $me->authorization_endpoint();
         $redir    = $me->make_callback_url();
