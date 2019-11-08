@@ -21,6 +21,17 @@ Login with Vipps suits all websites that need users to sign in and want to tailo
  * Your customers get what they want faster
  * You get more people signed in, leading to more insight and increased conversion.
 
+
+== Requirements ==
+
+ * Wordpress version 4.9 or above
+ * PHP version 7.0 or above
+ * Your website must have an SSL certificate and be available through HTTPS
+ * OpenSSL must be configured for your PHP installation
+ * allow_url_fopen must be true in your PHP configuration
+ * For WooCommerce, the version requirement is 3.3.4 or above
+ * The port 443 must be open for outward traffic on your servers firewall
+
 == Feature Highlights ==
 = Fully integrated with WooCommerce =
 Allows login and registration on your account pages, cart, checkout and via shortcodes. Addresses automatically synchronized with Vipps on login.
@@ -55,9 +66,36 @@ You can use the framework of this plugin to implement other signed actions, such
 2. Registerering your redirect URI 
 3. Activating Login with Vipps at the [Vipps Portal](https://portal.vipps.no)
 
-== Frequently Asked Questions ==
-= How do you customize the plugin? =
-You can add your own actions to be completed by using Vipps to continue by defining an 'action' and adding two action-hooks to handle success and error for the action. More information about this will be provided in the future.
+== Shortcodes ==
+ * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either Wordpress or WooCommerce.
+ * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
+
+== Customizing the Plugin ==
+To use 'Continue with Vipps' in your application, there are two levels of customizations available, except for a mass of filters and hooks.
+
+= Adding another 'application' to log into =
+Logging into basic Wordpress and into an application like WooCommerce is different in the details, especially with regards to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the users' address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
+
+  * Define your application with a name. It should be a simple slug, like 'wordpress' or 'woocommerce'
+  * Create your login button, and make it call the supplied Javascript function "login_with_vipps" with your application name as argument.
+  * To customize, you can now modify several filters and hooks, the most important of which would be:
+  * 'continue_with_vipps_error_*your application*_login_redirect'. This takes and returns an error-page redirect, the error string, and the login session data as an array. You can here return your own error page.
+  * 'continue_with_vipps_before_*your application*_login_redirect'. This takes your logged-in user and a session (which can be called as an array) and is called right before the user is redirected. This would be a good place to add a filter to 'login_redirect' for instance.
+  * Filter 'continue_with_vipps_*your application*_users_can_register'. Takes a truth value, an array of userinfo from Vipps and a session, and should return true only if you allow the user to register
+  * Filter 'continue_with_vipps_*your application*_create_userdata'. For newly registered users, takes an array to be passed to wp_update_user, an array of userinfo from Vipps, and a session. You can here add your extra meta fields
+  * Filter 'continue_with_vipps_*your application*_allow_login'. Takes a truth value, a user object, userinfo from Vipps and a session, and returns true only if the user is allowed to log in
+
+= Adding another 'action' apart from logging in =
+You may want to do other things than logging in with the users' confirmed Vipps identity, and this plugin absolutely allows this. This might be submisssions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address. 
+
+These are the main steps:
+ * Define your own action, like 'submitaddress'.
+ * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)` (you can also provide an array of sessiondata which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is an URL to which you should redirect your user.
+ * Create your success handler. This should be  
+ * Create your error handler. This should be hooked to 'continue_with_vipps_error_*your action*'. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here, and show your user the error. The redirect is important, you should not output content in this action.
+ * Create your succes handler. This should be hooked to 'continue_with_vipps_*your action*'. It will recieve an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page. 
+
+The rest is a simple matter of programming.
 
 == Upgrade Notice ==
 This is the very first version of this plugin
