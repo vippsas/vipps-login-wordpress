@@ -79,6 +79,9 @@ SOFTWARE.
 
 .continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
  font-size: 1em;
+ line-height: 2em;
+ font-weight: 500;
+ height: auto;
  padding: 5px 10px 4px 10px;
 }
 

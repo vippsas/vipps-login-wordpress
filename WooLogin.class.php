@@ -79,7 +79,7 @@ class WooLogin{
             add_action('admin_post_disconnect_vipps', array($this,'disconnect_vipps_post_handler'));
 
             // Login stuff
-            add_filter('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
+            add_action('continue_with_vipps_before_woocommerce_login_redirect', array($this, 'add_login_redirect'), 10, 2);
             add_filter('continue_with_vipps_woocommerce_users_can_register', array($this, 'users_can_register'), 10, 3);
             add_filter('continue_with_vipps_woocommerce_create_userdata', array($this, 'create_userdata'), 10, 3);
             add_filter('continue_with_vipps_woocommerce_create_username', array($this, 'create_username'), 10, 3);
