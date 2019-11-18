@@ -488,8 +488,6 @@ class ContinueWithVipps {
         $data =$this->get_oauth_data();
         if ($data && isset($data['jwks_uri'])) {
             $keyscontent = @wp_remote_retrieve_body(wp_remote_get($data['jwks_uri']));
-            error_log("keyscontent $keyscontent");
-
             $keysdata = array();
             if (!empty($keyscontent)) $keysdata = json_decode($keyscontent,true);
             if (!empty($keysdata) && isset($keysdata['keys'])) {
@@ -569,21 +567,24 @@ class ContinueWithVipps {
         if ($verb == 'GET' && $data_encoded) {
             $url .= "?$data_encoded";
         }
+
         $return = wp_remote_request($url, $args);
         $headers = array();
         $content = NULL;
         $response = 0;
         if (is_wp_error($return))  {
-          $headers['status'] = "500 " . $response->get_error_message();
+          $headers['status'] = "500 " . $return->get_error_message();
           $response = 500;
         } else {
           $response = wp_remote_retrieve_response_code($return);
+          $message =  wp_remote_retrieve_response_message($return);
           $headers = wp_remote_retrieve_headers($return);
+          $headers['status'] = "$response $message";
           $contenttext = wp_remote_retrieve_body($return);
           if ($contenttext) {
             $content = json_decode($contenttext,true);
           }
         }
-        return array('response'=>$response,'headers'=>$http_response_header,'content'=>$content);
+        return array('response'=>$response,'headers'=>$headers,'content'=>$content);
     }
 }

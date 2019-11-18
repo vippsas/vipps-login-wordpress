@@ -31,7 +31,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
     exit;
 }
 
-error_log("This is uninstall");
+error_log("Uninstalling Login with Vipps");
 
 
 function login_with_vipps_cleanup() {
