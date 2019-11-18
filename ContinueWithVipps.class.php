@@ -368,16 +368,16 @@ class ContinueWithVipps {
                 } else {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers'][0], 'login-with-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers']['status'], 'login-with-vipps'),'', $session);
                     }
-                    wp_die($authtoken['headers'][0]);
+                    wp_die($authtoken['headers']['status']);
                 }
                 $userinfo = $this->get_openid_userinfo($accesstoken);
 
                 if ($userinfo['response'] != 200) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers'][0], 'login-with-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers']['status'], 'login-with-vipps'),'', $session);
                     }
                     wp_die($userinfo['response']);
                 }
@@ -550,12 +550,6 @@ class ContinueWithVipps {
             $data_encoded = json_encode($data);
         }  
         $data_len = strlen ($data_encoded);
-        $http_response_header = null;
-        $sslparams = [];
-
-        $sslparams['verify_peer'] = true;
-        $sslparams['verify_peer_name'] = true;
-
         $headers['Connection'] = 'close';
         if ($verb=='POST' || $verb == 'PATCH' || $verb == 'PUT') {
             if ($encoding == 'url') {
@@ -564,37 +558,31 @@ class ContinueWithVipps {
                 $headers['Content-type'] = 'application/json';
             }
         }
-        $headerstring = '';
-        $hh = [];
-        foreach($headers as $key=>$value) {
-            array_push($hh,"$key: $value");
-        }
-        $headerstring = join("\r\n",$hh);
-        $headerstring .= "\r\n";
 
-        $httpparams = array('method'=>$verb,'header'=>$headerstring);
+        $args = array();
+        $args['method'] = $verb;
+        $args['headers'] = $headers;
+
         if ($verb == 'POST' || $verb == 'PATCH' || $verb == 'PUT') {
-            $httpparams['content'] = $data_encoded;
-        }
+            $args['body'] = $data_encoded;
+        } 
         if ($verb == 'GET' && $data_encoded) {
             $url .= "?$data_encoded";
         }
-        $params = ['http'=>$httpparams,'ssl'=>$sslparams];
-
-        $context = stream_context_create($params);
-        $content = null;
-
-        $contenttext = @file_get_contents($url,false,$context);
-        if ($contenttext) {
-            $content = json_decode($contenttext,true);
-        }
+        $return = wp_remote_request($url, $args);
+        $headers = array();
+        $content = NULL;
         $response = 0;
-        if ($http_response_header && isset($http_response_header[0])) {
-            $match = [];
-            $ok = preg_match('!^HTTP/... (...) !i',$http_response_header[0],$match);
-            if ($ok) {
-                $response = 1 * $match[1];
-            }
+        if (is_wp_error($return))  {
+          $headers['status'] = "500 " . $response->get_error_message();
+          $response = 500;
+        } else {
+          $response = wp_remote_retrieve_response_code($return);
+          $headers = wp_remote_retrieve_headers($return);
+          $contenttext = wp_remote_retrieve_body($return);
+          if ($contenttext) {
+            $content = json_decode($contenttext,true);
+          }
         }
         return array('response'=>$response,'headers'=>$http_response_header,'content'=>$content);
     }
