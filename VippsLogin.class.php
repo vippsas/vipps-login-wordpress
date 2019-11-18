@@ -1085,7 +1085,7 @@ class VippsLogin {
         // Override error page redirect for your application. No access to the possible new session. IOK 2019-10-08
         $redir = apply_filters('continue_with_vipps_error_synch_redirect', $redir, $error, $sessiondata);
         $redir = apply_filters("continue_with_vipps_error_{$app}_synch_redirect", $redir, $error, $sessiondata);
-        do_action("continue_with_vipps_error_{$app}_synch", $error, $errordesc, $errorhint, $sessiondata);
+        do_action("continue_with_vipps_error_{$app}_synch", $error, $errordesc, $error_hint, $sessiondata);
         wp_safe_redirect($redir);
         exit();
     }
