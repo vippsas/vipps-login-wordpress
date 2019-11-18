@@ -86,14 +86,14 @@ if (is_admin()) {
 // And if WooCommerce is installed, integrate with that with another class. IOK 2019-10-14
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(is_plugin_active( 'woocommerce/woocommerce.php')) { 
-    require_once(dirname(__FILE__) . '/WooLogin.class.php');
-    $WooLogin=WooLogin::instance();
-    register_activation_hook(__FILE__,array($WooLogin,'activate'));
-    register_deactivation_hook(__FILE__,array('WooLogin','deactivate'));
-    add_action('init',array($WooLogin,'init'));
-    add_action('plugins_loaded',array($WooLogin,'plugins_loaded'));
+    require_once(dirname(__FILE__) . '/VippsWooLogin.class.php');
+    $VippsWooLogin=VippsWooLogin::instance();
+    register_activation_hook(__FILE__,array($VippsWooLogin,'activate'));
+    register_deactivation_hook(__FILE__,array('VippsWooLogin','deactivate'));
+    add_action('init',array($VippsWooLogin,'init'));
+    add_action('plugins_loaded',array($VippsWooLogin,'plugins_loaded'));
     if (is_admin()) {
-        add_action('admin_init',array($WooLogin,'admin_init'));
+        add_action('admin_init',array($VippsWooLogin,'admin_init'));
     }
 }
 

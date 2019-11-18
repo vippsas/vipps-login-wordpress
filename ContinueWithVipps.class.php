@@ -173,7 +173,7 @@ class ContinueWithVipps {
         }
     }
 
-    // This is the main options-page for this plugin. The classes VippsLogin and WooLogin adds more options to this screen just to 
+    // This is the main options-page for this plugin. The classes VippsLogin and VippsWooLogin adds more options to this screen just to 
     // keep the option-data local to each class. IOK 2019-10-14
     public function toolpage () {
         if (!is_admin() || !current_user_can('manage_options')) {

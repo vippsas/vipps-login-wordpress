@@ -1099,7 +1099,7 @@ class VippsLogin {
         set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
     }
 
-    // This handler marks the users so that we know that at every login, we want to synchronize address info etc from Vipps to Wordrpess. Mostly used for Woocommerce, so see the WooLogin class. IOK 2019-10-14
+    // This handler marks the users so that we know that at every login, we want to synchronize address info etc from Vipps to Wordrpess. Mostly used for Woocommerce, so see the VippsWooLogin class. IOK 2019-10-14
     public function continue_with_vipps_synch($userinfo,$session) {
         if (!is_user_logged_in()) {
             $this->deleteBrowserCookie();

@@ -1,6 +1,6 @@
 <?php 
 /* 
-   WooLogin: 
+   VippsWooLogin: 
    This class checks that WooCommerce is available, and if so, will add features and buttons for logging in and registering as customers.
    It will also add a Vipps tab to the customer profile page, and interact with the shopping flow of Woocommerce. It will also interact properly with Vipps payment gateways, if available.  IOK 2019-10-14
 
@@ -34,7 +34,7 @@
    SOFTWARE.
 
  */
-class WooLogin{
+class VippsWooLogin{
     protected static $instance = null;
     protected $loginbuttonshown = 0;    // Ensure we show the login action just once on certain pages.
     protected $rewriteruleversion = 1;  // Can't avoid rewrite rule modifications for Woo
@@ -44,7 +44,7 @@ class WooLogin{
 
     // This is a singleton page, access the single instance just using this method. IOK 2019-10-14
     public static function instance()  {
-        if (!static::$instance) static::$instance = new WooLogin();
+        if (!static::$instance) static::$instance = new VippsWooLogin();
         return static::$instance;
     }
 
