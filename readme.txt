@@ -28,7 +28,6 @@ Login with Vipps suits all websites that need users to sign in and want to tailo
  * PHP version 7.0 or above
  * Your website must have an SSL certificate and be available through HTTPS
  * OpenSSL must be configured for your PHP installation
- * allow_url_fopen must be true in your PHP configuration
  * For WooCommerce, the version requirement is 3.3.4 or above
  * The port 443 must be open for outward traffic on your servers firewall
 
