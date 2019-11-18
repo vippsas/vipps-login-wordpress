@@ -487,7 +487,9 @@ class ContinueWithVipps {
         }
         $data =$this->get_oauth_data();
         if ($data && isset($data['jwks_uri'])) {
-            $keyscontent = @file_get_contents($data['jwks_uri']);
+            $keyscontent = @wp_remote_retrieve_body(wp_remote_get($data['jwks_uri']));
+            error_log("keyscontent $keyscontent");
+
             $keysdata = array();
             if (!empty($keyscontent)) $keysdata = json_decode($keyscontent,true);
             if (!empty($keysdata) && isset($keysdata['keys'])) {
@@ -507,7 +509,8 @@ class ContinueWithVipps {
             return $data;
         }
         $wellknownurl = $this->base_url() . ".well-known/openid-configuration";
-        $wellknowncontents= @file_get_contents($wellknownurl);
+        $wellknowncontents= @wp_remote_retrieve_body(wp_remote_get($wellknownurl));
+
         $wellknowndata=array();
         if ($wellknowncontents) {
             $wellknowndata = @json_decode($wellknowncontents,true);
