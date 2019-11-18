@@ -371,7 +371,7 @@ class VippsWooLogin{
     // We are always logged in here, so just use the cookie contents as a quickie session, using a short transient. IOK 2019-10-14
     // Any notices added will be shown on next page load, so this is used for both error handling and success messages. IOK 2019-10-14
     public function add_stored_woocommerce_notices() {
-        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
         $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
@@ -482,7 +482,7 @@ class VippsWooLogin{
         // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
         // We are always logged in here, so just use the cookie contents as a quickie session.
-        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if ($cookie) {
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
@@ -559,7 +559,7 @@ class VippsWooLogin{
         // Woocommerce may not have loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
         // We are always logged in here, so just use the cookie contents as a quickie session.
-        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if ($cookie) {
             $phone =  $userinfo['phone_number'];
             $cookiehash =  hash('sha256',$cookie,false);

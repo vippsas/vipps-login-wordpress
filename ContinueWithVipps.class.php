@@ -312,7 +312,7 @@ class ContinueWithVipps {
             header('Pragma: no-cache');
         }
         // The 'state' value passed to and from Vipps will conttain both the action and the session key. IOK 2019-10-14
-        $state = @$_REQUEST['state'];
+        $state = sanitize_text_field(@$_REQUEST['state']);
         $action ='';
         $sessionkey='';
         if ($state) {
@@ -320,9 +320,9 @@ class ContinueWithVipps {
         }
         $session = VippsSession::get($sessionkey);
 
-        $error = @$_REQUEST['error'];
-        $errordesc = @$_REQUEST['error_description'];
-        $error_hint = @$_REQUEST['error_hint'];
+        $error = sanitize_text_field(@$_REQUEST['error']);
+        $errordesc = sanitize_text_field(@$_REQUEST['error_description']);
+        $error_hint = sanitize_text_field(@$_REQUEST['error_hint']);
 
         $forwhat = $action;
         $userinfo = null;
@@ -334,8 +334,8 @@ class ContinueWithVipps {
             wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-with-vipps'), esc_html($forwhat), esc_html($error)));
         }
 
-        $code =  @$_REQUEST['code'];
-        $scope = @$_REQUEST['scope'];
+        $code =  sanitize_text_field(@$_REQUEST['code']);
+        $scope = sanitize_text_field(@$_REQUEST['scope']);
 
         // Now to get the user information. When successful, we will store this in the session, but to get there, we need to decode the idtoken, verify its signature, then get the userinfo
         // via the API and then check that the 'sub' (subscriber) values are the same. At each point we will redirect any errors to the error handler.

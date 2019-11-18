@@ -599,7 +599,7 @@ class VippsLogin {
         $continuepage = $this->ensure_continue_with_vipps_page();
         if ($continuepage && !is_wp_error($continuepage) && is_page($continuepage->ID)) {
 
-            $state = @$_REQUEST['state'];
+            $state = sanitize_text_field(@$_REQUEST['state']);
             $sessionkey = '';
             $action = '';
             if ($state) list($action,$sessionkey) = explode("::",$state);
@@ -629,7 +629,7 @@ class VippsLogin {
 
     // This is actually run as the 'the_content' filter for the waiting page, replacing the contents of whatever page was used with this. IOK 2019-10-14
     public  function continue_with_vipps_waiting_page($content) {
-        $state = @$_REQUEST['state'];
+        $state = sanitize_text_field(@$_REQUEST['state']);
         $sessionkey = '';
         $action = '';
         if ($state) list($action,$sessionkey) = explode("::",$state);
@@ -763,8 +763,8 @@ class VippsLogin {
     // In this situation we use a fresh VippsSession to carry this information.
     public function wp_login_errors ($errors, $redirect_to) {
         $session = array();
-        $state = @$_REQUEST['vippsstate'];
-        $errorcode = @$_REQUEST['vippserror'];
+        $state = sanitize_text_field(@$_REQUEST['vippsstate']);
+        $errorcode = sanitize_text_field(@$_REQUEST['vippserror']);
         if ($state) {
             $session = VippsSession::get($state);
         }
@@ -1011,7 +1011,7 @@ class VippsLogin {
         $redir = apply_filters('continue_with_vipps_error_confirm_redirect', $redir, $error, $sessiondata);
         $redir = apply_filters("continue_with_vipps_error_{$app}_confirm_redirect", $redir, $error, $sessiondata);
 
-        do_action("continue_with_vipps_error_{$app}_confirm", $error, $errordesc, $errorhint, $sessiondata);
+        do_action("continue_with_vipps_error_{$app}_confirm", $error, $errordesc, $error_hint, $sessiondata);
 
         wp_safe_redirect($redir);
         exit();
@@ -1020,7 +1020,7 @@ class VippsLogin {
     // This stores the error-messages temporarily in a transient keyed with the users' cookie. They can then be displayed on the profile page after reloads. IOK 2019-10-14
     public function continue_with_vipps_error_wordpress_confirm ($error, $errordesc, $errorhint, $sessiondata) {
         // Cannot  use the 'store_admin_notices' of ContinueWithVipps here, because it breaks Woocommerce which will not have been loaded yet - so we inline it. IOK 2019-10-14 
-        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
         $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
@@ -1092,7 +1092,7 @@ class VippsLogin {
     // Again, errors to the wordpress proflepage. IOK 2019-10-14
     public function continue_with_vipps_error_wordpress_synch ($error, $errordesc, $errorhint, $sessiondata) {
         // Cannot  use the 'store_admin_notices' of ContinueWithVipps here, because it breaks Woocommerce which will not have been loaded yet 
-        $cookie = @$_COOKIE[LOGGED_IN_COOKIE];
+        $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
         $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not synchronize your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
