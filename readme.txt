@@ -32,6 +32,7 @@ Login with Vipps suits all websites that need users to sign in and want to tailo
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Feature Highlights ==
+
 = Fully integrated with WooCommerce =
 Allows login and registration on your account pages, cart, checkout and via shortcodes. Addresses automatically synchronized with Vipps on login.
 
