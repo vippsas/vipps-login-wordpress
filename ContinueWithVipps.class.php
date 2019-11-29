@@ -377,7 +377,7 @@ class ContinueWithVipps {
                 if ($userinfo['response'] != 200) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $userinfo['headers']['status'], 'login-with-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when getting user info from Vipps:' . ' ' . $userinfo['headers']['status'], 'login-with-vipps'),'', $session);
                     }
                     wp_die($userinfo['response']);
                 }

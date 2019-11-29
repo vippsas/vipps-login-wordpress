@@ -101,4 +101,10 @@ The rest is a simple matter of programming.
 This is the very first version of this plugin
 
 == Changelog ==
+
+= 2019.11.29 Version 1.0.1 =
+
+= 1.0 =
 v1.0.0 First release
+
+
