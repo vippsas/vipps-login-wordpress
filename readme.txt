@@ -102,6 +102,9 @@ Small changes to facilitate running the plugin on sites like WPEngine that uses 
 
 == Changelog ==
 
+= 2019.12.06 Version 1.0.5 =
+* Added a 30s leeway to the JWT verifier, and made it so logging will go to the system log for Woo installations as well
+
 = 2019.12.06 Version 1.0.4 =
 * Conflicts with certain plugins that check for 'code' and 'state' in the parse_request hook fixed by deleting these if we are handling Vipps returns
 
