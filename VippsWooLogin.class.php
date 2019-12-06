@@ -533,8 +533,8 @@ class VippsWooLogin{
             // If possible, report errors on same page we are
             $link = $sessiondata['referer'];
         }
-        if ($link) return $link;
-        return $redir;
+        if (!$link) $link = $redir;
+        return apply_filters('login_with_vipps_woo_error_redirect', $link, $error, $sessiondata);
     }
 
     // If a user saves their own address on the profile screen, we break the link with Vipps. This can be re-linked by
@@ -592,13 +592,13 @@ class VippsWooLogin{
         add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
     }
     public function login_redirect ($redir, $requested_redir, $user) {
+        $link = wc_get_page_permalink( 'myaccount' );
         if (sizeof( WC()->cart->get_cart() ) > 0 ) {
-            return wc_get_checkout_url();
-        } else {
-            $link = wc_get_page_permalink( 'myaccount' );
-            if ($link) return $link;
-            return $redir;
-        }
+            $link = wc_get_checkout_url();
+        } 
+        if (!$link) $link = $redir;
+
+        return apply_filters('login_with_vipps_woo_login_redirect', $link, $user, $session);
     }
 
     // Standard Woo has several options for this depending on whether it is done on 'my account' or in the checkout page.

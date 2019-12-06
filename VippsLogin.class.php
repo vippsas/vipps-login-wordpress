@@ -242,18 +242,18 @@ class VippsLogin {
     // This ensures that a session is valid for the browser we are interacting with, using this cookie as a one-time password. 2019-10-14
     public function setBrowserCookie() {
         $cookie = base64_encode(hash('sha256',random_bytes(256), true));
-        $_COOKIE['VippsSessionKey'] = $cookie;
-        setcookie('VippsSessionKey', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
+        $_COOKIE['wordpress_vipps_session_key'] = $cookie;
+        setcookie('wordpress_vipps_session_key', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
         return $cookie;
     }
     public function deleteBrowserCookie() {
-        unset($_COOKIE['VippsSessionKey']);
-        setcookie('VippsSessionKey', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
+        unset($_COOKIE['wordpress_vipps_session_key']);
+        setcookie('wordpress_vipps_session_key', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
     }
     public function checkBrowserCookie($against) {
-        if (!isset($_COOKIE['VippsSessionKey'])) return false;
+        if (!isset($_COOKIE['wordpress_vipps_session_key'])) return false;
         if (empty($against)) return false;
-        return ($_COOKIE['VippsSessionKey'] == $against);
+        return ($_COOKIE['wordpress_vipps_session_key'] == $against);
     }
 
     public function admin_init () {

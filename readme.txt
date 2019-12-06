@@ -98,9 +98,13 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-This is the very first version of this plugin
+Small changes to facilitate running the plugin on sites like WPEngine that uses proxy-caches that may delete cookies, and some more filters.
 
 == Changelog ==
+
+= 2019.12.06 Version 1.0.3 =
+* Change named of session key, to be compatible out-of-the-box with wpengine. Thanks to Sondre @ NattogDag for help with debugging
+* Added convenience filters 'login_with_vipps_woo_error_redirect' and 'login_with_vipps_woo_login_redirect' to handle redirects on error and success for WooCommerce in particular
 
 = 2019.12.06 Version 1.0.2 =
 * Made account title filter more forgiving
