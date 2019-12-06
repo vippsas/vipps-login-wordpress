@@ -52,7 +52,8 @@
    contents of the idtoken. IOK 2019-10-14
  */
 class VippsJWTVerifier {
-    public static $leeway = 0;
+    // IOK 2019-12-06  Add a default leeway for the token verification to allow for slight clock skew
+    public static $leeway = 30; 
     public static $timestamp = null;
 
     public static $supported_algs = array(
@@ -66,7 +67,6 @@ class VippsJWTVerifier {
 
     public static function verify_idtoken($idtoken, $keys) {
         $timestamp = is_null(static::$timestamp) ? time() : static::$timestamp;
-
 
         // First decode the header, body and signature. IOK 2019-10-14
         @list($headb64,$bodyb64,$cryptob64) = explode('.', $idtoken);

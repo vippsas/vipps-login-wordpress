@@ -88,6 +88,7 @@ class ContinueWithVipps {
           $logger = wc_get_logger();
           $context = array('source'=>'login-with-vipps');
           $logger->log($type,$what,$context);
+          error_log("Login with Vipps (" . sanitize_title($type) . ") " . $what);
         } else {
           error_log($what);
         }
