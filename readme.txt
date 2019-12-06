@@ -102,6 +102,9 @@ This is the very first version of this plugin
 
 == Changelog ==
 
+= 2019.12.06 Version 1.0.2 =
+* Made account title filter more forgiving
+
 = 2019.11.29 Version 1.0.1 =
 
 = 1.0 =

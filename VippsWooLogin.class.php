@@ -496,7 +496,7 @@ class VippsWooLogin{
     }
 
     // For some reason we can't do this with woocommerce_endpoint_vipps_title. Set the title of this page to be what we want instead of 'my account'. IOK 2019-10-14
-    public function account_vipps_title($title, $id) {
+    public function account_vipps_title($title, $id=0) {
         if (in_the_loop() && !is_admin() && is_main_query() && is_account_page() ) {
             global $wp_query;
             $is_endpoint = isset($wp_query->query_vars['vipps']);
