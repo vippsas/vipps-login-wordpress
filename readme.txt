@@ -102,6 +102,9 @@ Small changes to facilitate running the plugin on sites like WPEngine that uses 
 
 == Changelog ==
 
+= 2019.12.06 Version 1.0.4 =
+* Conflicts with certain plugins that check for 'code' and 'state' in the parse_request hook fixed by deleting these if we are handling Vipps returns
+
 = 2019.12.06 Version 1.0.3 =
 * Change named of session key, to be compatible out-of-the-box with wpengine. Thanks to Sondre @ NattogDag for help with debugging
 * Added convenience filters 'login_with_vipps_woo_error_redirect' and 'login_with_vipps_woo_login_redirect' to handle redirects on error and success for WooCommerce in particular

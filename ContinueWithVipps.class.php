@@ -422,6 +422,13 @@ class ContinueWithVipps {
         return false;
     }
 
+    // Certain plugins seem to think they own *all* oAuth returns, by checking for the arguments 'code' and 'state'. Disable these if we are a Vipps return.
+    public function parse_request() {
+        if ($this->is_special_page()) {
+             remove_action('parse_request','the_champ_connect');
+        }
+    }
+
     // This is used to recognize the Vipps 'callback' - written like this to allow for sites wihtout pretty URLs IOK 2019-09-12
     public function is_special_page() {
         $specials = array('continue-from-vipps' => 'continue_from_vipps');
