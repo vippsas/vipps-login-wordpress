@@ -677,7 +677,10 @@ class VippsWooLogin{
     // IOK 2019-10-04 normally we want to update the users' address every time we log in, because this allows Vipps to be the repository of the users' address.
     // However, if the user has changed his or her address in woo itself, we will let it stay as it is. We handle this by a single use meta. IOK 2019-10-14
     public function maybe_update_address_info($customer, $userinfo) {
-        if (!get_user_meta($customer->get_id(),'_vipps_synchronize_addresses',true)) return false;
+        $update_for_user = get_user_meta($customer->get_id(),'_vipps_synchronize_addresses',true);
+        $actually_update = apply_filters('login_with_vipps_update_address_info', $update_for_user, $customer, $userinfo);
+        if (!$actually_update) return false;
+
         $address = $userinfo['address'][0];
         foreach($userinfo['address'] as $add) {
             if ($add['address_type'] == 'home') {

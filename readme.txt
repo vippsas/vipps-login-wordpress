@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.3.0
+Tested up to: 5.3.2
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -101,6 +101,9 @@ The rest is a simple matter of programming.
 Small changes to facilitate running the plugin on sites like WPEngine that uses proxy-caches that may delete cookies, and some more filters.
 
 == Changelog ==
+
+= 2019.12.06 Version 1.0.6 =
+* Added a filter 'login_with_vipps_update_address_info' which returns whether or not to update the address info for a user. Takes the current truth value, the customer object, and userinfo from Vippss.
 
 = 2019.12.06 Version 1.0.5 =
 * Added a 30s leeway to the JWT verifier, and made it so logging will go to the system log for Woo installations as well
