@@ -237,7 +237,7 @@ class VippsWooLogin{
     }
     public function maybe_flush_rewrite_rules() {
         $options = get_option('vipps_login_woo_options');
-        $rewrite = intval($options['rewriteruleversion']);
+        $rewrite = intval(@$options['rewriteruleversion']);
         if ($this->rewriteruleversion > $rewrite) {
             $this->add_rewrite_rules();
             $options['rewriteruleversion'] = $this->rewriteruleversion;
@@ -597,7 +597,7 @@ class VippsWooLogin{
             $link = wc_get_checkout_url();
         } 
         if (!$link) $link = $redir;
-
+        $session = null;
         return apply_filters('login_with_vipps_woo_login_redirect', $link, $user, $session);
     }
 

@@ -265,7 +265,7 @@ class ContinueWithVipps {
         $charset_collate = $wpdb->get_charset_collate();
         $options = get_option('vipps_login_options');
         $version = static::$dbversion;
-        if ($options['dbversion'] == $version) {
+        if (@$options['dbversion'] == $version) {
             return false;
         }
 
