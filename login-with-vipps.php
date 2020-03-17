@@ -8,6 +8,9 @@
    Description: Use Vipps for passwordless login and more. Integrates perfectly with WooCommerce.
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
+   Requires at least: 4.9.6
+   Tested up to: 5.4.0
+   Requires PHP: 7.0
    Text-domain: login-with-vipps
    Domain Path: /languages
    License: MIT  
