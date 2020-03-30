@@ -430,7 +430,6 @@ class VippsWooLogin{
     }
     // And add content to the 'Vipps' tab. . IOK 2019-10-14
     public function account_vipps_content() {
-        add_filter('the_title', function ($title) { return __('Vipps!', 'login-with-vipps'); });
         $userid = get_current_user_id();
         if (!$userid) print "No user!";
         $user = new WC_Customer($userid);
