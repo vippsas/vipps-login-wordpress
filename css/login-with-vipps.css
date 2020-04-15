@@ -137,6 +137,12 @@ SOFTWARE.
 }
 .woocommerce-info.vipps-info a {
  color:#fff;
+ background-color: transparent;
+}
+.woocommerce-info.vipps-info a:hover {
+    color:#fff;
+    font-weight: bolder;
+    background-color: transparent;
 }
 .woocommerce-info.vipps-info::before {
  color:#fff;
