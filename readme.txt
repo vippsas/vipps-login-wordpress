@@ -102,6 +102,9 @@ Small changes to facilitate running the plugin on sites like WPEngine that uses 
 
 == Changelog ==
 
+= 2019.12.06 Version 1.0.7 =
+* Stylesheet fixes
+
 = 2019.12.06 Version 1.0.6 =
 * Added a filter 'login_with_vipps_update_address_info' which returns whether or not to update the address info for a user. Takes the current truth value, the customer object, and userinfo from Vippss.
 
