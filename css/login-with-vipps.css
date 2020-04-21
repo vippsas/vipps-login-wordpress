@@ -29,6 +29,7 @@ SOFTWARE.
 #continue-with-vipps-wrapper, .continue-with-vipps-wrapper.center-block {
  text-align:center;
  display: block;
+ padding: 0.5rem 0;
 }
 #continue-with-vipps-wrapper {
  margin: 20px;
@@ -68,6 +69,7 @@ SOFTWARE.
  color: #fff;
  background-color: #fe5b24;
  border: 0;
+ padding:0;
  font-size: 22px;
  height: 48px;
  line-height: 48px;
