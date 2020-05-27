@@ -6,7 +6,7 @@
 
    It implements the login actions using Ajax for simplicity, and stores in the session a cookie value stored also in the browser. Any session that does not have the corresponding browser cookie is invalid.
 
-   Because Vipps email-addresses aren't verified, we require that a user wanting to use this  to confirm their email address and the connection. This is done using the standard Wordpress 'user request' API if the user hasn't logged in yet.  If they are, they can connect directly from their profile page with another 'action' using ContinueWithVipps.
+   Previously, Vipps email-addresses weren't verified, so we required that a user wanting to use Vipps should confirm their email address and the connection. This is now optional,  and is done using the standard Wordpress 'user request' API if the user hasn't logged in yet.  If they are, they can connect directly from their profile page with another 'action' using ContinueWithVipps.
 
    Furthermore, and really mostly a Woo application, there is an 'synch' action that lets an existing, connected user syncrhronize their user data with Vipps if it has become separate. If this is done,
    the address will be synchronized at each login until the user changes the address specifically in the Worpdress instance.
@@ -318,6 +318,7 @@ class VippsLogin {
             $continuepageid = $continuepage->ID;
         }
         $usevipps = $options['use_vipps_login'];
+        $require_confirmation = $options['require_confirmation'];
         $loginpage = $options['login_page'];
 
         ?>
@@ -347,14 +348,22 @@ class VippsLogin {
             </td>
             </tr>
 
-
+            <tr>
+            <td><?php _e('Require new users to confirm their email address', 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_options2[require_confirmation]' value=0>
+            <input type='checkbox' name='vipps_login_options2[require_confirmation]' value=1 <?php if ( $require_confirmation) echo ' CHECKED '; ?> >
+            </td>
+            <td>
+            <?php _e('Vipps email addresses are confirmed by Vipps when using login with Vipps for the first time on your website. However, if you wish, you may require users to confirm their email address in Wordpress too', 'login-with-vipps'); ?>
+            </td>
+            </tr>
 
             <tr>
             <td><?php _e('Continue with Vipps page', 'login-with-vipps'); ?></td>
             <td width=30%>
             <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-with-vipps'))); ?>
             </td>
-            <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose.','login-with-vipps'); ?></td>
+            <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose. A blank page will have been installed for you when activating the plugin, this is the default page which will be used. Do *not* use any system pages or anything that is being used for other things.','login-with-vipps'); ?></td>
             </tr>
             </table>
             <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
@@ -385,7 +394,7 @@ class VippsLogin {
         if (!is_wp_error($continuepage)) {
             $continueid = $continuepage->ID;
         }
-        $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true,'login_page'=>true);
+        $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true,'login_page'=>true,'require_confirmation'=>false);
         add_option('vipps_login_options2',$default,false);
     }
 
@@ -972,7 +981,18 @@ class VippsLogin {
             exit();
         }
 
-        // We are *not* connnected, so we must now redirect to the waiting page after sending a confirmation job IOK 2019-10-14
+        // We have a user not connected to the Vipps account, but with the same email. However, Vipps accounts are now verified, so unless we explicitly want confirmation,
+        // we'll just connect the accounts and log right in. IOK 2020-05-27
+        $options = get_option('vipps_login_options2');
+        if (!$options['require_confirmation']) {
+            update_user_meta($user->ID,'_vipps_phone',$phone);
+            update_user_meta($user->ID,'_vipps_id',$sub);
+            update_user_meta($user->ID,'_vipps_just_connected', 1);
+            $this->actually_login_user($user,$sid,$session);
+            exit();
+        }
+
+        // We are *not* connected, and we require confirmation, so we must now redirect to the waiting page after sending a confirmation job IOK 2019-10-14
         // First check for existing user requests. This is still no function for this, so we inline it using $wpdb. IOK 2019-10-14
         $requestid = 0;
         $requests = get_posts(array('post_type' => 'user_request','post_name__in' =>array( 'vipps_connect_login'),'title'=> $email,'post_status'=>array('request-pending')));
