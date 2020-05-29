@@ -550,7 +550,7 @@ class VippsLogin {
             <?php $this->login_button_html($text, $application); ?>
             </span>
             <?php
-            return ob_get_clean();
+        return ob_get_clean();
     }
 
     // The login-button on the front page. Moved up in front of the main form using javascript. IOK 2019-10-14
@@ -577,10 +577,12 @@ class VippsLogin {
     // The HTML for this button. IOK 2019-10-14
     public function login_button_html($text, $application) {
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        ob_start();
         ?>
             <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
             alt="<?php _e('Log in without password using Vipps', 'login-with-vipps'); ?>" src="<?php echo $logo; ?>">!</a>
             <?php
+        return apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
     }
 
     // The login form does not have any action that runs right before the form, where we want to be. So we cheat, rewriting the page using javascript. IOK 2019-10-14

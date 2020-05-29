@@ -282,11 +282,13 @@ class VippsWooLogin{
 
     public function cart_continue_with_vipps_button_html($type) {
         if (!$this->is_active()) return false;
+        ob_start();
         ?>
             <div class='continue-with-vipps-wrapper center-block <?php echo $type; ?>'>
             <?php VippsLogin::instance()->login_button_html(__('Continue with', 'login-with-vipps'), 'woocommerce'); ?>
             </div>
             <?php
+        return apply_filters('continue_with_vipps_cart_button', ob_get_clean(), $type);
     }
 
     // This will display a banner  on the top of the checkout page. It will replace the express checkout button if that is used in the gateway. IOK 2019-10-14
@@ -321,9 +323,12 @@ class VippsWooLogin{
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
+        ob_start();
         ?>
-            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+            <div class="woocommerce-info vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
             <?php
+        $html = apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
+        return $html;
     }
     public function login_with_vipps_banner() {
         if (!$this->is_active()) return false;
@@ -343,9 +348,12 @@ class VippsWooLogin{
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = apply_filters('continue_with_vipps_login_banner', $message);
+        ob_start();
         ?>
-            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+            <div class="woocommerce-info vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
             <?php
+        $html = apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
+        return $html;
     }
     public function register_with_vipps_banner() {
         if (!$this->is_active()) return false;
@@ -361,9 +369,12 @@ class VippsWooLogin{
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = apply_filters('continue_with_vipps_register_banner', $message);
+        ob_start();
         ?>
-            <div class="woocommerce-info vipps-info"><?php echo $message;?></div>
+            <div class="woocommerce-info vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
             <?php
+        $html = apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
+        return $html;
     }
 
 
@@ -680,23 +691,25 @@ class VippsWooLogin{
         $actually_update = apply_filters('login_with_vipps_update_address_info', $update_for_user, $customer, $userinfo);
         if (!$actually_update) return false;
 
-        $address = $userinfo['address'][0];
-        foreach($userinfo['address'] as $add) {
+        $address = !empty($userinfo['address']) ? $userinfo['address'][0] : null; // Default
+        foreach($userinfo['address'] as $add) {  // Find home address
             if ($add['address_type'] == 'home') {
                 $address = $add; break;
             }
         }
+        $address = apply_filters('login_with_vipps_woo_get_address',$address, $userinfo['address']);
+
         if (empty($address)) return;
         $email = $userinfo['email'];
-        $firstname = $userinfo['given_name'];
-        $lastname =  $userinfo['family_name'];
-        $phone =  $userinfo['phone_number'];
+        $firstname = apply_filters('login_with_vipps_woo_firstname', $userinfo['given_name'], $customer, $userinfo);
+        $lastname =  apply_filters('login_with_vipps_woo_lastname',$userinfo['family_name'], $customer, $userinfo);
+        $phone =  apply_filters('login_with_vipps_woo_phone_number',$userinfo['phone_number'], $customer, $userinfo);
 
         $country = $address['country'];
         if (!$country)  $country='NO';
-        $street_address = $address['street_address'];
-        $postal_code = $address['postal_code'];
-        $region = $address['region'];
+        $street_address = apply_filters('login_with_vipps_woo_street_address',$address['street_address'], $customer, $userinfo);
+        $postal_code = apply_filters('login_with_vipps_woo_postal_code', $address['postal_code'], $customer, $userinfo);
+        $region = apply_filters('login_with_vipps_woo_region', $address['region'], $customer, $userinfo);
 
         $customer->set_billing_email($email);
         $customer->set_billing_phone($phone);
