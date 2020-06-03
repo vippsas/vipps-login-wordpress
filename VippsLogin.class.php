@@ -582,7 +582,7 @@ class VippsLogin {
             <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
             alt="<?php _e('Log in without password using Vipps', 'login-with-vipps'); ?>" src="<?php echo $logo; ?>">!</a>
             <?php
-        return apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
+        echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
     }
 
     // The login form does not have any action that runs right before the form, where we want to be. So we cheat, rewriting the page using javascript. IOK 2019-10-14

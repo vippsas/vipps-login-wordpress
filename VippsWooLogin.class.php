@@ -288,7 +288,7 @@ class VippsWooLogin{
             <?php VippsLogin::instance()->login_button_html(__('Continue with', 'login-with-vipps'), 'woocommerce'); ?>
             </div>
             <?php
-        return apply_filters('continue_with_vipps_cart_button', ob_get_clean(), $type);
+        echo apply_filters('continue_with_vipps_cart_button', ob_get_clean(), $type);
     }
 
     // This will display a banner  on the top of the checkout page. It will replace the express checkout button if that is used in the gateway. IOK 2019-10-14
@@ -327,8 +327,7 @@ class VippsWooLogin{
         ?>
             <div class="woocommerce-info vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
             <?php
-        $html = apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
-        return $html;
+        echo apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
     }
     public function login_with_vipps_banner() {
         if (!$this->is_active()) return false;
@@ -352,8 +351,7 @@ class VippsWooLogin{
         ?>
             <div class="woocommerce-info vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
             <?php
-        $html = apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
-        return $html;
+        echo apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
     }
     public function register_with_vipps_banner() {
         if (!$this->is_active()) return false;
@@ -373,8 +371,7 @@ class VippsWooLogin{
         ?>
             <div class="woocommerce-info vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
             <?php
-        $html = apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
-        return $html;
+        echo apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
     }
 
 
