@@ -102,7 +102,7 @@ Small changes to facilitate running the plugin on sites like WPEngine that uses 
 
 == Changelog ==
 
-= 2020.xx.xx Version 1.0.8 =
+= 2020.06.07 Version 1.0.8 =
 * Made user confirmation optional and off by default, since this is now handled by Vipps
 
 = 2019.12.06 Version 1.0.7 =
