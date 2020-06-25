@@ -532,6 +532,7 @@ class VippsLogin {
 
     // For convenience, some shortcodes that output the same buttons added to the login page. IOK 2019-10-14
     public function add_shortcodes() {
+        add_shortcode('login-with-vipps', array($this, 'log_in_with_vipps_shortcode'));
         add_shortcode('log-in-with-vipps', array($this, 'log_in_with_vipps_shortcode'));
         add_shortcode('continue-with-vipps', array($this, 'continue_with_vipps_shortcode'));
     }

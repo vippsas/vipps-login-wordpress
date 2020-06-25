@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.4.1
+Tested up to: 5.4.2
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -101,6 +101,9 @@ The rest is a simple matter of programming.
 Small changes to facilitate running the plugin on sites like WPEngine that uses proxy-caches that may delete cookies, and some more filters.
 
 == Changelog ==
+
+= 2020.06.29 Version 1.0.9 =
+* Fixed misspelled shortcode name, version update
 
 = 2020.06.07 Version 1.0.8 =
 * Made user confirmation optional and off by default, since this is now handled by Vipps
