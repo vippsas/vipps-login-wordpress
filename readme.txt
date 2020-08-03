@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.4.2
+Tested up to: 5.5.0
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
