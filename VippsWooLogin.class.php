@@ -634,6 +634,13 @@ class VippsWooLogin{
         $userinfo = @$session['userinfo'];
         if (!$userinfo) return false;
         update_user_meta($user->ID,'_vipps_synchronize_addresses', 1);
+
+        // The "All in one WP security" plugin requires accounts to be confirmed before they can be used.
+        // per default, consider all newly created WooCommerce accounts as confirmed, but allow overiding with a filter IOK 2020-09-21
+        if (apply_filters('vipps_login_overrides_aiowps_account_confirmation', true)) {
+          update_user_meta($user->ID,'aiowps_account_status', 'approved');
+        }
+
         $customer = new WC_Customer($user->ID);
         $this->maybe_update_address_info($customer,$userinfo);
     } 
