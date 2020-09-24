@@ -904,7 +904,7 @@ class VippsLogin {
             // The user doesn't have a valid cookie for this session in their browser.
             // Leave the browser cookie for debugging. IOK 2019-10-14
             if ($session) $session->destroy();
-            $this->continue_with_vipps_error_login('invalid_session', __("Your session is invalid. Only one Vipps-session can be active per browser at a time. Also, ensure that you are not blocking cookies – you will need those to log in.", 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('invalid_session', __("Your login session is missing. Ensure that you are accessing this site on a secure link (using HTTPS). Also, ensure that you are not blocking cookies – you will need those to log in.", 'login-with-vipps'), '', $session);
         }
 
         // Check if we allow user registrations
