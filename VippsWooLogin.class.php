@@ -155,6 +155,7 @@ class VippsWooLogin{
         $woocreate = $options['woo-create-users'];
         $woocart = $options['woo-cart-login'];
         $woocheckout = $options['woo-checkout-login'];
+
         ?>
 
             <form action='options.php' method='post'>
@@ -188,6 +189,7 @@ class VippsWooLogin{
             <?php _e('If you are using Vipps Express Checkout, that will be shown instead.', 'login-with-vipps'); ?>
             </td>
             </tr>
+
             <tr>
             <td><?php _e('Show "Continue with Vipps" on the Checkout page', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
@@ -197,6 +199,27 @@ class VippsWooLogin{
             <?php _e('This will replace Vipps Express Checkout on the checkout page.', 'login-with-vipps'); ?>
             </td>
             </tr>
+
+            <tr>
+             <td><?php _e("Change 'Continue with Vipps' banner text", 'login-with-vipps'); ?></td>
+             <td><input style="width:100%" type="text" 
+                        name="vipps_login_woo_options[woo-banner-text]" 
+                        value="<?php echo esc_attr($options['woo-banner-text']); ?>"
+                        placeholder="<?php echo sprintf(__('Log in or register an account using %s.', 'login-with-vipps'), 'VIPPS'); ?>">
+                 <input style="width:100%" type="text" 
+                        name="vipps_login_woo_options[woo-banner-linktext]" 
+                        value="<?php echo esc_attr($options['woo-banner-linktext']); ?>" 
+                        placeholder="<?php _e('Click here to continue', 'login-with-vipps'); ?>" >
+            </td>
+            <td><?php _e('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text and linktext. VIPPS in all caps will be replaced by the Vipps logo', 'login-with-vipps'); ?></td>
+           </tr>
+           <tr>
+             <td><?php _e("Make the entire banner clickable", 'login-with-vipps'); ?></td>
+            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-banner-clickable]' value=0>
+            <input type='checkbox' name='vipps_login_woo_options[woo-banner-clickable]' value=1 <?php if ( @$options['woo-banner-clickable']) echo ' CHECKED '; ?> >
+            <td><?php _e('Normally, WooCommerce-banners like this will use a "click here"-text. If you don\'t, check here to make the entire banner clickable like a button', 'login-with-vipps'); ?></td>
+
+           <tr>
             </table>
             <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
             </form>
@@ -307,6 +330,32 @@ class VippsWooLogin{
         $this->continue_with_vipps_banner();
     }
 
+    protected function clickable_banner() {
+        $options = get_option('vipps_login_woo_options');
+        $clickable = '';
+        if (@$options['woo-banner-clickable']) {
+             $clickable = " onclick='login_with_vipps(\"woocommerce\");' style='cursor: pointer;' ";
+        }
+        return $clickable;
+    }
+    // Banner text overriden by settings IOK 2020-09-25
+    protected function overidden_banner_text($message) {
+        $options = get_option('vipps_login_woo_options');
+        if (@$options['woo-banner-text'] || @$options['woo-banner-linktext']) {
+           $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+           $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>";
+           $message = @$options['woo-banner-text'];
+           $message = preg_replace('!VIPPS!', $logoimg,$message); 
+           if (@$options['woo-banner-linktext']) {
+             $linktext = $options['woo-banner-linktext'];
+             $linktext= preg_replace('!VIPPS!', $logoimg,$linktext); 
+             $link = "<a href='javascript:login_with_vipps(\"woocommerce\");'>$linktext</a>";
+             $message = $message ? ($message . " - " . $link) : $link;
+           }
+        }
+        return $message;
+    }
+
     public function continue_with_vipps_banner() {
         if (!$this->is_active()) return false;
 
@@ -321,11 +370,14 @@ class VippsWooLogin{
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click to continue', 'login-with-vipps');
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>";
+        $message = sprintf($text, $logoimg)  . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
+      
         ob_start();
         ?>
-            <div class="woocommerce-info vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
     }
@@ -346,10 +398,11 @@ class VippsWooLogin{
         $linktext = __('Click here to continue', 'login-with-vipps');
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_login_banner', $message);
         ob_start();
         ?>
-            <div class="woocommerce-info vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
     }
@@ -366,10 +419,11 @@ class VippsWooLogin{
         $text = __('Create an account using ', 'login-with-vipps');
 
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_register_banner', $message);
         ob_start();
         ?>
-            <div class="woocommerce-info vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
     }
