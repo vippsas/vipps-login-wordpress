@@ -102,6 +102,9 @@ Small changes to facilitate running the plugin on sites like WPEngine that uses 
 
 == Changelog ==
 
+= 2020.09.28 Version 1.0.10 =
+* Make new Woo accounts created by Vipps login count as "Authorized" for All-in-one WP security; improved configuration options
+
 = 2020.06.29 Version 1.0.9 =
 * Fixed misspelled shortcode name, version update
 
