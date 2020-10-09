@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.5.0
+Tested up to: 5.5.1
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -98,9 +98,13 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Small changes to facilitate running the plugin on sites like WPEngine that uses proxy-caches that may delete cookies, and some more filters.
+If activated when Checkout with Vipps for WooCommerce is installed, configure that plugin to create users when using Express Checkout for extra synergy
 
 == Changelog ==
+
+
+= 2020.10.xx Version 1.0.11 =
+* If activated when Checkout with Vipps for WooCommerce is installed, configure that plugin to create users when using Express Checkout
 
 = 2020.09.28 Version 1.0.10 =
 * Make new Woo accounts created by Vipps login count as "Authorized" for All-in-one WP security; improved configuration options

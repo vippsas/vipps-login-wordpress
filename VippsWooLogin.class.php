@@ -177,7 +177,7 @@ class VippsWooLogin{
             <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Enable new users to be created as customers if using Login with Vipps with WooCommerce.', 'login-with-vipps'); ?>
+            <?php _e('Enable new users to be created as customers if using Login with Vipps with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'); ?>
             </td>
             </tr>
             <tr>
@@ -241,14 +241,25 @@ class VippsWooLogin{
     }
 
     public function activate () {
-        $allowcreatedefault = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
-        $allowcreatedefault = $allowcreatedefault ||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
+        $allowcreateoncheckout = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
+        $allowcreatedefault = $allowcreateoncheckout||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
         $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
         add_option('vipps_login_woo_options',$default,true);
         $this->add_rewrite_rules();
         $this->maybe_flush_rewrite_rules();
+
+        // If the Vipps payment gateway exists, set the "Create user on express checkout" setting to true (if this is the Woo setting). IOK 2020-10-09
+        if ($allowcreateoncheckout && class_exists('Vipps')) {
+          global $Vipps;
+          // Just to be sure that we aren't talking about some other class Vipps here
+          if ($Vipps && method_exists($Vipps, 'gateway')) {
+            $gw = $Vipps->gateway();
+            $gw->update_option('expresscreateuser', 'yes');
+          }
+       }
     }
+
     public static function deactivate () {
         // Nothing to do here. IOK 2019-10-14
     }
