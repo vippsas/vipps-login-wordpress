@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Login with Vipps\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 11:32+0000\n"
+"POT-Creation-Date: 2020-10-15 14:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Use Vipps to login to your account"
 msgstr ""
 
-#: VippsLogin.class.php:462 VippsWooLogin.class.php:470
+#: VippsLogin.class.php:462 VippsWooLogin.class.php:518
 #, php-format
 msgid "You are connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr ""
@@ -100,7 +100,7 @@ msgid ""
 "The user is connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr ""
 
-#: VippsLogin.class.php:466 VippsWooLogin.class.php:476
+#: VippsLogin.class.php:466 VippsWooLogin.class.php:524
 msgid "Unlink account"
 msgstr ""
 
@@ -113,7 +113,7 @@ msgstr ""
 msgid "You are not connected to any Vipps profile"
 msgstr ""
 
-#: VippsLogin.class.php:471 VippsWooLogin.class.php:481
+#: VippsLogin.class.php:471 VippsWooLogin.class.php:529
 msgid "Press here to connect with your app"
 msgstr ""
 
@@ -131,7 +131,7 @@ msgstr ""
 msgid "Login with Vipps is disabled"
 msgstr ""
 
-#: VippsLogin.class.php:501 VippsWooLogin.class.php:513
+#: VippsLogin.class.php:501 VippsWooLogin.class.php:561
 #, php-format
 msgid "Connection to Vipps profile %s <b>removed</b>."
 msgstr ""
@@ -141,7 +141,7 @@ msgid "Log in with"
 msgstr ""
 
 #: VippsLogin.class.php:545 VippsLogin.class.php:567
-#: VippsWooLogin.class.php:305
+#: VippsWooLogin.class.php:322
 msgid "Continue with"
 msgstr ""
 
@@ -330,60 +330,62 @@ msgid ""
 "this website doesn't know how to handle that."
 msgstr ""
 
-#: VippsWooLogin.class.php:163
+#: VippsWooLogin.class.php:164
 msgid "WooCommerce options"
 msgstr ""
 
-#: VippsWooLogin.class.php:165
+#: VippsWooLogin.class.php:166
 msgid "Enable Login with Vipps for WooCommerce"
 msgstr ""
 
-#: VippsWooLogin.class.php:170
+#: VippsWooLogin.class.php:171
 msgid "Enable Login with Vipps on your customer's pages in WooCommerce"
 msgstr ""
 
-#: VippsWooLogin.class.php:174
+#: VippsWooLogin.class.php:175
 msgid ""
 "Allow users to register as customers in WooCommerce using Login with Vipps"
 msgstr ""
 
-#: VippsWooLogin.class.php:179
+#: VippsWooLogin.class.php:180
 msgid ""
 "Enable new users to be created as customers if using Login with Vipps with "
-"WooCommerce."
+"WooCommerce. If you are using the payment gateway, this will have been "
+"configured to create new users when using Express Checkout - checkout the "
+"payment gateway settings to modify this."
 msgstr ""
 
-#: VippsWooLogin.class.php:183
+#: VippsWooLogin.class.php:184
 msgid "Show \"Continue with Vipps\" in Cart page and widgets"
 msgstr ""
 
-#: VippsWooLogin.class.php:188
+#: VippsWooLogin.class.php:189
 msgid "If you are using Vipps Express Checkout, that will be shown instead."
 msgstr ""
 
-#: VippsWooLogin.class.php:193
+#: VippsWooLogin.class.php:194
 msgid "Show \"Continue with Vipps\" on the Checkout page"
 msgstr ""
 
-#: VippsWooLogin.class.php:198
+#: VippsWooLogin.class.php:199
 msgid "This will replace Vipps Express Checkout on the checkout page."
 msgstr ""
 
-#: VippsWooLogin.class.php:203
+#: VippsWooLogin.class.php:204
 msgid "Change 'Continue with Vipps' banner text"
 msgstr ""
 
-#: VippsWooLogin.class.php:205 VippsWooLogin.class.php:358
+#: VippsWooLogin.class.php:208 VippsWooLogin.class.php:404
 #, php-format
 msgid "Log in or register an account using %s."
 msgstr ""
 
-#: VippsWooLogin.class.php:206 VippsWooLogin.class.php:363
-#: VippsWooLogin.class.php:382
+#: VippsWooLogin.class.php:212 VippsWooLogin.class.php:409
+#: VippsWooLogin.class.php:429
 msgid "Click here to continue"
 msgstr ""
 
-#: VippsWooLogin.class.php:208
+#: VippsWooLogin.class.php:214
 msgid ""
 "The \"Continue with Vipps\" banner will have slightly different text "
 "depending on context, and some of these are rather long. You can change "
@@ -392,68 +394,68 @@ msgid ""
 "by the Vipps logo"
 msgstr ""
 
-#: VippsWooLogin.class.php:211
+#: VippsWooLogin.class.php:217
 msgid "Make the entire banner clickable"
 msgstr ""
 
-#: VippsWooLogin.class.php:214
+#: VippsWooLogin.class.php:220
 msgid ""
 "Normally, WooCommerce-banners like this will use a \"click here\"-text. If "
 "you don't, check here to make the entire banner clickable like a button"
 msgstr ""
 
-#: VippsWooLogin.class.php:334
+#: VippsWooLogin.class.php:377
 #, php-format
 msgid "Log in or register an account with %s to continue your checkout."
 msgstr ""
 
-#: VippsWooLogin.class.php:336
+#: VippsWooLogin.class.php:379
 #, php-format
 msgid ""
 "Are you registered as a customer? Log in with %s to continue your checkout."
 msgstr ""
 
-#: VippsWooLogin.class.php:339
+#: VippsWooLogin.class.php:382
 msgid "Click to continue"
 msgstr ""
 
-#: VippsWooLogin.class.php:360
+#: VippsWooLogin.class.php:406
 #, php-format
 msgid "Are you registered as a customer? Log in with %s."
 msgstr ""
 
-#: VippsWooLogin.class.php:383
+#: VippsWooLogin.class.php:430
 msgid "Create an account using "
 msgstr ""
 
-#: VippsWooLogin.class.php:445
+#: VippsWooLogin.class.php:493
 #, php-format
 msgid "You are now connected to the Vipps profile <b>%s</b>!"
 msgstr ""
 
-#: VippsWooLogin.class.php:453
+#: VippsWooLogin.class.php:501
 msgid "Vipps"
 msgstr ""
 
-#: VippsWooLogin.class.php:483
+#: VippsWooLogin.class.php:531
 msgid ""
 "The easiest way to sign in. Anyone with Vipps can use Vipps to sign in. No "
 "need to remember passwords ever again. Vipps, and you are logged in."
 msgstr ""
 
-#: VippsWooLogin.class.php:491
+#: VippsWooLogin.class.php:539
 msgid "Get addresses"
 msgstr ""
 
-#: VippsWooLogin.class.php:500
+#: VippsWooLogin.class.php:548
 msgid "You must be logged in to disconnect"
 msgstr ""
 
-#: VippsWooLogin.class.php:528
+#: VippsWooLogin.class.php:576
 msgid "Vipps!"
 msgstr ""
 
-#: VippsWooLogin.class.php:591
+#: VippsWooLogin.class.php:639
 #, php-format
 msgid "Your addresses are now synchronized with the Vipps-account %s."
 msgstr ""

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Login with Vipps\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 11:32+0000\n"
-"PO-Revision-Date: 2020-09-25 11:33+0000\n"
+"POT-Creation-Date: 2020-10-15 14:34+0000\n"
+"PO-Revision-Date: 2020-10-15 14:35+0000\n"
 "Last-Translator: Iver Odin Kvello <iver@wp-hosting.no>\n"
 "Language-Team: Norsk bokmål\n"
 "Language: nb_NO\n"
@@ -97,7 +97,7 @@ msgstr "Logg inn med Vipps"
 msgid "Use Vipps to login to your account"
 msgstr "Bruk Vipps til å logge inn til din konto"
 
-#: VippsLogin.class.php:462 VippsWooLogin.class.php:470
+#: VippsLogin.class.php:462 VippsWooLogin.class.php:518
 #, php-format
 msgid "You are connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr "Du er tilkoblet Vipps-profilen med telefonnummer <b>%s</b>"
@@ -108,7 +108,7 @@ msgid ""
 "The user is connected to the Vipps profile with the phone number <b>%s</b>"
 msgstr "Brukeren er koblet til Vipps-profilen med telefonnummer <b>%s</b>"
 
-#: VippsLogin.class.php:466 VippsWooLogin.class.php:476
+#: VippsLogin.class.php:466 VippsWooLogin.class.php:524
 msgid "Unlink account"
 msgstr "Fjern tilknytningen"
 
@@ -122,7 +122,7 @@ msgstr ""
 msgid "You are not connected to any Vipps profile"
 msgstr "Du er ikke koblet til noen Vipps-profil."
 
-#: VippsLogin.class.php:471 VippsWooLogin.class.php:481
+#: VippsLogin.class.php:471 VippsWooLogin.class.php:529
 msgid "Press here to connect with your app"
 msgstr "Trykk her for å koble til med appen din"
 
@@ -142,7 +142,7 @@ msgstr ""
 msgid "Login with Vipps is disabled"
 msgstr "Logg inn med Vipps er skrudd av"
 
-#: VippsLogin.class.php:501 VippsWooLogin.class.php:513
+#: VippsLogin.class.php:501 VippsWooLogin.class.php:561
 #, php-format
 msgid "Connection to Vipps profile %s <b>removed</b>."
 msgstr "Forbindelsen til Vipps-profilen %s <b>fjernet</b>."
@@ -152,7 +152,7 @@ msgid "Log in with"
 msgstr "Logg inn med"
 
 #: VippsLogin.class.php:545 VippsLogin.class.php:567
-#: VippsWooLogin.class.php:305
+#: VippsWooLogin.class.php:322
 msgid "Continue with"
 msgstr "Fortsett med"
 
@@ -380,62 +380,66 @@ msgstr ""
 "Du har fullført handlingen \"%s\" med Vipps. Uheldigvis så vet ikke denne "
 "nettsiden hva den skal gjøre med det."
 
-#: VippsWooLogin.class.php:163
+#: VippsWooLogin.class.php:164
 msgid "WooCommerce options"
 msgstr "Valg for WooCommerce"
 
-#: VippsWooLogin.class.php:165
+#: VippsWooLogin.class.php:166
 msgid "Enable Login with Vipps for WooCommerce"
 msgstr "Skru på Logg inn med Vipps for WooCommerce"
 
-#: VippsWooLogin.class.php:170
+#: VippsWooLogin.class.php:171
 msgid "Enable Login with Vipps on your customer's pages in WooCommerce"
 msgstr "Skru på Logg inn med Vipps på kundens side i WooCommerce"
 
-#: VippsWooLogin.class.php:174
+#: VippsWooLogin.class.php:175
 msgid ""
 "Allow users to register as customers in WooCommerce using Login with Vipps"
 msgstr "Tillat brukere å registrere seg som kunder i WooCommerce med Vipps"
 
-#: VippsWooLogin.class.php:179
+#: VippsWooLogin.class.php:180
 msgid ""
 "Enable new users to be created as customers if using Login with Vipps with "
-"WooCommerce."
+"WooCommerce. If you are using the payment gateway, this will have been "
+"configured to create new users when using Express Checkout - checkout the "
+"payment gateway settings to modify this."
 msgstr ""
-"Skru på at brukere blir opprettet som kunder når du bruker Logg inn med "
-"Vipps med WooCommerce"
+"Tillat nye brukere å bli opprettet som kunder hvis du bruker Login med Vips "
+"sammen med WooCommerce. Hvis du bruker betalingsgatewayen, vil denne nå bli "
+"konfigurert til å opprette nye brukere når de handler med hurtigkassen - se "
+"betalingsmodulinstillingene for å endre på dette."
 
-#: VippsWooLogin.class.php:183
+#: VippsWooLogin.class.php:184
 msgid "Show \"Continue with Vipps\" in Cart page and widgets"
 msgstr "Vis \"Fortsett med Vipps\" på Handlekurvsiden og i widgets"
 
-#: VippsWooLogin.class.php:188
+#: VippsWooLogin.class.php:189
 msgid "If you are using Vipps Express Checkout, that will be shown instead."
 msgstr "Hvis du bruker Vipps Hurtigkasse, vil den bli vist i stedet"
 
-#: VippsWooLogin.class.php:193
+#: VippsWooLogin.class.php:194
 msgid "Show \"Continue with Vipps\" on the Checkout page"
 msgstr "Vis \"Fortsett med Vipps\" på Kassesiden"
 
-#: VippsWooLogin.class.php:198
+#: VippsWooLogin.class.php:199
 msgid "This will replace Vipps Express Checkout on the checkout page."
 msgstr "Dette vil erstatte Vipps Hurtigkasse på Kassesiden"
 
-#: VippsWooLogin.class.php:203
+#: VippsWooLogin.class.php:204
 msgid "Change 'Continue with Vipps' banner text"
 msgstr "Endre \"Fortsett med Vipps\"-bannerteksten"
 
-#: VippsWooLogin.class.php:205 VippsWooLogin.class.php:358
+#: VippsWooLogin.class.php:208 VippsWooLogin.class.php:404
 #, php-format
 msgid "Log in or register an account using %s."
 msgstr "Logg inn eller registrer en konto med %s."
 
-#: VippsWooLogin.class.php:206 VippsWooLogin.class.php:363
-#: VippsWooLogin.class.php:382
+#: VippsWooLogin.class.php:212 VippsWooLogin.class.php:409
+#: VippsWooLogin.class.php:429
 msgid "Click here to continue"
 msgstr "Trykk her for å fortsette"
 
-#: VippsWooLogin.class.php:208
+#: VippsWooLogin.class.php:214
 msgid ""
 "The \"Continue with Vipps\" banner will have slightly different text "
 "depending on context, and some of these are rather long. You can change "
@@ -449,11 +453,11 @@ msgstr ""
 "endre standard tekst og lenketekst. VIPPS med store bokstaver vil bli "
 "erstattet av Vipps-logoen."
 
-#: VippsWooLogin.class.php:211
+#: VippsWooLogin.class.php:217
 msgid "Make the entire banner clickable"
 msgstr "Gjør hele banneret klikkbart"
 
-#: VippsWooLogin.class.php:214
+#: VippsWooLogin.class.php:220
 msgid ""
 "Normally, WooCommerce-banners like this will use a \"click here\"-text. If "
 "you don't, check here to make the entire banner clickable like a button"
@@ -462,41 +466,41 @@ msgstr ""
 "Hvis du ikke gjør dette, huk av her for å gjøre hele bannert klikkbart (som "
 "en knapp)"
 
-#: VippsWooLogin.class.php:334
+#: VippsWooLogin.class.php:377
 #, php-format
 msgid "Log in or register an account with %s to continue your checkout."
 msgstr "Logg inn eller registrer en konto med %s for å fortsette til kassen."
 
-#: VippsWooLogin.class.php:336
+#: VippsWooLogin.class.php:379
 #, php-format
 msgid ""
 "Are you registered as a customer? Log in with %s to continue your checkout."
 msgstr ""
 "Er du registrert som kunde? Logg inn med %s for å fortsette til kassen."
 
-#: VippsWooLogin.class.php:339
+#: VippsWooLogin.class.php:382
 msgid "Click to continue"
 msgstr "Klikk for å fortsette"
 
-#: VippsWooLogin.class.php:360
+#: VippsWooLogin.class.php:406
 #, php-format
 msgid "Are you registered as a customer? Log in with %s."
 msgstr "Er du registrert som kunde? Logg inn med %s."
 
-#: VippsWooLogin.class.php:383
+#: VippsWooLogin.class.php:430
 msgid "Create an account using "
 msgstr "Lag en ny konto med"
 
-#: VippsWooLogin.class.php:445
+#: VippsWooLogin.class.php:493
 #, php-format
 msgid "You are now connected to the Vipps profile <b>%s</b>!"
 msgstr "Du er nå tilkoblet Vipps-profilen <b>%s</b>!"
 
-#: VippsWooLogin.class.php:453
+#: VippsWooLogin.class.php:501
 msgid "Vipps"
 msgstr "Vipps"
 
-#: VippsWooLogin.class.php:483
+#: VippsWooLogin.class.php:531
 msgid ""
 "The easiest way to sign in. Anyone with Vipps can use Vipps to sign in. No "
 "need to remember passwords ever again. Vipps, and you are logged in."
@@ -504,19 +508,19 @@ msgstr ""
 "Enklere innlogging finnes ikke. Alle som har Vipps kan også logge inn med "
 "Vipps. Aldri mer brukernavn og passord. Vipps, så er du logget inn."
 
-#: VippsWooLogin.class.php:491
+#: VippsWooLogin.class.php:539
 msgid "Get addresses"
 msgstr "Hent adresser"
 
-#: VippsWooLogin.class.php:500
+#: VippsWooLogin.class.php:548
 msgid "You must be logged in to disconnect"
 msgstr "Du må være logget inn for å kunne koble fra"
 
-#: VippsWooLogin.class.php:528
+#: VippsWooLogin.class.php:576
 msgid "Vipps!"
 msgstr "Vipps!"
 
-#: VippsWooLogin.class.php:591
+#: VippsWooLogin.class.php:639
 #, php-format
 msgid "Your addresses are now synchronized with the Vipps-account %s."
 msgstr "Addressene dine er nå synkronisert med Vipps-kontoen %s."
