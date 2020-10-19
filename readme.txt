@@ -103,7 +103,7 @@ If activated when Checkout with Vipps for WooCommerce is installed, configure th
 == Changelog ==
 
 
-= 2020.10.xx Version 1.0.11 =
+= 2020.10.19 Version 1.0.11 =
 * If activated when Checkout with Vipps for WooCommerce is installed, configure that plugin to create users when using Express Checkout
 
 = 2020.09.28 Version 1.0.10 =
