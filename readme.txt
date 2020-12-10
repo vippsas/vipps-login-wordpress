@@ -102,8 +102,11 @@ Testing on latest versions
 
 == Changelog ==
 
+= 2020.12.xx Version 1.0.13 =
+* Versions tested on WP 5.6 and WC 4.8.0
+
 = 2020.11.24 Version 1.0.12 =
-* Version tested on WP 5.5.3 and WC 7.0
+* Version tested on WP 5.5.3 and WC 4.7.0
 
 = 2020.10.19 Version 1.0.11 =
 * If activated when Checkout with Vipps for WooCommerce is installed, configure that plugin to create users when using Express Checkout
