@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.5.3
+Tested up to: 5.6.0
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -102,7 +102,7 @@ Testing on latest versions
 
 == Changelog ==
 
-= 2020.12.xx Version 1.0.13 =
+= 2020.12.14 Version 1.0.13 =
 * Versions tested on WP 5.6 and WC 4.8.0
 
 = 2020.11.24 Version 1.0.12 =
