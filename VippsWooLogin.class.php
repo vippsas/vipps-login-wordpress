@@ -760,13 +760,19 @@ class VippsWooLogin{
         $actually_update = apply_filters('login_with_vipps_update_address_info', $update_for_user, $customer, $userinfo);
         if (!$actually_update) return false;
 
-        $address = !empty($userinfo['address']) ? $userinfo['address'][0] : null; // Default
-        foreach($userinfo['address'] as $add) {  // Find home address
-            if ($add['address_type'] == 'home') {
-                $address = $add; break;
-            }
+        $address = !empty($userinfo['address']) ? $userinfo['address'] : null; // Default - this is v2 of the login api, v1 always used a list of addresses here
+ 
+        // Some potential error handling and backwards compatiblity going on here - the next filter will receive all addressses. IOK 2020-12-15
+        $others = $userinfo['other_addresses'];
+        if (!$others) $others = array();
+        $all = $others;
+        if ($address) {
+          array_unshift($all, $address);
+        } else {
+          if ($others) $address = $others[0];
         }
-        $address = apply_filters('login_with_vipps_woo_get_address',$address, $userinfo['address']);
+
+        $address = apply_filters('login_with_vipps_woo_get_address',$address, $all);
 
         if (empty($address)) return;
         $email = $userinfo['email'];
