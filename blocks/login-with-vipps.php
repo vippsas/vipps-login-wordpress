@@ -25,6 +25,7 @@ function login_with_vipps_block_init() {
 		plugins_url( $index_js, __FILE__ ),
 		array(
 			'wp-blocks',
+			'wp-block-editor',
 			'wp-i18n',
 			'wp-element',
 		),
