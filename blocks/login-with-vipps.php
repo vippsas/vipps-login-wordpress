@@ -26,6 +26,8 @@ function login_with_vipps_block_init() {
 		array(
 			'wp-blocks',
 			'wp-block-editor',
+			'wp-components',
+			'wp-compose',
 			'wp-i18n',
 			'wp-element',
 		),
