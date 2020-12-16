@@ -1,5 +1,30 @@
 ( function( wp ) {
 
+/*
+    public function continue_with_vipps_shortcode($atts,$content,$tag) {
+        $args = shortcode_atts(array('application'=>'wordpress', 'text'=>__('Continue with', 'login-with-vipps')), $atts);
+        $text = esc_html($args['text']);
+        $application = $args['application'];
+        ob_start();
+        ?>
+            <span class='continue-with-vipps-wrapper inline'>
+            <?php $this->login_button_html($text, $application); ?>
+            </span>
+            <?php
+        return ob_get_clean();
+    }
+
+    public function login_button_html($text, $application) {
+        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        ob_start();
+        ?>
+            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
+            alt="<?php _e('Log in without password using Vipps', 'login-with-vipps'); ?>" src="<?php echo $logo; ?>">!</a>
+            <?php
+        echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
+    }
+*/
+
 
 	/**
 	 * Registers a new block provided a unique name and an object defining its behavior.
@@ -48,7 +73,7 @@
 		 * Optional block extended support features.
 		 */
 		supports: {
-			html: true,
+			html: false,
                         anchor: true,
                         align:true,
                         customClassName: true,
@@ -108,17 +133,21 @@
 		    } );
 		};
 
+                var onChangeAlignment = function(newalignment) {
+                  props.setAttributes( { alignment: newalignment } );
+                }
+
 		return el(
 		    'div',
 		    { className: props.className },
 
 // This is for the menu-bar over the block
                    el(BlockControls, {}, 
-                        el(AlignmentToolbar,{ value: attributes.alignment  } )
+                        el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment  } )
                    ),
 // This is for left-hand block properties thing
                    el(InspectorControls, {},
-                        el(AlignmentToolbar,{ value: attributes.alignment  } )
+                        el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment } )
                    ),
 
 
