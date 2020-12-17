@@ -27,6 +27,7 @@ SOFTWARE.
 
 // This can be used in buttons to login for the specified application
 function login_with_vipps(application) {
+    console.log("doing %j", application);
     var ajaxUrl = vippsLoginConfig.ajax_url;
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {
@@ -44,3 +45,10 @@ function login_with_vipps(application) {
 
     });
 }
+// This is for blocks, which can't use onclick or really any stored javascript IOK 2020-12-16
+jQuery(document).ready(function () {
+  jQuery('.vipps-button.continue-with-vipps.continue-with-vipps-action').click(function (e) {
+    login_with_vipps(jQuery(this).data('application'));
+  });
+});
+

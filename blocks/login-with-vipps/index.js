@@ -63,7 +63,7 @@
                        type: "string",
                        source: "attribute",
                        selector: "a",
-                       attribute: "'data-application'" // 'data-application' 
+                       attribute: "data-application"
                   },
                   title: {
                        type: "string",
@@ -73,9 +73,13 @@
                   },
                   prelogo: {
                       type: "array",
+                      source: "children",
+                      selector: ".prelogo",
                   },
                   postlogo: {
                       type: "array",
+                      source: "children",
+                      selector: ".postlogo",
                   },
                  },
 
@@ -86,7 +90,8 @@
 		return el(
 		    'span',
 		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
-                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, title:attributes.title, 'data-application':attributes.application},
+                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, 
+                              title:attributes.title, 'data-application':attributes.application},
                       el(RichText, { tagName: 'span', className:'prelogo', inline:true,value:attributes.prelogo,placeholder: "Fortsett med", onChange: v => props.setAttributes({prelogo: v}) }),
                       el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
                       el(RichText, { tagName: 'span', className:'postlogo', inline:true, value:attributes.postlogo,placeholder: " !", onChange: v => props.setAttributes({postlogo: v}) }),
@@ -111,8 +116,8 @@
 	    save: function( props ) {
 		var attributes = props.attributes;
 		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className, onClick: e => { e.preventDefault(); alert("foon!"); }  },
-                    el("a", { "data-test": "hest",className: "button vipps-orange vipps-button continue-with-vipps", title:attributes.title, 'data-application':attributes.application,
-                              href: "javascript: login_with_vipps(" + (attributes.application ? JSON.stringify(attributes.application) : "")  + ");"},
+                    el("a", { "data-test": "hest",className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action", 
+                              title:attributes.title, 'data-application':attributes.application, href: "javascript: void(0);" },
                     el( RichText.Content, {
                        tagName: 'span',
                        className: 'prelogo',
