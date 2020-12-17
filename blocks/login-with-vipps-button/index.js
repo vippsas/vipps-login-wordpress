@@ -35,12 +35,12 @@
 	 * Every block starts by registering a new block type definition.
 	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
 	 */
-	registerBlockType( 'login-with-vipps/login-with-vipps', {
+	registerBlockType( 'login-with-vipps/login-with-vipps-button', {
 		/**
 		 * This is the display title for your block, which can be translated with `i18n` functions.
 		 * The block inserter will show this name.
 		 */
-		title: __( 'Log in with Vipps', 'login-with-vipps' ),
+		title: __( 'Log in with Vipps-button', 'login-with-vipps' ),
 
 		/**
 		 * Blocks are grouped into categories to help users browse and discover them.
@@ -60,23 +60,27 @@
 
                 attributes: {
                   application: {
+                       default: "bar",
                        type: "string",
                        source: "attribute",
                        selector: "a",
                        attribute: "data-application"
                   },
                   title: {
+                       default: "Logg inn med Vipps!",
                        type: "string",
                        source: "attribute",
                        selector: "a",
                        attribute: "title" 
                   },
                   prelogo: {
+                      default: ["Logg inn med "],
                       type: "array",
                       source: "children",
                       selector: ".prelogo",
                   },
                   postlogo: {
+                      default: [" !"],
                       type: "array",
                       source: "children",
                       selector: ".postlogo",
@@ -87,14 +91,16 @@
                 let logo =  LoginWithVippsBlockConfig['logosrc'];
 		let attributes = props.attributes;
 
+console.log("attributes: %j", attributes);
+
 		return el(
 		    'span',
 		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
                     el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, 
                               title:attributes.title, 'data-application':attributes.application},
-                      el(RichText, { tagName: 'span', className:'prelogo', inline:true,value:attributes.prelogo,placeholder: "Fortsett med", onChange: v => props.setAttributes({prelogo: v}) }),
+                      el(RichText, { tagName: 'span', className:'prelogo', inline:true,value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
                       el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
-                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, value:attributes.postlogo,placeholder: " !", onChange: v => props.setAttributes({postlogo: v}) }),
+                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
                     ),
 
 
