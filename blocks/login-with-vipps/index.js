@@ -11,6 +11,7 @@
         var components = wp.components;
 
         var SelectControl = components.SelectControl;
+        var TextControl = components.TextControl;
 
         var useBlockProps = wp.blockEditor.useBlockProps;
         var RichText = wp.blockEditor.RichText;
@@ -100,8 +101,9 @@
 */
 // This is for left-hand block properties thing
                    el(InspectorControls, {},
-                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] })),
-
+                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] }),
+                        el(TextControl, { onChange: x=>props.setAttributes({title: x}) , label: "Title", value:attributes.title  })
+                   ),
                  )
 
             },
