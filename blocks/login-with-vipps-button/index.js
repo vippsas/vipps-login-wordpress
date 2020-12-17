@@ -31,6 +31,10 @@
 	 */
 	var __ = wp.i18n.__;
 
+        let vippsicon = el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']});
+
+
+
 	/**
 	 * Every block starts by registering a new block type definition.
 	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
@@ -47,7 +51,7 @@
 		 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
 		 */
 		category: 'widgets',
-
+                icon: vippsicon,
 		/**
 		 * Optional block extended support features.
 		 */
@@ -111,6 +115,7 @@
 */
 // This is for left-hand block properties thing
                    el(InspectorControls, {},
+                        el("p", {},  "The application is this and that, the title will appear in a popup"),
                         el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] }),
                         el(TextControl, { onChange: x=>props.setAttributes({title: x}) , label: "Title", value:attributes.title  })
                    ),
