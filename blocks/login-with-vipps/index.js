@@ -115,8 +115,9 @@
 
 	    save: function( props ) {
 		var attributes = props.attributes;
-		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className },
-                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, title:attributes.title, 'data-application':attributes.application},
+		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className, onClick: e => { e.preventDefault(); alert("foon!"); }  },
+                    el("a", { "data-test": "hest",className: "button vipps-orange vipps-button continue-with-vipps", title:attributes.title, 'data-application':attributes.application,
+                              href: "javascript: login_with_vipps(" + (attributes.application ? JSON.stringify(attributes.application) : "")  + ");"},
                     el( RichText.Content, {
                        tagName: 'span',
                        className: 'prelogo',
