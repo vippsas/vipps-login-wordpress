@@ -90,17 +90,16 @@
 	    edit: function( props ) {
                 let logo =  LoginWithVippsBlockConfig['logosrc'];
 		let attributes = props.attributes;
-
-console.log("attributes: %j", attributes);
+                let formats = ['core/bold', 'core/italic'];
 
 		return el(
 		    'span',
 		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
                     el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, 
                               title:attributes.title, 'data-application':attributes.application},
-                      el(RichText, { tagName: 'span', className:'prelogo', inline:true,value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
+                      el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
                       el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
-                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
+                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
                     ),
 
 
