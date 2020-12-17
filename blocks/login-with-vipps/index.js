@@ -14,7 +14,6 @@
 
         var useBlockProps = wp.blockEditor.useBlockProps;
         var RichText = wp.blockEditor.RichText;
-        var AlignmentToolbar = wp.blockEditor.AlignmentToolbar;
         var MediaUpload = wp.blockEditor.MediaUpload;
 
         var BlockControls = wp.blockEditor.BlockControls;
@@ -77,18 +76,11 @@
                   postlogo: {
                       type: "array",
                   },
-                  alignment: {
-                        type: "string"
-                  }
                  },
 
 	    edit: function( props ) {
                 let logo =  LoginWithVippsBlockConfig['logosrc'];
 		let attributes = props.attributes;
-
-                const onChangeAlignment = function(newalignment) {
-                  props.setAttributes( { alignment: newalignment } );
-                }
 
 		return el(
 		    'span',
@@ -99,17 +91,18 @@
                       el(RichText, { tagName: 'span', className:'postlogo', inline:true, value:attributes.postlogo,placeholder: " !", onChange: v => props.setAttributes({postlogo: v}) }),
                     ),
 
-/*
+
 // This is for the menu-bar over the block
+/*
                    el(BlockControls, {}, 
                         el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment  } )
                    ),
+*/
 // This is for left-hand block properties thing
                    el(InspectorControls, {},
-                        el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment } ),
-                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] }),
-*/
-                 );
+                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] })),
+
+                 )
 
             },
 
