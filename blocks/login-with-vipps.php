@@ -19,6 +19,10 @@ function login_with_vipps_block_init() {
 	}
 	$dir = dirname( __FILE__ );
 
+
+        $localizations = array();
+        $localizations['applications'] = array('wordpress', 'woocommerce');
+
 	$index_js = 'login-with-vipps/index.js';
 	wp_register_script(
 		'login-with-vipps-block-editor',
@@ -33,6 +37,7 @@ function login_with_vipps_block_init() {
 		),
 		filemtime( "$dir/$index_js" )
 	);
+        wp_localize_script('login-with-vipps-block-editor', 'LoginWithVippsBlockConfig', $localizations);
 
 	$editor_css = 'login-with-vipps/editor.css';
 	wp_register_style(
