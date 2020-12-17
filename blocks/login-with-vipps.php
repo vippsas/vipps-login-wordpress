@@ -22,6 +22,7 @@ function login_with_vipps_block_init() {
 
         $localizations = array();
         $localizations['applications'] = array('wordpress', 'woocommerce');
+        $localizations['logosrc'] = plugins_url('../img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
 
 	$index_js = 'login-with-vipps/index.js';
 	wp_register_script(
