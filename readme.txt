@@ -102,6 +102,9 @@ Testing on latest versions
 
 == Changelog ==
 
+= 2020.12.xx Version 1.1.0 =
+* Now uses version 2 of the Vipps Login Api and provides a Gutenberg block for a "Login with Vipps" button
+
 = 2020.12.14 Version 1.0.13 =
 * Versions tested on WP 5.6 and WC 4.8.0
 
