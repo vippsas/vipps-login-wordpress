@@ -1,62 +1,26 @@
 ( function( wp ) {
-//        console.log("This is %j", LoginWithVippsBlockConfig);
+
+	const registerBlockType = wp.blocks.registerBlockType;
+
+	const el  = wp.element.createElement;
+        const components = wp.components;
+
+        const SelectControl = components.SelectControl;
+        const TextControl = components.TextControl;
+
+        const RichText = wp.blockEditor.RichText;
+
+        const useBlockProps = wp.blockEditor.useBlockProps;
+        const BlockControls = wp.blockEditor.BlockControls;
+        const InspectorControls = wp.blockEditor.InspectorControls;
 
 
-	/**
-	 * Registers a new block provided a unique name and an object defining its behavior.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
-	 */
-	var registerBlockType = wp.blocks.registerBlockType;
-
-        var components = wp.components;
-
-        var SelectControl = components.SelectControl;
-        var TextControl = components.TextControl;
-
-        var useBlockProps = wp.blockEditor.useBlockProps;
-        var RichText = wp.blockEditor.RichText;
-        var MediaUpload = wp.blockEditor.MediaUpload;
-
-        var BlockControls = wp.blockEditor.BlockControls;
-        var InspectorControls = wp.blockEditor.InspectorControls;
-
-	/**
-	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-element/
-	 */
-	var el = wp.element.createElement;
-	/**
-	 * Retrieves the translation of text.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-i18n/
-	 */
-	var __ = wp.i18n.__;
-
-        let vippsicon = el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']});
-
-
-
-	/**
-	 * Every block starts by registering a new block type definition.
-	 * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/#registering-a-block
-	 */
 	registerBlockType( 'login-with-vipps/login-with-vipps-button', {
-		/**
-		 * This is the display title for your block, which can be translated with `i18n` functions.
-		 * The block inserter will show this name.
-		 */
-		title: __( 'Log in with Vipps-button', 'login-with-vipps' ),
-
-		/**
-		 * Blocks are grouped into categories to help users browse and discover them.
-		 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
-		 */
+		title: LoginWithVippsBlockConfig['BlockTitle'],
 		category: 'widgets',
-                icon: vippsicon,
-		/**
-		 * Optional block extended support features.
-		 */
+                icon: el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']}),
 		supports: {
-			html: false,
+			html: true,
                         anchor: true,
                         align:true,
                         customClassName: true,
@@ -64,27 +28,27 @@
 
                 attributes: {
                   application: {
-                       default: "bar",
+                       default: LoginWithVippsBlockConfig['defaultapp'],
                        type: "string",
                        source: "attribute",
                        selector: "a",
                        attribute: "data-application"
                   },
                   title: {
-                       default: "Logg inn med Vipps!",
+                       default: LoginWithVippsBlockConfig['DefaultTitle'],
                        type: "string",
                        source: "attribute",
                        selector: "a",
                        attribute: "title" 
                   },
                   prelogo: {
-                      default: ["Logg inn med "],
+                      default: [LoginWithVippsBlockConfig['DefaultTextPrelogo']],
                       type: "array",
                       source: "children",
                       selector: ".prelogo",
                   },
                   postlogo: {
-                      default: [" !"],
+                      default: [LoginWithVippsBlockConfig['DefaultTextPostlogo']],
                       type: "array",
                       source: "children",
                       selector: ".postlogo",
@@ -96,6 +60,17 @@
 		let attributes = props.attributes;
                 let formats = ['core/bold', 'core/italic'];
 
+                // Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
+                let appOptions =  LoginWithVippsBlockConfig['applications'];
+                let current = attributes.application;
+                let found=false;
+                for(let i=0; i<appOptions.length; i++) {
+                   if (current == appOptions[i].value) {
+                       found=true; break;
+                   } 
+                }
+                if (!found) appOptions.push({label: current, value: current});
+
 		return el(
 		    'span',
 		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
@@ -106,18 +81,22 @@
                       el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
                     ),
 
-
-// This is for the menu-bar over the block
+// This is for the menu-bar over the block - not used here
 /*
                    el(BlockControls, {}, 
                         el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment  } )
                    ),
 */
+
 // This is for left-hand block properties thing
                    el(InspectorControls, {},
-                        el("p", {},  "The application is this and that, the title will appear in a popup"),
-                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , label: "Application", value:attributes.application, options: [ { label: "Foo", value:"foo" }, { label: "Bar", value: "bar" } ] }),
-                        el(TextControl, { onChange: x=>props.setAttributes({title: x}) , label: "Title", value:attributes.title  })
+                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , 
+                                            label: LoginWithVippsBlockConfig['Application'], value:attributes.application, 
+                                            options: appOptions,
+                                            help:  LoginWithVippsBlockConfig['ApplicationsText']  }),
+                        el(TextControl, { onChange: x=>props.setAttributes({title: x}) , 
+                                          label:  LoginWithVippsBlockConfig['Title'] , value:attributes.title,
+                                          help:  LoginWithVippsBlockConfig['TitleText']   })
                    ),
                  )
 
@@ -125,8 +104,8 @@
 
 	    save: function( props ) {
 		var attributes = props.attributes;
-		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className, onClick: e => { e.preventDefault(); alert("foon!"); }  },
-                    el("a", { "data-test": "hest",className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action", 
+		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className   },
+                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action", 
                               title:attributes.title, 'data-application':attributes.application, href: "javascript: void(0);" },
                     el( RichText.Content, {
                        tagName: 'span',
