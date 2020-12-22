@@ -612,7 +612,7 @@ class VippsLogin {
 
                 if ($needs_verification) {
                     $referer = wp_get_raw_referer();
-                    $url = ContinueWithVipps::getAuthRedirect('confirm_login',array('uid'=>$userid,'referer'=>$referer));
+                    $url = ContinueWithVipps::getAuthRedirect('confirm_login',array('uid'=>$userid,'origin'=>$referer));
 error_log("got $url");
                     wp_redirect($url);
                     exit();
@@ -1233,10 +1233,11 @@ error_log("got $url");
     }
     // The error handling punts a bit: Just print the referer and exit.
     public function continue_with_vipps_error_confirm_login ($error,$errordesc,$error_hint='',$sessiondata=array()) {
-       $referer = $sessiondata['referer'];
+       $origin = $sessiondata['referer'];
+       if (!$origin) $origin = wp_login_url();
        $message .= "<h2>" . __("Cannot log in: It is required for this account to verify login with the Vipps app", 'login-with-vipps') . "</h2>";
        $message .= "<p>" . "<b>" . esc_html($error) . "<b>: " .  esc_html($errordesc) . "</p>";
-       $message .= "<p>" . sprintf(__("<a href='%s'>Return to your previous page</a> to try again</a>", 'login-with-vipps'), esc_attr($referer)) . "</p>";
+       $message .= "<p>" . sprintf(__("<a href='%s'>Return to your previous page</a> to try again</a>", 'login-with-vipps'), esc_attr($origin)) . "</p>";
        wp_die($message);
     }
 

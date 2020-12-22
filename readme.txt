@@ -102,6 +102,9 @@ Testing on latest versions
 
 == Changelog ==
 
+= 202x.xx.xx Version 1.1.1 =
+* Supports _requiring_ certain users, roles or everybody to use Vipps to log in or to confirm their login
+
 = 2020.12.21 Version 1.1.0 =
 * Now uses version 2 of the Vipps Login Api and provides a Gutenberg block for a "Login with Vipps" button
 
