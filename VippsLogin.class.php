@@ -73,6 +73,8 @@ class VippsLogin {
     // The main init hook. We are going to hook into authentication, logout, error handling, the hooks defined by ContinueWithVipps and to the UserRequest handlers
     // for connecting accounts. IOK 2019-10-14
     public function init () {
+
+
         if (!static::is_active()) return;
         // Hook into standard auth and logout, but do so after the secure signon bits and so forth.
         add_filter('authenticate', array($this,'authenticate'),50,3); 
@@ -139,7 +141,11 @@ class VippsLogin {
         add_action('continue_with_vipps_error_synch', array($this, 'continue_with_vipps_error_synch'), 10, 4);
         add_action('continue_with_vipps_error_wordpress_synch', array($this, 'continue_with_vipps_error_wordpress_synch'), 10, 4);
 
+        // This is for confirming logins with username/password. Emails must match.
+        add_action('continue_with_vipps_confirm_login', array($this, 'continue_with_vipps_confirm_login'), 10, 2);
+        add_action('continue_with_vipps_error_confirm_login', array($this, 'continue_with_vipps_error_confirm_login'), 10, 4);
     }
+
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
     public function wp_enqueue_scripts() {
         if (!static::is_active()) return;
@@ -321,6 +327,8 @@ class VippsLogin {
         $require_confirmation = $options['require_confirmation'];
         $loginpage = $options['login_page'];
 
+        $required_roles = $options['required_roles'];
+
         ?>
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options2'); ?>
@@ -345,6 +353,27 @@ class VippsLogin {
             </td>
             <td>
             <?php _e('Log in with Vipps on the Wordpress login page', 'login-with-vipps'); ?>
+            </td>
+            </tr>
+
+            <tr>
+            <td><?php _e('Require Vipps to log in for users in these roles', 'login-with-vipps'); ?></td>
+            <td width=30%> 
+            <label for="vipps_require__all_"><?php _e("Everybody", "login-with-vipps"); ?> </label>
+                   <input type='checkbox' id=vipps_require__all_  name='vipps_login_options2[required_roles][_all_]' value="1" 
+                          <?php if (isset($required_roles['_all_']) && $required_roles['_all_']) echo ' checked=checked'; ?> >
+                   <br>
+<?php foreach(wp_roles()->roles as $role=>$roledata): $r=esc_attr($role); ?>
+            <span style="margin-right:1em" white-space:nowrap"><label for="vipps_require_<?php echo $r; ?>"><?php echo esc_html($roledata['name']); ?></label>
+             <input type='checkbox' id="vipps_require_<?php echo $r; ?>"
+                    name='vipps_login_options2[required_roles][<?php echo $r; ?>]' value=1 
+                    <?php if (isset($required_roles[$role]) && $required_roles[$role]) echo ' checked=checked'; ?>>
+            </span>
+<?php endforeach; ?>
+
+            </td>
+            <td>
+            <?php _e('Users in these roles *must* use login with Vipps. You can also require this for a given user on the profile page', 'login-with-vipps'); ?>
             </td>
             </tr>
 
@@ -450,6 +479,7 @@ class VippsLogin {
         $vippsphone = trim(get_user_meta($user->ID,'_vipps_phone',true));
         $vippsid = trim(get_user_meta($user->ID,'_vipps_id',true));
         $its_you = (get_current_user_id() == $user->ID);
+        $is_admin = current_user_can('manage_options');
         ?>
             <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-with-vipps'); ?> </h2>
             <?php if ($allow_login): ?>
@@ -476,6 +506,29 @@ class VippsLogin {
             <?php endif; ?>
             </td>
             </tr>
+            <?php if ($is_admin): ?>
+            <tr>
+            <th><?php _e("Require this user to confirm their login with Vipps if logging in normally", 'login-with-vipps'); ?></th>
+            <td>
+               <input type="hidden" name="_require_vipps_confirm" value=0>
+
+               <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_yes" 
+                      <?php if (get_user_meta($user->ID, "_require_vipps_confirm", true)=='yes') echo "checked=checked" ?>
+                      value="yes"><label for="_require_vipps_confirm_yes"><?php _e("Yes, require confirmation", 'login-with-vipps'); ?></label><br>
+               <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_no" 
+                      <?php if (get_user_meta($user->ID, "_require_vipps_confirm", true)=='no') echo "checked=checked" ?>
+                      value="no"><label for="_require_vipps_confirm_no"> <?php _e("No, allow login without the app", 'login-with-vipps'); ?></label><br>
+               <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_default" 
+                      <?php if (!get_user_meta($user->ID, "_require_vipps_confirm", true)) echo "checked=checked" ?>
+                      value=""><label for="_require_vipps_confirm_default"> <?php _e("Only if member of restricted groups", 'login-with-vipps'); ?></label><br>
+               <span class="description"><?php _e("If you check this, this user will not be allowed to log in without confirming this operation with their Vipps app - email addresses must match.",'login-with-vipps'); ?></span>
+
+       
+
+            </td>
+            </tr>
+            <?php endif; ?>
+
             </table>
             <?php else: ?>
             <table class="form-table">
@@ -494,6 +547,12 @@ class VippsLogin {
     // This runs when the users saves the profile page, which here includes disconnecting from Vipps. IOK 2019-10-14
     function profile_update( $userid ) {
         if (!current_user_can('edit_user',$userid)) return false;
+
+        // Allow admin (only) to set the "require Vipps confirmation field
+        if (current_user_can('manage_options') && isset($_POST['_require_vipps_confirm'])) {
+           update_user_meta($userid, '_require_vipps_confirm', sanitize_key($_POST['_require_vipps_confirm']));
+        }
+
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
             $phone = get_user_meta($userid, '_vipps_phone',true);
             delete_user_meta($userid,'_vipps_phone');
@@ -517,10 +576,48 @@ class VippsLogin {
         if (!$user) return $user;
         if (! ($user instanceof WP_User)) return $user;
 
+        // This is the Vipps login session ID, if it is missing, we're not logging in via Vipps 2020-12-21
         if (!$this->currentSid) $this->currentSid = array($user->ID, null);
         if ($this->currentSid) {
             list ($userid, $sid) = $this->currentSid; 
-# If user requries vipps and we have no sid, then return a WP_Error
+            if (!$sid) {
+                $options = get_option('vipps_login_options2');
+                $option_roles= $options['required_roles'];
+                if (!is_array($option_roles)) $option_roles=array();
+
+                $needs_verification = false;
+                $needs_verification_setting = get_user_meta($userid,'_require_vipps_confirm',true);
+
+                // This user has been marked as requiring verification by Vipps before login 
+                if (!$needs_verification && $needs_verification_setting == 'yes') $needs_verification=true;
+
+                // Unless an exception has been made for this user, role rules apply
+                if ($needs_verification_setting!= 'no' && !$needs_verification) {
+                    // Everybody should be verified
+                    if (!$needs_verification && isset($option_roles['_all_']) && $option_roles['_all_']) {
+                        $needs_verification = true;
+                    }
+                    // Some roles need verification, and this user is in one of them
+                    if (!$needs_verification && !empty($option_roles)) {
+                        $required_roles=array_keys($option_roles);
+                        if (!empty(array_intersect($user->roles, $required_roles))) {
+                            $needs_verification=true;
+                        }
+                    }
+                }
+
+                // A final filter
+                $needs_verification = apply_filters('login_with_vipps_user_needs_verification', $needs_verification, $user);
+
+
+                if ($needs_verification) {
+                    $referer = wp_get_raw_referer();
+                    $url = ContinueWithVipps::getAuthRedirect('confirm_login',array('uid'=>$userid,'referer'=>$referer));
+error_log("got $url");
+                    wp_redirect($url);
+                    exit();
+                }
+            }
         }
         return $user;
     }
@@ -828,8 +925,10 @@ class VippsLogin {
     // can redirect to the final page ('login_redirect').  IOK 2019-10-14
     // This page is also parametrized on the passed application so that for instance Woo can update addressses and so forth. IOK 2019-10-14
     protected function actually_login_user($user,$sid=null,$session=null) {
-        // First, ensure that we interact properly with MFA stuff and so forth
+        // Note our session ID. This also will indicate that we have logged in via Vipps. IOK 2020-12-21
+        $this->currentSid = array($user->ID, $sid);
 
+        // Then, ensure that we interact properly with MFA stuff and so forth so other plugins can invalidate the login
         $user = apply_filters('authenticate', $user, '', '');
         if (is_wp_error($user)) {
             $error = $user;
@@ -841,7 +940,6 @@ class VippsLogin {
         do_action('continue_with_vipps_before_user_login', $user, $session);
         do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
 
-        $this->currentSid = array($user->ID, $sid);
         add_filter('attach_session_information', function ($data,$user_id) use ($sid) {
                 $data['vippssession'] = $sid;
                 return $data;
@@ -1095,6 +1193,51 @@ class VippsLogin {
         wp_safe_redirect($redir);
         exit();
 
+    }
+
+    // This handler runs when normal logins need to be confirmed with Vipps. It is *only* called from "authenticate" after the user is verified, so we know that the userid in the
+    // session is good. Therefore we will just log right in.  If there are other MFA applications active, they may cause an interesting loop at this point, so probably don't do that.
+    //  IOK 2019-10-14.
+    public function continue_with_vipps_confirm_login ($userinfo,$session) {
+        $userid = $session['uid'];
+        $user = new WP_User($userid);
+        $referer = $session['referer'];
+        if (!$userinfo) {
+            $this->deleteBrowserCookie();
+            if ($session) $session->destroy();
+            $msg = __('Not a valid user', 'login-with-vipps');
+            wp_die($msg);
+            exit();
+        }
+        if (!$user || is_wp_error($user)) {
+            $this->deleteBrowserCookie();
+            if ($session) $session->destroy();
+            $msg = __('Not a valid user', 'login-with-vipps');
+            if (is_wp_error($user)) $msg .= "<br>" . $user->get_error_message();
+            wp_die($msg);
+        }
+
+        $email = $userinfo['email'];
+        $sid=  $userinfo['sid'];
+
+        $verifieduser = get_user_by('email',$email);
+        if ($verifieduser->ID != $userid) {
+            if($session) $session->destroy();
+            $this->deleteBrowserCookie();
+            return $this->continue_with_vipps_error_confirm_login('wrong_user', __('Login not confirmed: This user has a different email address than the one registered in your app', 'login-with-vipps'));
+        }
+        $this->deleteBrowserCookie();
+        if ($session) $session->destroy();
+
+        $this->actually_login_user($user,$sid,$session);
+    }
+    // The error handling punts a bit: Just print the referer and exit.
+    public function continue_with_vipps_error_confirm_login ($error,$errordesc,$error_hint='',$sessiondata=array()) {
+       $referer = $sessiondata['referer'];
+       $message .= "<h2>" . __("Cannot log in: It is required for this account to verify login with the Vipps app", 'login-with-vipps') . "</h2>";
+       $message .= "<p>" . "<b>" . esc_html($error) . "<b>: " .  esc_html($errordesc) . "</p>";
+       $message .= "<p>" . sprintf(__("<a href='%s'>Return to your previous page</a> to try again</a>", 'login-with-vipps'), esc_attr($referer)) . "</p>";
+       wp_die($message);
     }
 
     // Very much like for confirmation, this handles errors for the action that marks the account to be synched with Vipps as to addressinfo etc. IOK 2019-10-14
