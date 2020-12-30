@@ -98,12 +98,15 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Testing on latest versions
+Bugfix release
 
 == Changelog ==
 
-= 202x.xx.xx Version 1.1.1 =
+= 202x.xx.xx Version 1.1.2 =
 * Supports _requiring_ certain users, roles or everybody to use Vipps to log in or to confirm their login
+
+= 2020.12.30 Version 1.1.1 =
+* Fix bug causing output when WP_DEBUG is on. Thanks to @horgster on wp.org for reporting.
 
 = 2020.12.21 Version 1.1.0 =
 * Now uses version 2 of the Vipps Login Api and provides a Gutenberg block for a "Login with Vipps" button

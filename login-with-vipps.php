@@ -104,7 +104,6 @@ if(is_plugin_active( 'woocommerce/woocommerce.php')) {
 
 // Gutenberg block for the block editor, if installed. IOK 2020-12-15
 require_once(dirname(__FILE__) . '/blocks/login-with-vipps.php');
-login_with_vipps_block_init();
 
 
 
