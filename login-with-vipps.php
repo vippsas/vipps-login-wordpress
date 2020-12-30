@@ -1,7 +1,7 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.1.0
+   Version: 1.1.1
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -104,7 +104,6 @@ if(is_plugin_active( 'woocommerce/woocommerce.php')) {
 
 // Gutenberg block for the block editor, if installed. IOK 2020-12-15
 require_once(dirname(__FILE__) . '/blocks/login-with-vipps.php');
-login_with_vipps_block_init();
 
 
 
