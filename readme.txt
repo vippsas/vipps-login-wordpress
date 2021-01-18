@@ -102,7 +102,7 @@ Bugfix release
 
 == Changelog ==
 
-= 202x.xx.xx Version 1.1.2 =
+= 2021.01.18 Version 1.1.2 =
 * Supports _requiring_ certain users, roles or everybody to use Vipps to log in or to confirm their login
 
 = 2020.12.30 Version 1.1.1 =
