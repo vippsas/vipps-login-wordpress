@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.6.0
+Tested up to: 5.7.0
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -101,6 +101,9 @@ The rest is a simple matter of programming.
 Bugfix release
 
 == Changelog ==
+
+= 2021.02.xx Version 1.1.3 =
+* Compatibility with WP 5.7
 
 = 2021.01.18 Version 1.1.2 =
 * Supports _requiring_ certain users, roles or everybody to use Vipps to log in or to confirm their login
