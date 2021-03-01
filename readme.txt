@@ -98,11 +98,11 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Bugfix release
+Compatibility testing
 
 == Changelog ==
 
-= 2021.02.xx Version 1.1.3 =
+= 2021.03.01 Version 1.1.3 =
 * Compatibility with WP 5.7
 
 = 2021.01.18 Version 1.1.2 =
