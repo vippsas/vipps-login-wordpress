@@ -11,16 +11,27 @@ License URI: https://choosealicense.com/licenses/mit/
 Login with Vipps is the easiest way to sign in and create an account. No need to worry about usernames and passwords.
 
 == Description ==
-Login with Vipps is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number. Vipps, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
+Login with Vipps offers super-easy registration and login from the leading smart-payment app in Norway with more than 3.9 million users. There is no easier login. No more usernames or passwords. Vipps, and your customers are logged in.
 
-Vipps is the leading smart payment app in Norway, used by more than 75% of Norwegians and tops the list of most positive word of mouth for any brand.
+The users need only remember their phone number. They are also able to provide information that websites often require, like e-mail, phone numbers and addresses, from their Vipps profile with no tedious data entry.
 
-Login with Vipps suits all websites that need users to sign in and want to tailor content and dialogue with their customers.
+Logg in with Vipps is fully integrated into WordPress and WooCommerce and is free for both users and webshops. The plugin is easy to modify for your own applications.
 
- * Anyone with Vipps can create a profile on your website with just one click and can be directly signed in at the next visit.
- * Your customers get what they want faster
- * You get more people signed in, leading to more insight and increased conversion.
+This solution is great for all websites that wants to:
 
+ * Get more logged-in users
+ * All Vipps-users can create a profile on your website with just one click, and can be logged in directly on the next visit
+ * You can modify content, messaging and retrieve stored shopping carts for the user
+ * Your customers can see order histories and potentially register product returns
+ * More logged-in users gives you better overview and better conversion rates
+
+== Free for consumers and webshops ==
+Login with Vipps is free for both websites and end users.
+
+== Get started ==
+
+ * If you are a user of Vipps for E-Commerce, you can add Login with Vipps to your account on https://portal.vipps.no and find your API-keys there - see "Installation" for more details.
+ * If you do not have an account with Vipps, you can order this here: https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang . When the order has been processed, you will be notified and you will be able to retrieve the API-keys on https://portal.vipps.no . Then see "Installation" for the next steps.
 
 == Requirements ==
 
@@ -36,45 +47,45 @@ Login with Vipps suits all websites that need users to sign in and want to tailo
 = Fully integrated with WooCommerce =
 Allows login and registration on your account pages, cart, checkout and via shortcodes. Addresses automatically synchronized with Vipps on login.
 
-= No need for usernames and passwords =
-Users don't need to worry about forgetting usernames and passwords. All they need to sign in is their phone number. For an even smoother sign in experience, the user can choose to be remembered in the browser, enabling automatic sign-ins for later visits.
-
 = User can register with one click  =
-Login with Vipps is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birth date. The identity of all Vipps users is verified using BankID, Norway's leading electronic ID, so rest assured that these are real people with correct name and information. (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.) 
+Login with Vipps is the easiest way to create a new account. The user can easily share high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birth date. The identity of all Vipps users is verified using BankID, Norway's leading electronic ID, so rest assured that these are real people with correct name and information. (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.) 
 
 = Link existing account =
 Already registered users can link their current accounts when signing in with Vipps or from their account page. Users can choose to update their address information from Vipps.
 
-= Fully integrated with WooCommerce and available for all relevant areas of your store =
-Login with Vipps can be added to all relevant pages in your webshop: login, registration, cart, and checkout pages.
-
-= Free of charge =
-Login with Vipps is free of charge for site owners and end-users. Merchants that already use Vipps online payment can add Sign in with Vipps to their account at [https://portal.vipps.no](https://portal.vipps.no). New site owners need to set-up an agreement with Vipps to use the service. This can be ordered here: [https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang](https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang).
-
 = Customizable for your application =
-You can use the framework of this plugin to implement other signed actions, such as submitting data with verified identities, without requiring the user to login.
+You can use the framework of this plugin to implement other solutions that require verified users, without actually requiring login. For example, you might create a system for having users sign their comments with Vipps so as to avoid spam issues.
+
+== Shortcodes ==
+ * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either Wordpress or WooCommerce.
+ * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
 
 == Installation ==
-1. Install the plugin using WordPress' [built-in installer](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins). The plugin can also be installed manually by upload the plugin files to the /wp-content/plugins/ directory.
-2. Activate the plugin through the \'Plugins\' screen in WordPress.
-3. From the [Vipps portal](portal.vipps.no), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
-4. Note your callback URL from the plugins settings-page and add that to the Vipps Portal (see screenshot 2)
-5. Modify the options as needed 
+**If you are an existing Vipps customer**, log onto the Vipps portal https://portal.vipps.no and retreive your API keys that you will need to install Login with Vipps
+
+**If you are a new Vipps customer**, apply for an account [here](https://vipps.no/signup/logginnmedvipps) - before downloading the plugin. Choose "Integration through your partner", or if you don't know your partner, choose "direct integration" and fill out the form. When your application is approved, you will recieve the API keys that you will need to install the plugin.
+
+ 1. Install the plugin using WordPress' [built-in installer](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins). The plugin can also be installed manually by upload the plugin files to the /wp-content/plugins/ directory.
+ 2. Activate the plugin through the \'Plugins\' screen in WordPress.
+ 3. From the [Vipps portal](portal.vipps.no), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
+ 4. Note your callback URL from the plugins settings-page and add that to the Vipps Portal (see screenshot 2)
+ 5. Modify the options as needed 
 
 == Screenshots ==
 1. Retrieving your Client ID and Client Secret from the [Vipps Portal](https://portal.vipps.no)
 2. Registerering your redirect URI 
 3. Activating Login with Vipps at the [Vipps Portal](https://portal.vipps.no)
 
-== Shortcodes ==
- * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either Wordpress or WooCommerce.
- * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
-
 == Customizing the Plugin ==
 To use 'Continue with Vipps' in your application, there are two levels of customizations available, except for a mass of filters and hooks.
 
 = Adding another 'application' to log into =
-Logging into basic Wordpress and into an application like WooCommerce is different in the details, especially with regards to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the users' address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
+Logging into basic Wordpress and into an application like WooCommerce is different in the details, especially with regards to 
+  * what page to redirect to (the profile page, or your account page, or maybe the checkout page), 
+  * handling of user data (for WooCommerce you want to update the users' address) 
+  * and for error handling.  
+
+For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
 
   * Define your application with a name. It should be a simple slug, like 'wordpress' or 'woocommerce'
   * Create your login button, and make it call the supplied Javascript function "login_with_vipps" with your application name as argument.
@@ -89,21 +100,21 @@ Logging into basic Wordpress and into an application like WooCommerce is differe
 You may want to do other things than logging in with the users' confirmed Vipps identity, and this plugin absolutely allows this. This might be submisssions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address. 
 
 These are the main steps:
+
  * Define your own action, like 'submitaddress'.
  * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)` (you can also provide an array of sessiondata which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is an URL to which you should redirect your user.
- * Create your success handler. This should be  
  * Create your error handler. This should be hooked to 'continue_with_vipps_error_*your action*'. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here, and show your user the error. The redirect is important, you should not output content in this action.
  * Create your succes handler. This should be hooked to 'continue_with_vipps_*your action*'. It will recieve an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page. 
 
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Compatibility testing
+Bugfix release
 
 == Changelog ==
 
 = 2021.03.01 Version 1.1.3 =
-* Compatibility with WP 5.7
+* Bugfix
 
 = 2021.01.18 Version 1.1.2 =
 * Supports _requiring_ certain users, roles or everybody to use Vipps to log in or to confirm their login
