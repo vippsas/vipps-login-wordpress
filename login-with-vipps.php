@@ -1,7 +1,7 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.1.3
+   Version: 1.1.4
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -69,7 +69,7 @@ if (is_admin()) {
     // IOK 2019-12-06 The below is required only because certain plugins in this
     // hook assumes they own every return with 'state' and 'code' args.
     add_action('parse_request',array($ContinueWithVipps,'parse_request'),1);
-    add_action('template_redirect',array($ContinueWithVipps,'template_redirect'));
+    add_action('template_redirect',array($ContinueWithVipps,'template_redirect'),1);
 }
 
 // This class implements all login logic. IOK 2019-10-14
