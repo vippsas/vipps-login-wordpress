@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Bugfix release
+Bugfix release affecting users of some plugins and themes
 
 == Changelog ==
+
+= 2021.03.01 Version 1.1.4 =
+* Bugfix
 
 = 2021.03.01 Version 1.1.3 =
 * Bugfix
