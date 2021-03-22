@@ -245,7 +245,7 @@ class VippsWooLogin{
         $allowcreatedefault = $allowcreateoncheckout||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
         $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
-        add_option('vipps_login_woo_options',$default,true);
+        add_option('vipps_login_woo_options',$default, false, true);
         $this->add_rewrite_rules();
         $this->maybe_flush_rewrite_rules();
 
