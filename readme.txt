@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Bugfix release affecting users of some plugins and themes
+Handle deprecations of the Vipps Login Api
 
 == Changelog ==
+
+= 2021.03.23 Version 1.1.5 =
+* Handle deprecation of the 'sid' field of the userinfo
 
 = 2021.03.22 Version 1.1.4 =
 * Bugfix
