@@ -613,7 +613,6 @@ class VippsLogin {
                 if ($needs_verification) {
                     $referer = wp_get_raw_referer();
                     $url = ContinueWithVipps::getAuthRedirect('confirm_login',array('uid'=>$userid,'origin'=>$referer));
-error_log("got $url");
                     wp_redirect($url);
                     exit();
                 }
@@ -773,7 +772,9 @@ error_log("got $url");
 
         if ($vippsphone == $userinfo['phone_number'] && $vippsid == $userinfo['sub']) { 
             $user = get_user_by('id', $userid);
-            $this->actually_login_user($user,$userinfo['sid'],$session);
+            // $sid=  $userinfo['sid'];
+            $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
+            $this->actually_login_user($user,$sid,$session);
             exit();
         }
         return false;
@@ -979,7 +980,9 @@ error_log("got $url");
         $firstname =  $userinfo['given_name'];
         $phone =  $userinfo['phone_number'];
         $sub =  $userinfo['sub'];
-        $sid=  $userinfo['sid'];
+
+        // $sid=  $userinfo['sid'];
+        $sid = 'no_longer_relevant'; // IOK SID no longer avaiable from $userinfo.
 
         $user = get_user_by('email',$email);
 
@@ -1172,7 +1175,8 @@ error_log("got $url");
         $email = $userinfo['email'];
         $phone =  sanitize_text_field($userinfo['phone_number']);
         $sub =  sanitize_text_field($userinfo['sub']);
-        $sid=  $userinfo['sid'];
+        // $sid=  $userinfo['sid'];
+        $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
 
         $user = get_user_by('email',$email);
         if ($user->ID != $userid) {
@@ -1218,7 +1222,8 @@ error_log("got $url");
         }
 
         $email = $userinfo['email'];
-        $sid=  $userinfo['sid'];
+        // $sid=  $userinfo['sid'];
+        $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
 
         $verifieduser = get_user_by('email',$email);
         if ($verifieduser->ID != $userid) {
