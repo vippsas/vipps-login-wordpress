@@ -113,7 +113,7 @@ Handle deprecations of the Vipps Login Api
 
 == Changelog ==
 
-= 2021.04.19 Version 1.1.5 =
+= 2021.04.19 Version 1.1.6 =
 * Tested for latest versions of WP and Woo
 
 = 2021.03.23 Version 1.1.5 =
