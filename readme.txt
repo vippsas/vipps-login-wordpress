@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.7.0
+Tested up to: 5.7.1
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -112,6 +112,9 @@ The rest is a simple matter of programming.
 Handle deprecations of the Vipps Login Api
 
 == Changelog ==
+
+= 2021.04.19 Version 1.1.5 =
+* Tested for latest versions of WP and Woo
 
 = 2021.03.23 Version 1.1.5 =
 * Handle deprecation of the 'sid' field of the userinfo
