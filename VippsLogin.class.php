@@ -1052,8 +1052,12 @@ class VippsLogin {
             update_user_meta($user_id,'_vipps_synchronize_addresses', 1);
 
             $user = get_user_by('id', $user_id);
+
+            // Unfortunately we need this to do the WooCommerce calls correctly that send emails after an account has been created.
+            $session->set('created_pw', $pass); 
             do_action('continue_with_vipps_after_create_user', $user, $session);
             do_action("continue_with_vipps_after_create_{$app}_user", $user, $session);
+            $session->set('created_pw', null);
 
             $this->actually_login_user($user,$sid,$session);
             exit();

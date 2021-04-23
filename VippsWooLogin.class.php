@@ -708,6 +708,23 @@ class VippsWooLogin{
 
         $customer = new WC_Customer($user->ID);
         $this->maybe_update_address_info($customer,$userinfo);
+
+        //  This is used among other things to send emails to newly created users. IOK 2021-04-23
+        $user_pass= @$session['created_pw'];
+        $userdata = array(
+            'ID' => $user->ID,
+            'user_login'=> $user->user_login,
+            'user_pass'=> $user_pass,
+            'user_nicename' => $user->user_nicename,
+            'user_email' => $user->user_email,
+            'user_url' => $user->user_url,
+            'user_registered' => $user->user_registered,
+            'display_name' => $user->display_name,
+            'role' => 'customer',
+            'created_by' => 'vipps');
+        $new_customer_data = apply_filters('woocommerce_new_customer_data', $userdata);
+        do_action( 'woocommerce_created_customer', $user->ID, $new_customer_data, $user_pass);
+
     } 
 
     // IOK 2019-10-14 currently, we just say 'yes' here, but we may want to disallow login for e.g. admins in this context.

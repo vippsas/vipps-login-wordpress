@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Handle deprecations of the Vipps Login Api
+Ensure the 'woocommerce_created_customer' hook is called correctly when registering on WooCommerce - this fixes the bug where user registration emails weren't sent.
 
 == Changelog ==
+
+= 2021.04.26 Version 1.1.7 =
+* Ensure the 'woocommerce_created_customer' hook is called correctly when registering on WooCommerce - this fixes the bug where user registration emails weren't sent.
 
 = 2021.04.19 Version 1.1.6 =
 * Tested for latest versions of WP and Woo
