@@ -798,7 +798,7 @@ class VippsLogin {
 
     // IOK 2019-10-14 this handler is run when the user confirms their identity by clicking on the email link. We connect the accounts and mark the request as completed.
     public function confirm_vipps_connect_and_login ($request_id) {
-        $request = wp_get_user_request_data( $request_id );
+        $request = wp_get_user_request( $request_id );
         if (!is_a( $request, 'WP_User_Request' ) || 'request-confirmed' !== $request->status) {
             return;
         }
@@ -1107,12 +1107,15 @@ class VippsLogin {
         if (!empty($requests)) {
             $requestid = $requests[0]->ID;
         } else {
-            $requestid = wp_create_user_request($email,'vipps_connect_login', array('application'=>$app, 'email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
+            // IOK 2021-04-27: We cannot call the system wp_create_user_request any more, it does not allow arbitrary actions any more. This functionality will be deleted
+            // as it is no longer required, but this is a quick fix. 
+            $requestid = $this->wp_create_user_request($email,'vipps_connect_login', array('application'=>$app, 'email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
         }
         // Now we should have a possibly fresh request, but just to be sure, errorhandling: IOK 2019-10-14
         if (is_wp_error($requestid)) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
+            $this->log(__('Error sending confirmation email: ', 'login-with-vipps') . $requestid->get_error_message(), 'ERROR');
             $this->continue_with_vipps_error_login('confirmation_request_failed', __('Unfortunately, we could not send a confirmation request to your email address. You will need to log in with your username and password and connect with Vipps on your profile page.', 'login-with-vipps'), '', $session);
             exit();
         }
@@ -1309,4 +1312,63 @@ class VippsLogin {
         wp_safe_redirect($redir);
         exit();
     }
+
+
+    // This core function used to be extensible for action_types, but for some reason, the allowable types were at some point enumerated with no filter to extend. 
+    // This functionality will be removed, but this is a quick fix for the current email confirmation feature. IOK 2021-04-27
+
+    function wp_create_user_request( $email_address = '', $action_name = '', $request_data = array(), $status = 'pending' ) {
+        $email_address = sanitize_email( $email_address );
+        $action_name   = sanitize_key( $action_name );
+
+        if ( ! is_email( $email_address ) ) {
+            return new WP_Error( 'invalid_email', __( 'Invalid email address.' ) );
+        }
+
+    //    if ( ! in_array( $action_name, _wp_privacy_action_request_types(), true ) ) {
+    //       return new WP_Error( 'invalid_action', __( 'Invalid action name.' ) );
+    //   }
+
+        if ( ! in_array( $status, array( 'pending', 'confirmed' ), true ) ) {
+            return new WP_Error( 'invalid_status', __( 'Invalid request status.' ) );
+        }
+
+        $user    = get_user_by( 'email', $email_address );
+        $user_id = $user && ! is_wp_error( $user ) ? $user->ID : 0;
+
+        // Check for duplicates.
+        $requests_query = new WP_Query(
+            array(
+                'post_type'     => 'user_request',
+                'post_name__in' => array( $action_name ), // Action name stored in post_name column.
+                'title'         => $email_address,        // Email address stored in post_title column.
+                'post_status'   => array(
+                    'request-pending',
+                    'request-confirmed',
+                ),
+                'fields'        => 'ids',
+            )
+        );
+
+        if ( $requests_query->found_posts ) {
+            return new WP_Error( 'duplicate_request', __( 'An incomplete personal data request for this email address already exists.' ) );
+        }
+
+        $request_id = wp_insert_post(
+            array(
+                'post_author'   => $user_id,
+                'post_name'     => $action_name,
+                'post_title'    => $email_address,
+                'post_content'  => wp_json_encode( $request_data ),
+                'post_status'   => 'request-' . $status,
+                'post_type'     => 'user_request',
+                'post_date'     => current_time( 'mysql', false ),
+                'post_date_gmt' => current_time( 'mysql', true ),
+            ),
+            true
+        );
+
+        return $request_id;
+    }
+
 }

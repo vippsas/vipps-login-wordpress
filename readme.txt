@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Ensure the 'woocommerce_created_customer' hook is called correctly when registering on WooCommerce - this fixes the bug where user registration emails weren't sent.
+Fix sending of user confirmation messages
 
 == Changelog ==
+
+= 2021.04.27 Version 1.1.8 =
+* Fix the email confirmations - this will be removed in a future version however
 
 = 2021.04.26 Version 1.1.7 =
 * Ensure the 'woocommerce_created_customer' hook is called correctly when registering on WooCommerce - this fixes the bug where user registration emails weren't sent.
