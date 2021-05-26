@@ -132,21 +132,96 @@ class ContinueWithVipps {
 
     // The admin-init hook. We add warnings temporarily stored in the database as well as handling options and cleaning out old sessiondata (if any). 2019-10-14
     public function admin_init () {
+
+        add_action('wp_ajax_login_vipps_dismiss_notice', array($this, 'ajax_vipps_dismiss_notice'));
+
         add_action('admin_notices',array($this,'stored_admin_notices'));
+        $this->add_configure_help_login_banner();
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
         register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
         VippsSession::clean();
     }
 
+
+    // Offer support if plugin not yet configured
+    public function add_configure_help_login_banner () {
+
+        $dismissed = get_option('_login_vipps_dismissed_notices');
+        if (isset($dismissed['configure01'])) return;
+        $options = get_option('vipps_login_options');
+        // Not yet configured. We *could* call getOauthData here too, to see if it is *correctly* configured.
+        // FIXME Add a timer here - don't do anything until the plugin has been installed for a while.
+        // Also, don't show on settings screen.
+        if (!empty($options['clientid']) && !empty($options['clientsecret'])) {
+           if (!is_array($dismissed)) $dismissed = array();
+           $dismissed['configure01'] = time();
+           update_option('_login_vipps_dismissed_notices', $dismissed, false);
+           return;
+        }
+
+        add_action('admin_notices', function () {
+            $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
+            $loginurl = "https://wordpress.org/plugins/login-with-vipps/#description";
+            $settingsurl = admin_url('options-general.php?page=vipps_login_options');
+            ?>
+            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure01'>
+            <a target="_blank"  href="<?php echo $loginurl; ?>">
+            <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="Logg inn med Vipps-logo">
+             <div>
+                 <p style="font-size:1rem"><?php echo __("Help with configuration?", 'woo-vipps'); ?></p>
+             </div>
+             </a>
+            </div>
+            <?php
+            });
+    }
     public function admin_enqueue_scripts ($suffix) {
+        $jsconfig = array();
+        $jsconfig['vippssecnonce'] = wp_create_nonce('loginvippssecnonce');
+        wp_register_script('login-vipps-admin', plugins_url('js/vipps-admin.js', __FILE__), array('jquery'), filemtime(dirname(__FILE__) . "/js/vipps-admin.js"), 'true');
+        wp_localize_script('login-vipps-admin', 'LoginVippsConfig', $jsconfig);
+        wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
+
+        wp_enqueue_script('login-vipps-admin');
         if ($suffix == 'settings_page_vipps_login_options') {
-            wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
+            wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
 
     public function admin_menu () {
         add_options_page(__('Login with Vipps', 'login-with-vipps'), __('Login with Vipps','login-with-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
     }
+
+    public function ajax_vipps_dismiss_notice() {
+        error_log("iverok a");
+        check_ajax_referer('loginvippssecnonce','vipps_sec');
+        error_log("iverok b");
+        if (!isset($_POST['key']) || !$_POST['key']) return;
+        error_log("iverok c");
+        $dismissed = get_option('_login_vipps_dismissed_notices');
+        if (!is_array($dismissed)) $dismissed = array();
+        $key = sanitize_text_field($_POST['key']);
+        $dismissed[$key] = time();
+        $this->log(__("Dismissed message ", 'login-with-vipps')  . $key, 'info');
+        update_option('_login_vipps_dismissed_notices', $dismissed, false);
+        error_log("iverok d " . print_r($dismissed, true));
+        wp_cache_flush();
+    }
+
+    // Add a backend notice to stand out a bit, using a Vipps logo and the Vipps color for info-level messages. IOK 2020-02-16
+    public function add_vipps_admin_notice ($text, $type='info',$key='') {
+        if ($key) {
+            $dismissed = get_option('_login_vipps_dismissed_notices');
+            if (isset($dismissed[$key])) return;
+        }
+        add_action('admin_notices', function() use ($text,$type, $key) {
+                $logo = plugins_url('img/vipps_logo_rgb.png',__FILE__);
+                $text= "<img style='height:40px;float:left;' src='$logo' alt='Vipps-logo'> $text";
+                echo "<div class='notice notice-vipps-login notice-$type is-dismissible'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
+                });
+    }
+
+
     // Helper function for creating an admin notice.
     public function add_admin_notice($notice) {
         add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-info is-dismissible'><p>$notice</p></div>"; });
@@ -188,9 +263,6 @@ class ContinueWithVipps {
         ?>
             <div class='wrap'>
             <h2><?php _e('Login with Vipps', 'login-with-vipps'); ?></h2>
-
-
-            <?php do_action('admin_notices'); ?>
 
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options'); ?>
