@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.7.1
+Tested up to: 5.7.2
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -67,7 +67,7 @@ You can use the framework of this plugin to implement other solutions that requi
 
  1. Install the plugin using WordPress' [built-in installer](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins). The plugin can also be installed manually by upload the plugin files to the /wp-content/plugins/ directory.
  2. Activate the plugin through the \'Plugins\' screen in WordPress.
- 3. From the [Vipps portal](portal.vipps.no), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
+ 3. From the [Vipps portal](https://portal.vipps.no), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
  4. Note your callback URL from the plugins settings-page and add that to the Vipps Portal (see screenshot 2)
  5. Modify the options as needed 
 
@@ -109,9 +109,13 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Fix sending of user confirmation messages
+Version 1.1.9: Dismissable banner linking to configuration page for users that do not activate after three days; deprecation pending removal of extra email configuration feature.
 
 == Changelog ==
+
+= 2021.05.31 Version 1.1.9 =
+* Get-started banner for users that have not completed configuration
+* Remove the old 'verify email account feature' 
 
 = 2021.04.27 Version 1.1.8 =
 * Fix the email confirmations - this will be removed in a future version however

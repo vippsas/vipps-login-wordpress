@@ -324,7 +324,6 @@ class VippsLogin {
             $continuepageid = $continuepage->ID;
         }
         $usevipps = $options['use_vipps_login'];
-        $require_confirmation = $options['require_confirmation'];
         $loginpage = $options['login_page'];
 
         $required_roles = $options['required_roles'];
@@ -374,16 +373,6 @@ class VippsLogin {
             </td>
             <td>
             <?php _e('Users in these roles *must* use login with Vipps. You can also require this for a given user on the profile page', 'login-with-vipps'); ?>
-            </td>
-            </tr>
-
-            <tr>
-            <td><?php _e('Require new users to confirm their email address', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_options2[require_confirmation]' value=0>
-            <input type='checkbox' name='vipps_login_options2[require_confirmation]' value=1 <?php if ( $require_confirmation) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php _e('Vipps email addresses are confirmed by Vipps when using login with Vipps for the first time on your website. However, if you wish, you may require users to confirm their email address in Wordpress too', 'login-with-vipps'); ?>
             </td>
             </tr>
 
@@ -1091,14 +1080,19 @@ class VippsLogin {
 
         // We have a user not connected to the Vipps account, but with the same email. However, Vipps accounts are now verified, so unless we explicitly want confirmation,
         // we'll just connect the accounts and log right in. IOK 2020-05-27
-        $options = get_option('vipps_login_options2');
-        if (!$options['require_confirmation']) {
+        // IOK 2021-05-27 No longer in effect as the "user request" API is being limited at WP, and no longer required
+        // as Vipps does confirm email addresses.
+        // We'll leave a filter in the short term to allow any users depending on this to find another solution.
+        $require_confirmation = apply_filters('login_with_vipps_require_email_confirmation', false);
+        if (!$require_confirmation) {
             update_user_meta($user->ID,'_vipps_phone',$phone);
             update_user_meta($user->ID,'_vipps_id',$sub);
             update_user_meta($user->ID,'_vipps_just_connected', 1);
             $this->actually_login_user($user,$sid,$session);
             exit();
         }
+
+        // IOK 2021-05-27 The below code branch is to be deleted with its corresponding handlers; it is being kept a short while to ensure any users of this feature aren't cut off.
 
         // We are *not* connected, and we require confirmation, so we must now redirect to the waiting page after sending a confirmation job IOK 2019-10-14
         // First check for existing user requests. This is still no function for this, so we inline it using $wpdb. IOK 2019-10-14

@@ -80,6 +80,7 @@ class ContinueWithVipps {
     // translating return values from the Vipps API 2019-10-14
     private function translation_dummy () {
         print __('User cancelled the login', 'login-with-vipps');
+        print __("Having downloaded Log in with Vipps: It is quick and easy to get started! Get your API keys in the Vipps Portal and add them to the plugin to activate Log in with Vipps.", 'login-with-vipps');
     }
 
 
@@ -124,7 +125,12 @@ class ContinueWithVipps {
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
     public function plugins_loaded () {
         $ok = load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
-        $this->options =  get_option('vipps_login_options'); 
+        $options =   get_option('vipps_login_options'); 
+        if (!@$options['installtime']) {
+            $options['installtime'] = time();
+            update_option('vipps_login_options',$options,false);
+        }
+        $this->options = $options;
         // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
         $this->dbtables();
     }
@@ -147,28 +153,42 @@ class ContinueWithVipps {
     public function add_configure_help_login_banner () {
 
         $dismissed = get_option('_login_vipps_dismissed_notices');
-        if (isset($dismissed['configure01'])) return;
+        if (isset($dismissed['configure05'])) return;
         $options = get_option('vipps_login_options');
+
+        global $pagenow;
+        if ($pagenow == 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] == 'vipps_login_options') {
+            return; // Show only on other pages, not the vipps login settings page
+        }
+
+        // Do nothing until 3 days after activation
+        $installtime = $options['installtime'];
+        $since = time()-$installtime;
+        if ($since <  (60 * 60 * 24 * 3)) return;
+
+        $configured = !empty($options['clientid']) && !empty($options['clientsecret']);
+
         // Not yet configured. We *could* call getOauthData here too, to see if it is *correctly* configured.
-        // FIXME Add a timer here - don't do anything until the plugin has been installed for a while.
         // Also, don't show on settings screen.
-        if (!empty($options['clientid']) && !empty($options['clientsecret'])) {
+        if ($configured) {
            if (!is_array($dismissed)) $dismissed = array();
-           $dismissed['configure01'] = time();
+           $dismissed['configure05'] = time();
            update_option('_login_vipps_dismissed_notices', $dismissed, false);
            return;
         }
 
         add_action('admin_notices', function () {
             $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
-            $loginurl = "https://wordpress.org/plugins/login-with-vipps/#description";
+            $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
             $settingsurl = admin_url('options-general.php?page=vipps_login_options');
+            $options = get_option('vipps_login_options');
+
             ?>
-            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure01'>
-            <a target="_blank"  href="<?php echo $loginurl; ?>">
+            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure05'>
+            <a target="_blank"  href="<?php echo $configurl; ?>">
             <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="Logg inn med Vipps-logo">
              <div>
-                 <p style="font-size:1rem"><?php echo __("Help with configuration?", 'woo-vipps'); ?></p>
+                 <p style="font-size:1rem"><?php echo sprintf(__("Having downloaded Log in with Vipps: It is quick and easy to get started! Get your API keys in the Vipps Portal and add them to the plugin to activate Log in with Vipps.", 'login-with-vipps')); ?></p>
              </div>
              </a>
             </div>
@@ -193,18 +213,14 @@ class ContinueWithVipps {
     }
 
     public function ajax_vipps_dismiss_notice() {
-        error_log("iverok a");
         check_ajax_referer('loginvippssecnonce','vipps_sec');
-        error_log("iverok b");
         if (!isset($_POST['key']) || !$_POST['key']) return;
-        error_log("iverok c");
         $dismissed = get_option('_login_vipps_dismissed_notices');
         if (!is_array($dismissed)) $dismissed = array();
         $key = sanitize_text_field($_POST['key']);
         $dismissed[$key] = time();
         $this->log(__("Dismissed message ", 'login-with-vipps')  . $key, 'info');
         update_option('_login_vipps_dismissed_notices', $dismissed, false);
-        error_log("iverok d " . print_r($dismissed, true));
         wp_cache_flush();
     }
 
@@ -304,7 +320,7 @@ class ContinueWithVipps {
     public function validate ($input) {
         $current =  get_option('vipps_login_options'); 
 
-        $valid = array();
+        $valid = $current;
         foreach($input as $k=>$v) {
             switch ($k) {
                 default: 
@@ -317,10 +333,9 @@ class ContinueWithVipps {
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
     public function activate () {
         // Options
-        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0);
+        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time());
         add_option('vipps_login_options',$default,false);
         $this->dbtables();
-
     }
 
     // The deactivation hook. It currently will only delete all active sessions. Deletion of the database will occur in the uninstall.php file instead.
