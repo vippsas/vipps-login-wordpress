@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.7.2
+Tested up to: 5.8.0
 Requires PHP: 7.0
 Stable tag: trunk
 License: MIT
@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.9: Dismissable banner linking to configuration page for users that do not activate after three days; deprecation pending removal of extra email configuration feature.
+Version 1.1.10: Updated for WP 5.8
 
 == Changelog ==
+
+= 2021.06.09 Version 1.1.10 =
+* Testing for WP 5.8
 
 = 2021.05.31 Version 1.1.9 =
 * Get-started banner for users that have not completed configuration
