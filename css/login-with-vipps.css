@@ -149,10 +149,13 @@ SOFTWARE.
 .woocommerce-info.vipps-info::before {
  color:#fff;
 }
-img.inline {
+
+/* Make this very specific */
+html body img.inline.vipps-logo {
  height: 2ex;
  display:inline;
  vertical-align: text-bottom;
+ padding:0;
+ border:0;
+ background-color:transparent;
 }
-
-
