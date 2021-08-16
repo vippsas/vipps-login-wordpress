@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.10: Updated for WP 5.8
+Version 1.1.11: CSS made more specific to avoid broken banners
 
 == Changelog ==
+
+= 2021.06.16 Version 1.1.11 =
+* CSS Tweaks
 
 = 2021.06.09 Version 1.1.10 =
 * Testing for WP 5.8
