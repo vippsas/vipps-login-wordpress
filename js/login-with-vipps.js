@@ -29,9 +29,16 @@ SOFTWARE.
 function login_with_vipps(application) {
     console.log("doing %j", application);
     var ajaxUrl = vippsLoginConfig.ajax_url;
+    var data = { 'action': 'vipps_login_get_link', 'application' : application};
+
+    // for WPML. IOK 2021-08-31
+    if (vippsLoginConfig['lang']) {
+        data['lang'] = vippsLoginConfig['lang'];
+    }
+
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {
-       data: { 'action': 'vipps_login_get_link', 'application' : application},
+       data: data,
        method: 'POST',
        dataType: 'json',
        error: function (jqXHR,textStatus,errorThrown) {

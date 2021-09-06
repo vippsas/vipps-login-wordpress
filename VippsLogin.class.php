@@ -150,7 +150,16 @@ class VippsLogin {
     public function wp_enqueue_scripts() {
         if (!static::is_active()) return;
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
-        wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+
+        $loginconfig = array( 'ajax_url' => admin_url( 'admin-ajax.php' ));
+
+        // If WPML is installed, ensure ajax gets passed a language parameter IOK 2021-08-31
+        global $sitepress;
+        if (is_object($sitepress) && method_exists($sitepress, 'get_current_language')) {
+            $loginconfig['lang'] = $sitepress->get_current_language();
+        }
+
+        wp_localize_script('login-with-vipps', 'vippsLoginConfig', $loginconfig);
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
     }
 
@@ -177,7 +186,6 @@ class VippsLogin {
         // We need the 'originating page' even when we are doing a POST to ourselves, so use 'raw reverer'. This means that this
         // must use 'safe redirect' as well.
         $referer = wp_get_raw_referer();
-
         $url = $this->get_vipps_login_link($application, array('referer'=>$referer));
         wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
         wp_die();

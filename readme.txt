@@ -109,9 +109,13 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.11: CSS made more specific to avoid broken banners
+Version 1.1.12: Improved support for WPML sites, and support for running against Vipps test/dev environment using filters.
 
 == Changelog ==
+
+= 2021.09.05 Version 1.1.12 =
+* Improved support for WPML
+* Support for running against Vipps' test/dev server using filters
 
 = 2021.06.16 Version 1.1.11 =
 * CSS Tweaks

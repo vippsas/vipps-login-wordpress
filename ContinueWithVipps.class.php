@@ -104,6 +104,12 @@ class ContinueWithVipps {
         $url      = $me->authorization_endpoint();
         $redir    = $me->make_callback_url();
         $clientid = $me->settings['clientid'];
+
+        $testmode = apply_filters('login_with_vipps_test_mode', false);
+        if ($testmode) {
+            $clientid = apply_filters('login_with_vipps_test_clientid', $clientid);
+        }
+
         if (is_array($scope)) $scope = join(' ',$scope);
         $scope ="api_version_2 $scope"; // Necessary to keep trucking after feb 28 2021
 
@@ -114,6 +120,7 @@ class ContinueWithVipps {
         $state = $action . "::" . $sessionkey;
 
         $args = array('client_id'=>$clientid, 'response_type'=>'code', 'scope'=>$scope, 'state'=>$state, 'redirect_uri'=>$redir);
+
         return $url . '?' . http_build_query($args);
     }
 
@@ -489,7 +496,6 @@ class ContinueWithVipps {
         } 
 
         // Ok so if we get here, we have a session with the userinfo in place. Now redirect to the application code! IOK 2019-10-14
-
         do_action('continue_with_vipps_' .  $forwhat, $userinfo, $session);
         if($session) $session->destroy();
         wp_die(sprintf(__('You successfully completed the action "%s" using Vipps - unfortunately, this website doesn\'t know how to handle that.', 'login-with-vipps'), $forwhat ));
@@ -497,10 +503,11 @@ class ContinueWithVipps {
 
 
     public function make_callback_url () {
+        $home = untrailingslashit(home_url());
         if ( !get_option('permalink_structure')) {
-            return set_url_scheme(home_url(),'https') . "/?wp-vipps-login=continue-from-vipps&callback=";
+            return set_url_scheme($home,'https') . "/?wp-vipps-login=continue-from-vipps&callback=";
         } else {
-            return set_url_scheme(home_url(),'https') . "/wp-vipps-login/continue-from-vipps/";
+            return set_url_scheme($home,'https') . "/wp-vipps-login/continue-from-vipps/";
         }
     }
 
@@ -528,6 +535,7 @@ class ContinueWithVipps {
                 if (preg_match("!/wp-vipps-login/$special/!", $_SERVER['REQUEST_URI'], $matches)) {
                     $method = $specialmethod;
                     break;
+                } else {
                 }
             }
         } else {
@@ -548,16 +556,32 @@ class ContinueWithVipps {
         $secret = $this->settings['clientsecret'];
         $redir  = $this->make_callback_url();
 
+        $testmode = apply_filters('login_with_vipps_test_mode', false, $this);
+        if ($testmode) {
+            $clientid = apply_filters('login_with_vipps_test_clientid', $clientid);
+            $secret = apply_filters('login_with_vipps_test_clientsecret', $secret);
+        }
+
         $url = $this->token_endpoint();
 
         $headers = array();
-        $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
-
         $args = array('grant_type'=>'authorization_code', 'code'=>$code, 'redirect_uri'=>$redir);
 
+        // Vipps Login can be set to accept either 'client_secret_post' or 'client_secret_basic'
+        // in the Vipps Portal - but not both. Normally we will use 'client_secret_basic', because
+        // this is the default, but e.g. Vipps Checkout uses 'client_secret_post' so let's make it 
+        // possible to switch between these. IOK 2021-09-01
+        $client_secret_post = apply_filters('login_with_vipps_client_secret_post', false);
+        if ($client_secret_post) {
+            $args['client_id'] = $clientid;
+            $args['client_secret'] = $secret;
+        } else {
+            $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
+        }
         $response = $this->http_call($url,$args,'POST',$headers,'url');
         return $response;
     }
+
     // And this fetches the userinfo given an accesstoken. Remember that it is obligatory to check the 'sub' from this value against the JWT sub received in the 'get_auth_token' call.  IOK 2019-10-14
     private function get_openid_userinfo($accesstoken) {
         $headers = array();
@@ -570,14 +594,20 @@ class ContinueWithVipps {
 
     // This is the base URL to talk to the Vipps api. From this we retreive the '.well-known'-value from which we get the authorize/accesstoken/userinfo endpoints. IOK 2019-10-14
     protected function base_url() {
-        return "https://api.vipps.no/access-management-1.0/access/";
+        $testmode = apply_filters('login_with_vipps_test_mode', false);
+        if ($testmode) {
+            return "https://apitest.vipps.no/access-management-1.0/access/";
+        } else {
+            return "https://api.vipps.no/access-management-1.0/access/";
+        }
     }
 
     // This gets and temporarily stores the keys used to verify that the idtoken (containing the 'sub' value indicating the identity of the subscriber) really ss from Vipps. IOK 2019-10-14
     protected function get_oauth_keys() {
         if ($this->oauthkeys) return $this->oauthkeys;
+        $testmode = apply_filters('login_with_vipps_test_mode', false);
         $keys = get_transient('_login_with_vipps_oauth_keys');
-        if ($keys) {
+        if (!$testmode && $keys) {
             $this->oauthkeys= $keys;
             return $keys;
         }
@@ -588,7 +618,9 @@ class ContinueWithVipps {
             if (!empty($keyscontent)) $keysdata = json_decode($keyscontent,true);
             if (!empty($keysdata) && isset($keysdata['keys'])) {
                 $this->oauthkeys = $keysdata['keys']; 
-                set_transient('_login_with_vipps_oauth_keys', $this->oauthkeys, 60*60*24);
+                if (!$testmode) {
+                    set_transient('_login_with_vipps_oauth_keys', $this->oauthkeys, 60*60*24);
+                }
             }
         }
         return $this->oauthkeys;
@@ -598,7 +630,9 @@ class ContinueWithVipps {
     protected function get_oauth_data() {
         if ($this->oauthdata) return $this->oauthdata;
         $data = get_transient('_login_with_vipps_oauth_data');
-        if ($data) {
+
+        $testmode = apply_filters('login_with_vipps_test_mode', false);
+        if (!$testmode && $data) {
             $this->oauthdata = $data;
             return $data;
         }
@@ -610,10 +644,13 @@ class ContinueWithVipps {
             $wellknowndata = @json_decode($wellknowncontents,true);
         }
         // Store for one day if possible
-        set_transient('_login_with_vipps_oauth_data', $wellknowndata, 60*60*24);
+        if (!$testmode) {
+            set_transient('_login_with_vipps_oauth_data', $wellknowndata, 60*60*24);
+        }
         $this->oauthdata = $wellknowndata;
         return $wellknowndata;
     }
+
     // Returns the endpoint from which we get access and idtokens from the Vipps oAuth2 api IOK 2019-10-14 
     protected function token_endpoint() {
         $fallback = $this->base_url() . "oauth2/token";  // Just in case, this is acctually the address, but let's check .well-known
