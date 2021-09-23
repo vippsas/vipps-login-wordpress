@@ -82,13 +82,12 @@ class ContinueWithVipps {
         print __('User cancelled the login', 'login-with-vipps');
         print __("Having downloaded Log in with Vipps: It is quick and easy to get started! Get your API keys in the Vipps Portal and add them to the plugin to activate Log in with Vipps.", 'login-with-vipps');
         // Future strings for translation IOK 2021-09-23
-        print __("You'll find more descriptions and illustrations about the setup of Log in with Vipps in <a href='%s'>the documentation</a>", 'login-with-vipps');
+        print __("You'll find more descriptions and illustrations about the setup of Log in with Vipps in <a href='%s'>Vipps' documentation</a>", 'login-with-vipps');
         print __("Your redirect-URI is:", 'login-with-vipps');
-        print __("Go to <a target='blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
-        print __("Go to <a target='blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
-        print __("Copy the URI to the left. Then go to  <a target='blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
+        print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
+        print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
+        print __("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
     }
-
 
     public function log ($what,$type='info') {
         if (function_exists('wc_get_logger')) {
