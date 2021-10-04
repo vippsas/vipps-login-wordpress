@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 5.8.0
 Requires PHP: 7.0
-Stable tag: trunk
+Stable tag: 1.1.12
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
