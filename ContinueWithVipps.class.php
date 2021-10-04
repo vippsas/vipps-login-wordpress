@@ -522,7 +522,11 @@ class ContinueWithVipps {
     // This allows us to handle 'special' pages by using registered query variables; rewrite rules can be added to add the actual argument to the query.
     public function template_redirect () {
         $special = $this->is_special_page() ;
-        if ($special) return $this->$special();
+        if ($special) {
+            remove_filter('template_redirect', 'redirect_canonical', 10);
+            do_action('login_with_vipps_before_handling_special_page', $special);
+            $this->$special();
+        }
         return false;
     }
 
