@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 5.8.0
 Requires PHP: 7.0
-Stable tag: 1.1.12
+Stable tag: 1.1.13
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.12: Improved support for WPML sites, and support for running against Vipps test/dev environment using filters.
+Version 1.1.13: Improved text for how to use the plugin
 
 == Changelog ==
+
+= 2021.10.04 Version 1.1.13 =
+* Improved texts for how to use the plugin
 
 = 2021.09.05 Version 1.1.12 =
 * Improved support for WPML
