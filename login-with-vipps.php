@@ -93,6 +93,7 @@ if (is_admin()) {
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(is_plugin_active( 'woocommerce/woocommerce.php')) { 
     require_once(dirname(__FILE__) . '/VippsWooLogin.class.php');
+    global $VippsWooLogin;
     $VippsWooLogin=VippsWooLogin::instance();
     register_activation_hook(__FILE__,array($VippsWooLogin,'activate'));
     register_deactivation_hook(__FILE__,array('VippsWooLogin','deactivate'));
