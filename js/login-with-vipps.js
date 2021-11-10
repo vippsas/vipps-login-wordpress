@@ -26,10 +26,12 @@ SOFTWARE.
 */
 
 // This can be used in buttons to login for the specified application
-function login_with_vipps(application) {
-    console.log("doing %j", application);
+function login_with_vipps(application, more_data) {
     var ajaxUrl = vippsLoginConfig.ajax_url;
-    var data = { 'action': 'vipps_login_get_link', 'application' : application};
+
+    var data =  (typeof more_data == 'object' && more_data !== null) ? more_data : {};
+    data['action'] = 'vipps_login_get_link';
+    data['application'] = application;
 
     // for WPML. IOK 2021-08-31
     if (vippsLoginConfig['lang']) {

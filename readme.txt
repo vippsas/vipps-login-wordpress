@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.8.0
+Tested up to: 5.8.1
 Requires PHP: 7.0
-Stable tag: 1.1.13
+Stable tag: 1.1.14
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -109,9 +109,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.13: Improved text for how to use the plugin
+Version 1.1.14: Improved programmability for custom login actions
 
 == Changelog ==
+
+= 2021.11.10 Version 1.1.14 =
+* Slight improvement in programmability of the login function for those who want to extend the plugin
 
 = 2021.10.04 Version 1.1.13 =
 * Improved texts for how to use the plugin

@@ -186,7 +186,12 @@ class VippsLogin {
         // We need the 'originating page' even when we are doing a POST to ourselves, so use 'raw reverer'. This means that this
         // must use 'safe redirect' as well.
         $referer = wp_get_raw_referer();
-        $url = $this->get_vipps_login_link($application, array('referer'=>$referer));
+        $data = array('referer' => $referer);
+
+        // Allow applications to extend the values added to the session IOK 2021-11-09
+        $data = apply_filters('login_with_vipps_login_link_data', $data, $application);
+
+        $url = $this->get_vipps_login_link($application, $data);
         wp_send_json(array('ok'=>1,'url'=>$url,'message'=>'ok'));
         wp_die();
     }

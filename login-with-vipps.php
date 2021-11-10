@@ -1,8 +1,8 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.1.13
-   Stable tag: 1.1.13
+   Version: 1.1.14
+   Stable tag: 1.1.14
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 4.9.6
-   Tested up to: 5.8.0
+   Tested up to: 5.8.1
    Requires PHP: 7.0
    Text-domain: login-with-vipps
    Domain Path: /languages
@@ -93,6 +93,7 @@ if (is_admin()) {
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 if(is_plugin_active( 'woocommerce/woocommerce.php')) { 
     require_once(dirname(__FILE__) . '/VippsWooLogin.class.php');
+    global $VippsWooLogin;
     $VippsWooLogin=VippsWooLogin::instance();
     register_activation_hook(__FILE__,array($VippsWooLogin,'activate'));
     register_deactivation_hook(__FILE__,array('VippsWooLogin','deactivate'));
