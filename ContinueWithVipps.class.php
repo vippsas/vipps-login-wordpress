@@ -601,6 +601,11 @@ class ContinueWithVipps {
         $url = $this->userinfo_endpoint();
         $args = array();
 
+        $headers['Vipps-System-Name'] = 'Wordpress';
+        $headers['Vipps-System-Version'] = bloginfo('version');
+        $headers['Vipps-System-Plugin-Name'] = 'login-with-vipps';
+        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION;
+
         return $this->http_call($url,$args,'GET',$headers,'url');
     }
 
