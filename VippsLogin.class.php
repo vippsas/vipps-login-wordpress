@@ -336,10 +336,10 @@ class VippsLogin {
         } else {
             $continuepageid = $continuepage->ID;
         }
-        $usevipps = $options['use_vipps_login'];
-        $loginpage = $options['login_page'];
+        $usevipps = @$options['use_vipps_login'];
+        $loginpage = @$options['login_page'];
 
-        $required_roles = $options['required_roles'];
+        $required_roles = @$options['required_roles'];
 
         ?>
             <form action='options.php' method='post'>
