@@ -1,8 +1,8 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.1.15
-   Stable tag: 1.1.15
+   Version: 1.1.16
+   Stable tag: 1.1.16
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 4.9.6
-   Tested up to: 5.8.1
+   Tested up to: 5.8.2
    Requires PHP: 7.0
    Text-domain: login-with-vipps
    Domain Path: /languages
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define('VIPPS_LOGIN_VERSION', '1.1.15');
+define('VIPPS_LOGIN_VERSION', '1.1.16');
 
 // Utility classes used to verify JWT tokens and manage login sessions. IOK 2019-10-14
 require_once(dirname(__FILE__) . '/VippsSession.class.php');

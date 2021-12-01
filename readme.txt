@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 5.8.2
 Requires PHP: 7.0
-Stable tag: 1.1.15
+Stable tag: 1.1.16
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -41,6 +41,9 @@ Login with Vipps is free for both websites and end users.
  * OpenSSL must be configured for your PHP installation
  * For WooCommerce, the version requirement is 3.3.4 or above
  * The port 443 must be open for outward traffic on your servers firewall
+
+== Upgrade Notice ==
+Version 1.1.16: If you instead of getting logged in see your sites version number; you need this upgrade.
 
 == Feature Highlights ==
 
@@ -112,6 +115,9 @@ The rest is a simple matter of programming.
 Version 1.1.15: Added version headers for the Vipps integration
 
 == Changelog ==
+
+= 2021.12.01 Version 1.1.16 =
+* For some reason, a bug where the blogversion was *outputed* didn't kick in on our systems, but broke login for some users. This version restores normal operations.
 
 = 2021.11.18 Version 1.1.15 =
 * Versioning headers sent to Vipps to aid debugging

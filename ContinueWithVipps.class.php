@@ -601,7 +601,7 @@ class ContinueWithVipps {
         $args = array();
 
         $headers['Vipps-System-Name'] = 'Wordpress';
-        $headers['Vipps-System-Version'] = bloginfo('version');
+        $headers['Vipps-System-Version'] = get_bloginfo('version');
         $headers['Vipps-System-Plugin-Name'] = 'login-with-vipps';
         $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION;
 
