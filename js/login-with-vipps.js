@@ -26,7 +26,10 @@ SOFTWARE.
 */
 
 // This can be used in buttons to login for the specified application
+var vipps_loggingin = false;
 function login_with_vipps(application, more_data) {
+    if (vipps_loggingin) return;
+    vipps_loggingin = true;
     var ajaxUrl = vippsLoginConfig.ajax_url;
 
     var data =  (typeof more_data == 'object' && more_data !== null) ? more_data : {};
@@ -44,11 +47,14 @@ function login_with_vipps(application, more_data) {
        method: 'POST',
        dataType: 'json',
        error: function (jqXHR,textStatus,errorThrown) {
+           vipps_loggingin = false;
            alert("Error " + textStatus);
        },
        success: function(data, textStatus, jqXHR) {
          if (data && data['url']) {
            window.location.href = data['url'];
+         } else {
+           vipps_loggingin = false;
          }
        }
 
