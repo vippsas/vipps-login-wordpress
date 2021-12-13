@@ -36,10 +36,19 @@ function login_with_vipps(application, more_data) {
     data['action'] = 'vipps_login_get_link';
     data['application'] = application;
 
+    // Allow customizers to add more data to what is sent to the login process without it having been explicitly passed
+    if (typeof wp !== 'undefined' && typeof wp.hooks !== 'undefined') {
+         data = wp.hooks.applyFilters('loginWithVippsExtraData', data);
+    }
+    // But let's not overwrite these
+    data['action'] = 'vipps_login_get_link';
+    data['application'] = application;
+
     // for WPML. IOK 2021-08-31
     if (vippsLoginConfig['lang']) {
         data['lang'] = vippsLoginConfig['lang'];
     }
+
 
     if (!application) application='wordpress';
     jQuery.ajax(ajaxUrl, {

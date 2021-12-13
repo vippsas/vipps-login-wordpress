@@ -38,6 +38,7 @@ class VippsWooLogin{
     protected static $instance = null;
     protected $loginbuttonshown = 0;    // Ensure we show the login action just once on certain pages.
     protected $rewriteruleversion = 1;  // Can't avoid rewrite rule modifications for Woo
+    protected $session = null; // Pass to login-redirect
 
     function __construct() {
     }
@@ -661,15 +662,19 @@ class VippsWooLogin{
     // For logins, we want to *either* go to 'my account', or if something is in the cart,
     // to go directly to the checkout page. IOK 2019-10-14
     public function add_login_redirect($user, $session) {
+        $this->session = $session;
         add_filter('login_redirect', array($this, 'login_redirect'), 99, 3);
     }
+
     public function login_redirect ($redir, $requested_redir, $user) {
         $link = wc_get_page_permalink( 'myaccount' );
         if (sizeof( WC()->cart->get_cart() ) > 0 ) {
             $link = wc_get_checkout_url();
         } 
         if (!$link) $link = $redir;
-        $session = null;
+        $session = $this->session;
+        $this->session = null;
+
         return apply_filters('login_with_vipps_woo_login_redirect', $link, $user, $session);
     }
 
