@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 5.8.2
 Requires PHP: 7.0
-Stable tag: 1.1.18
+Stable tag: 1.1.19
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -43,7 +43,7 @@ Login with Vipps is free for both websites and end users.
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.1.18: Made sure 'login_with_vipps_woo_login_redirect' gets access to the login session, and allow javascript hooks in the login process - developer features to make customization easier
+Version 1.1.19: Fixes for multisites where COOKIE_PATH is not set, + a filter for sites that need further fixes
 
 == Feature Highlights ==
 
@@ -115,6 +115,9 @@ The rest is a simple matter of programming.
 Version 1.1.15: Added version headers for the Vipps integration
 
 == Changelog ==
+
+= 2021.12.20 Version 1.1.19 =
+* Fix COOKIEPATH on multisite installs where it isn't set.
 
 = 2021.12.13 Version 1.1.18 =
 * Made 'login_with_vipps_woo_login_redirect' get access to the login session

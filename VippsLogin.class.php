@@ -258,16 +258,27 @@ class VippsLogin {
         return $url;
     }
 
+    // We need to do this because on earlier versions of WordPress, COOKEPATH can be wrong for multisites. IOK 2021-12-17
+    public function getCookiePath() {
+        $cookiepath = defined("COOKIEPATH") ? COOKIEPATH : "";
+        if (!$cookiepath) {
+            $cookiepath = trailingslashit(parse_url(get_option( 'home' ), PHP_URL_PATH));
+        }
+        return apply_filters('login_with_vipps_cookie_path', $cookiepath);
+    }
+
     // This ensures that a session is valid for the browser we are interacting with, using this cookie as a one-time password. 2019-10-14
     public function setBrowserCookie() {
         $cookie = base64_encode(hash('sha256',random_bytes(256), true));
+        $path = $this->getCookiePath();
         $_COOKIE['wordpress_vipps_session_key'] = $cookie;
-        setcookie('wordpress_vipps_session_key', $cookie, time() + (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
+        setcookie('wordpress_vipps_session_key', $cookie, time() + (2*3600), $path, COOKIE_DOMAIN,true,true);
         return $cookie;
     }
     public function deleteBrowserCookie() {
         unset($_COOKIE['wordpress_vipps_session_key']);
-        setcookie('wordpress_vipps_session_key', '', time() - (2*3600), COOKIEPATH, COOKIE_DOMAIN,true,true);
+        $path = $this->getCookiePath();
+        setcookie('wordpress_vipps_session_key', '', time() - (2*3600), $path, COOKIE_DOMAIN,true,true);
     }
     public function checkBrowserCookie($against) {
         if (!isset($_COOKIE['wordpress_vipps_session_key'])) return false;
