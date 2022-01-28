@@ -104,6 +104,7 @@ class ContinueWithVipps {
     // IOK 2019-10-14 This is the main entry-point for this class and for logging in and doing stuff with the Vipps oauth API. Call this with an action-name (like 'login') and sessiondata,
     // and you will get an URL back to which you can redirect the user. You should do this in a POST request so that you can start a session by setting a cookie.
     // The login-session will be stored in the database and is retrievable by the 'state' argument passed to and from Vipps. If sensitive, you may need to secure this session with a private (cookie-stored) value as well.
+    // The scopes determine what is  returned from Vipps. In addition to the below, you can get birthDate, and if you have the access, the norwegian natinal identity number (nin) or users' bank account numbers (accountNumbers). See https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api.md#scopes for details.
     public static function getAuthRedirect($action,$sessiondata=null,$scope="openid address email name phoneNumber") {
         $me = static::instance();
         $url      = $me->authorization_endpoint();
@@ -113,6 +114,13 @@ class ContinueWithVipps {
         $testmode = apply_filters('login_with_vipps_test_mode', false);
         if ($testmode) {
             $clientid = apply_filters('login_with_vipps_test_clientid', $clientid);
+        }
+
+        // Allow developers to modify the scope to ask for e.g birthYear. Always feed this filter an array.
+        if (has_filter('login_with_vipps_openid_scope')) {
+            if (!is_array($scope)) $scope = explode(" ", $scope);
+            $scope = array_filter($scope);
+            $scope = apply_filters('login_with_vipps_openid_scope', $scope, $action, $sessiondata);
         }
 
         if (is_array($scope)) $scope = join(' ',$scope);

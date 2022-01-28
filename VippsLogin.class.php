@@ -950,6 +950,7 @@ class VippsLogin {
             exit();
         }
 
+
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
         do_action('continue_with_vipps_before_user_login', $user, $session);
         do_action("continue_with_vipps_before_{$app}_user_login", $user, $session);
@@ -985,7 +986,6 @@ class VippsLogin {
             wp_safe_redirect($loginurl);
             exit();
         }
-
         $email = $userinfo['email'];
         $name = $userinfo['name'];
         $username = sanitize_user($email);
