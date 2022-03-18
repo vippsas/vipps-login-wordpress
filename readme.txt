@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.9.0
+Tested up to: 5.9.2
 Requires PHP: 7.0
-Stable tag: 1.1.20
+Stable tag: 1.1.21
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -112,9 +112,12 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.15: Added version headers for the Vipps integration
+Version 1.1.21: Removed the api_version_2 scope
 
 == Changelog ==
+
+= 2022.03.18 Version 1.1.21 =
+* Removed the api_version_2 scope
 
 = 2022.01.28 Version 1.1.20 =
 * Add filter `login_with_vipps_openid_scope ( $scope, $action, $sessiondata)` to allow developers to ask for e.g. birthDate. The filter will always receive an array.
