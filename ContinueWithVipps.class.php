@@ -124,7 +124,6 @@ class ContinueWithVipps {
         }
 
         if (is_array($scope)) $scope = join(' ',$scope);
-        $scope ="api_version_2 $scope"; // Necessary to keep trucking after feb 28 2021
 
         if (!is_array($sessiondata)) $sessiondata = array();
         $sessiondata['action'] = $action;
