@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 5.9.2
 Requires PHP: 7.0
-Stable tag: 1.1.21
+Stable tag: 1.2.0
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -43,7 +43,7 @@ Login with Vipps is free for both websites and end users.
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.1.20: Adds support for specifying your openID scope by the filter `login_with_vipps_openid_scope ( $scope, $action, $sessiondata)`
+Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses.
 
 == Feature Highlights ==
 
@@ -115,6 +115,8 @@ The rest is a simple matter of programming.
 Version 1.1.21: Removed the api_version_2 scope
 
 == Changelog ==
+= 2022.0x.xx Version 1.2.0 =
+* Add support for using the phone number as Vipps ID for users
 
 = 2022.03.18 Version 1.1.21 =
 * Removed the api_version_2 scope
