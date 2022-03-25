@@ -62,7 +62,7 @@ class ContinueWithVipps {
     public $oauthkeys = array();
     // We extend the database for this application with a single table for storing sessions needed
     // when negotiating with Vipps IOK 2019-10-14
-    public static $dbversion = 1;
+    public static $dbversion = 2;
     // This is a singleton class. IOK 2019-10-14
     protected static $instance = null;
 
@@ -370,7 +370,8 @@ class ContinueWithVipps {
     public function dbtables() {
         global $wpdb;
         $prefix = $wpdb->prefix;
-        $tablename = $wpdb->prefix . 'vipps_login_sessions';
+        $tablename = $wpdb->prefix . 'vipps_login_sessions'; // Used to manage the ephemeral login sessions 
+        $tablename2  = $wpdb->prefix . 'vipps_login_users'; // Used to map Vipps ids to users after a connection has been made
         $charset_collate = $wpdb->get_charset_collate();
         $options = get_option('vipps_login_options');
         $version = static::$dbversion;
@@ -389,15 +390,42 @@ class ContinueWithVipps {
                   KEY expire (expire)
                       ) ${charset_collate};";
 
+        // This really mapps a single vippsid (phone no) to a single user id, but we don't enforce it
+        // in the database in case further development or plugins would like to allow for having a single Vipps acount
+        // allow for login to more than one WP account. Because of this, we use an arbitrary int as a primary key for the mapping.
+        // We also don't use a "foreign key" on the userid just to be sure that referential integrity doesn't cause issues. Therefore
+        // users of this table - which is only this plugin right now - needs to do error handling on the mapped result. IOK 2022-03-25
+        $tablecreatestatement2 = "CREATE TABLE `${tablename2}` (
+                  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                  vippsid  varchar(32) not null,
+                  userid int not null,
+                  modified timestamp DEFAULT CURRENT_TIMESTAMP,
+                  KEY vippsid (vippsid),
+                  KEY userid (userid)
+                      ) ${charset_collate};";
+
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         $result = dbDelta( $tablecreatestatement, true );
         foreach ($result as $s) {
             error_log($s);
         }
+        $result = dbDelta( $tablecreatestatement2, true );
+        foreach ($result as $s) {
+            error_log($s);
+        }
+
+        $ok = true;
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
         if($exists != $tablename) {
+            $ok = false;
             $this->add_admin_notice(__('Could not create session table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
-        } else {
+        }
+        $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename2'");
+        if($exists != $tablename2) {
+            $ok = false;
+            $this->add_admin_notice(__('Could not create user identity table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
+        }
+        if ($ok) {
             error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
             $options['dbversion']=static::$dbversion;
             update_option('vipps_login_options',$options,false);
