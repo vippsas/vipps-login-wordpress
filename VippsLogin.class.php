@@ -892,7 +892,18 @@ class VippsLogin {
     public function get_user_by_vipps_phone($phone) {
         global $wpdb;
          $tablename2  = $wpdb->prefix . 'vipps_login_users';
-         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsid=%s ORDER BY id DESC LIMIT 1", $phone);
+         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsphone=%s ORDER BY id DESC LIMIT 1", $phone);
+         $result = $wpdb->get_row($q);
+         if (!$result) return null;
+         $user = get_user_by('id', $result['userid']);
+         if (!is_wp_error($user)) return $user;
+         return null;
+    }
+    // The same, but uses the 'sub' oauth value. Not currently used.
+    public function get_user_by_vipps_id($sub) {
+        global $wpdb;
+         $tablename2  = $wpdb->prefix . 'vipps_login_users';
+         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsid=%s ORDER BY id DESC LIMIT 1", $sub);
          $result = $wpdb->get_row($q);
          if (!$result) return null;
          $user = get_user_by('id', $result['userid']);
@@ -902,23 +913,25 @@ class VippsLogin {
 
     // This maintains the mapping table from Vipps phones to users, which is used for logins once the user is "connected". Before this, you will 
     // either need to be logged in (and connect), or the users' verified email address will be used. IOK 2022-04-01
-    protected function map_phone_to_user($phone, $user) {
+    protected function map_phone_to_user($phone, $sub, $user) {
         global $wpdb;
         $tablename2  = $wpdb->prefix . 'vipps_login_users';
-        $ok = $wpdb::insert($tablename2, array( 'vippsid' => $phone, 'userid' => $user->ID), array( '%s', '%d' ));
+        $ok = $wpdb::insert($tablename2, array( 'vippsphone' => $phone, 'vippsid' => $sub, 'userid' => $user->ID), array('%s','%s', '%d' ));
         $newentry = $wpdb->insert_id;
 
         // Since we don't have any uniqueness constraints.. which we should probably add instead. But anyway.
         if ($ok and $newentry) {
-           $deleteothers = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsid = %s AND userid = %d  and id !=%d", $phone, $user->ID, $newentry);
+           $deleteothers = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone = %s AND userid = %d  and id !=%d", $phone, $user->ID, $newentry);
            $wpdb->query($deleteothers);
         }
 
         //  This is for future reference, allow filters to stop us deleting the *other* linkages so that one Vipps account
         // *could* be used to log in to several accounts.
         if (! apply_filters('login_with_vipps_allow_multiple_acount_binding', false)) {
-           $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsid = %s AND userid != %d", $phone, $user->ID);
+           $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone  = %s AND userid != %d", $phone, $user->ID);
            $wpdb->query($delete);
+
+           // Handle the user meta values too? Or should we just delete them at this point? FIXME!
         }
 
         return $newentry;
@@ -1019,7 +1032,7 @@ class VippsLogin {
 
             wp_update_user($userdata);
 
-            $this->map_phone_to_user($phone, $user); # This will make logging in use the *phone* for the Vipps account instead of the account from now on.
+            $this->map_phone_to_user($phone, $sub, $user); # This will make logging in use the *phone* for the Vipps account instead of the account from now on.
             update_user_meta($user_id,'_vipps_phone',$phone);
             update_user_meta($user_id,'_vipps_id',$sub);
             update_user_meta($user_id, '_vipps_just_connected', 1);
@@ -1073,7 +1086,7 @@ class VippsLogin {
         $require_confirmation = apply_filters('login_with_vipps_require_email_confirmation', false);
         if (!$require_confirmation) {
             if (!$mapped && $user) {
-                $this->map_phone_to_user($phone, $user);
+                $this->map_phone_to_user($phone, $sub, $user); 
             }
             update_user_meta($user->ID,'_vipps_phone',$phone);
             update_user_meta($user->ID,'_vipps_id',$sub);
