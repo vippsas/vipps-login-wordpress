@@ -43,7 +43,7 @@ Login with Vipps is free for both websites and end users.
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses.
+Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses; cleanup
 
 == Feature Highlights ==
 
@@ -117,6 +117,9 @@ Version 1.1.21: Removed the api_version_2 scope
 == Changelog ==
 = 2022.0x.xx Version 1.2.0 =
 * Add support for using the phone number as Vipps ID for users
+* Removes old "verify your email account" code as it was not future-proof. Filters allow developers to reimplement this if neccessary
+* Fix CSS to be more independent of certain themes
+* Allow any account to which you are logged in to be connected to a Vipps account regardless of email account. This can be turned off by an option.
 
 = 2022.03.18 Version 1.1.21 =
 * Removed the api_version_2 scope
