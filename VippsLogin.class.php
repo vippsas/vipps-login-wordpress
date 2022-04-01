@@ -88,7 +88,8 @@ class VippsLogin {
         add_action('edit_user_profile_update',array($this,'profile_update'));
         add_action('user_profile_update_errors', array($this,'user_profile_update_errors'), 10,3);
 
-        // Action that handles the 'waiting' page - the page that will be shown to the user while they confirm their email account.
+        // Action that handles the 'waiting' page - originally, this was the page that will be shown to the user while they confirm their email account.
+        // It can however be used for other actions to be done before actually logging a user in, so the filters are kept.
         // On confirmation and reload, the user will be logged in .  This also integrates with 'template_redirect' because of this. IOK 2019-10-14
         add_action('continue_with_vipps_page_login', array($this, 'continue_with_vipps_page_login'), 10, 1);
         add_action('continue_with_vipps_before_page_login', array($this, 'continue_with_vipps_before_page_login') , 10, 1);
@@ -101,8 +102,7 @@ class VippsLogin {
         add_action('register_form', array($this, 'register_form_continue_with_vipps'));
         add_action( 'login_enqueue_scripts', array($this,'login_enqueue_scripts' ));
 
-
-        // We provdde 'login with vipps / continue with vipps' button shortcodes'. IOK 2019-10-14
+        // We provide 'login with vipps / continue with vipps' button shortcodes'. IOK 2019-10-14
         $this->add_shortcodes();
 
         // Ajax code to get the redirect url to start the login/confirmation process. IOK 2019-10-14
@@ -110,21 +110,6 @@ class VippsLogin {
         add_action('wp_ajax_nopriv_vipps_login_get_link', array($this,'ajax_vipps_login_get_link'));
         add_action('wp_ajax_vipps_confirm_get_link', array($this,'ajax_vipps_confirm_get_link'));
         add_action('wp_ajax_vipps_synch_get_link', array($this,'ajax_vipps_synch_get_link'));
-
-        /* The following actions are for using the confirm-handler to allow users to confirm their account using email with the
-           standard WP mechanism for user requests IOK 2019-10-11*/
-        // This handler handles actual confirmations. It should be run after the default action at priority 10, but before the
-        // maintenance action at 12.
-        add_action('user_request_action_confirmed', array($this, 'confirm_vipps_connect_and_login'), 11); 
-
-        // The user email. IOK 2019-10-14
-        add_filter('user_request_action_description', array($this, 'confirm_vipps_connect_and_login_description'), 10, 2);
-        add_filter('user_request_action_email_content', array($this, 'confirm_vipps_connect_and_login_email_content'), 10, 2);
-        add_filter('user_request_action_email_subject', array($this, 'confirm_vipps_connect_and_login_email_subject'), 10, 3);
-
-        // The admin email (not used) IOK 2019-10-14
-        add_filter( 'user_confirmed_action_email_content', array($this, 'user_confirmed_vipps_connection_email_content'), 10, 2);
-        add_filter( 'user_request_confirmed_email_subject', array($this, 'user_confirmed_vipps_connection_email_subject'), 10, 3);
 
         // Main return handler. This will do all the work neccessary to login a user, register a user, ask for confirmation etc before redirecting to
         // either the users' profile page or to the waiting page for confirmations. IOK 2019-10-14
@@ -809,79 +794,6 @@ class VippsLogin {
     }
 
 
-    // IOK 2019-10-14 this handler is run when the user confirms their identity by clicking on the email link. We connect the accounts and mark the request as completed.
-    public function confirm_vipps_connect_and_login ($request_id) {
-        $request = wp_get_user_request( $request_id );
-        if (!is_a( $request, 'WP_User_Request' ) || 'request-confirmed' !== $request->status) {
-            return;
-        }
-        $action = $request->action_name;
-        if ($action !== 'vipps_connect_login') return;
-
-        $data = $request->request_data;
-
-        $email = @$data['email'];
-        $userid = @$data['userid'];
-        $phone = @$data['vippsphone'];
-        $sub = @$data['sub'];
-
-        // One could here check the post author too. IOK 2019-10-11
-
-        update_user_meta($userid,'_vipps_phone',$phone);
-        update_user_meta($userid,'_vipps_id',$sub);
-        update_user_meta($userid, '_vipps_just_connected', 1);
-
-        // We don't need to alert admin, so we don't.
-        update_post_meta( $request_id, '_wp_admin_notified', true );
-        update_post_meta( $request_id, '_wp_user_request_completed_timestamp', time() );
-        $result = wp_update_post(
-                array(
-                    'ID'          => $request_id,
-                    'post_status' => 'request-completed',
-                    )
-                );
-    }
-
-    // The below overrides texts and contents of the confirmation emails. IOK 2019-10-14
-    public function confirm_vipps_connect_and_login_description ($desc, $action) {
-        if ($action !== 'vipps_connect_login') return $desc;
-        return __('Connect your Vipps account', 'login-with-vipps');
-    }
-    public function confirm_vipps_connect_and_login_email_content ($email_text, $email_data) {
-        if (empty($email_data)) return $email_text;
-        if ($email_data['request']->action_name !== 'vipps_connect_login') return $email_text;
-        return $email_text; 
-    }
-    public function confirm_vipps_connect_and_login_email_subject ($subject,$sitename,$email_data) {
-        if (empty($email_data)) return $subject;
-        if ($email_data['request']->action_name !== 'vipps_connect_login') return $subject;
-        return sprintf(__('Confirm that you want to connect your Vipps profile on %s', 'login-with-vipps'), $sitename); 
-    }
-    // Admin emails, not used but still
-    public function user_confirmed_vipps_connection_email_content ($email_text, $email_data) {
-        if (empty($email_data)) return $email_text;
-        if ($email_data['request']->action_name !== 'vipps_connect_login') return $email_text;
-        $email_text = __(
-                'Hei,
-
-                A user just connected his Vipps account with his Wordpress account on ###SITENAME###:
-
-                User: ###USER_EMAIL###
-                Request: ###DESCRIPTION###
-
-                No further action is required.
-
-                Regards,
-                All at ###SITENAME###
-###SITEURL###'
-                );
-        return $email_text; 
-    }
-    public function user_confirmed_vipps_connection_email_subject ($subject, $sitename, $email_data) {
-        if ($email_data['request']->action_name !== 'vipps_connect_login') return $subject;
-    }
-
-
     // This is used in a hook when redirecing to wp-login.php. It will format and output any errors that occured during login. IOK 2019-10-14
     // In this situation we use a fresh VippsSession to carry this information.
     public function wp_login_errors ($errors, $redirect_to) {
@@ -975,6 +887,43 @@ class VippsLogin {
         exit();
     }
 
+    // Standard method of finding "the" user mapped to this phone number. The table in principle supports 
+    // 1-n mappings, but we don't support that out of the box, as that would require user interaction on login.
+    public function get_user_by_vipps_phone($phone) {
+        global $wpdb;
+         $tablename2  = $wpdb->prefix . 'vipps_login_users';
+         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsid=%s ORDER BY id DESC LIMIT 1", $phone);
+         $result = $wpdb->get_row($q);
+         if (!$result) return null;
+         $user = get_user_by('id', $result['userid']);
+         if (!is_wp_error($user)) return $user;
+         return null;
+    }
+
+    // This maintains the mapping table from Vipps phones to users, which is used for logins once the user is "connected". Before this, you will 
+    // either need to be logged in (and connect), or the users' verified email address will be used. IOK 2022-04-01
+    protected function map_phone_to_user($phone, $user) {
+        global $wpdb;
+        $tablename2  = $wpdb->prefix . 'vipps_login_users';
+        $ok = $wpdb::insert($tablename2, array( 'vippsid' => $phone, 'userid' => $user->ID), array( '%s', '%d' ));
+        $newentry = $wpdb->insert_id;
+
+        // Since we don't have any uniqueness constraints.. which we should probably add instead. But anyway.
+        if ($ok and $newentry) {
+           $deleteothers = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsid = %s AND userid = %d  and id !=%d", $phone, $user->ID, $newentry);
+           $wpdb->query($deleteothers);
+        }
+
+        //  This is for future reference, allow filters to stop us deleting the *other* linkages so that one Vipps account
+        // *could* be used to log in to several accounts.
+        if (! apply_filters('login_with_vipps_allow_multiple_acount_binding', false)) {
+           $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsid = %s AND userid != %d", $phone, $user->ID);
+           $wpdb->query($delete);
+        }
+
+        return $newentry;
+    }
+
     // Main login handler action! This should redirect to either a success page (the profile page as default) or it should call the error handler.
     // It will log in a new user if a) there is no existing user with that email, and registration is allowed or b) the user is connected to the Vipps account using
     // the user_meta values. If not, then a confirmation message will be sent to the user. IOK 2019.
@@ -997,7 +946,18 @@ class VippsLogin {
         // $sid=  $userinfo['sid'];
         $sid = 'no_longer_relevant'; // IOK SID no longer avaiable from $userinfo.
 
-        $user = get_user_by('email',$email);
+        // First, see if we have this user already mapped:
+        $mapped = false;
+        $user = $this->get_user_by_vipps_phone($phone);
+        if ($user) {
+            $mapped = true;
+        } else  {
+            // Else, use  the verified email address to retrieve the user
+            $mapped = false;
+            $user = get_user_by('email',$email);
+        } 
+        // Allow a filter to find the user
+        $user = apply_filters( 'login_with_vipps_authenticate_user', $user, $userinfo, $session); 
 
         // Login is parametrized by 'application' stored in the session. Will be 'wordpress', 'woocommerce' etc. IOK 2019-10-14
         $app = sanitize_title(($session && isset($session['application'])) ? $session['application'] : 'wordpress');
@@ -1020,6 +980,7 @@ class VippsLogin {
             if ($session) $session->destroy();
             $this->continue_with_vipps_error_login('invalid_session', __("Your login session is missing. Ensure that you are accessing this site on a secure link (using HTTPS). Also, ensure that you are not blocking cookies – you will need those to log in.", 'login-with-vipps'), '', $session);
         }
+
 
         // Check if we allow user registrations
         $can_register = apply_filters('option_users_can_register', get_option('users_can_register'));
@@ -1058,6 +1019,7 @@ class VippsLogin {
 
             wp_update_user($userdata);
 
+            $this->map_phone_to_user($phone, $user); # This will make logging in use the *phone* for the Vipps account instead of the account from now on.
             update_user_meta($user_id,'_vipps_phone',$phone);
             update_user_meta($user_id,'_vipps_id',$sub);
             update_user_meta($user_id, '_vipps_just_connected', 1);
@@ -1088,6 +1050,7 @@ class VippsLogin {
             exit();
         }
 
+        // IOK CHECK MAPPED INSTEAD FIXME FIXME
         // And now we have a user, but we must see if the accounts are connected, and if so, log in IOK 2019-10-14
         $vippsphone = get_user_meta($user->ID,'_vipps_phone',true);
         $vippsid = get_user_meta($user->ID,'_vipps_id',true);
@@ -1109,6 +1072,9 @@ class VippsLogin {
         // We'll leave a filter in the short term to allow any users depending on this to find another solution.
         $require_confirmation = apply_filters('login_with_vipps_require_email_confirmation', false);
         if (!$require_confirmation) {
+            if (!$mapped && $user) {
+                $this->map_phone_to_user($phone, $user);
+            }
             update_user_meta($user->ID,'_vipps_phone',$phone);
             update_user_meta($user->ID,'_vipps_id',$sub);
             update_user_meta($user->ID,'_vipps_just_connected', 1);
@@ -1116,35 +1082,15 @@ class VippsLogin {
             exit();
         }
 
-        // IOK 2021-05-27 The below code branch is to be deleted with its corresponding handlers; it is being kept a short while to ensure any users of this feature aren't cut off.
-
-        // We are *not* connected, and we require confirmation, so we must now redirect to the waiting page after sending a confirmation job IOK 2019-10-14
-        // First check for existing user requests. This is still no function for this, so we inline it using $wpdb. IOK 2019-10-14
-        $requestid = 0;
-        $requests = get_posts(array('post_type' => 'user_request','post_name__in' =>array( 'vipps_connect_login'),'title'=> $email,'post_status'=>array('request-pending')));
-        if (!empty($requests)) {
-            $requestid = $requests[0]->ID;
-        } else {
-            // IOK 2021-04-27: We cannot call the system wp_create_user_request any more, it does not allow arbitrary actions any more. This functionality will be deleted
-            // as it is no longer required, but this is a quick fix. 
-            $requestid = $this->wp_create_user_request($email,'vipps_connect_login', array('application'=>$app, 'email'=>$email,'vippsphone'=>$phone, 'userid'=>$user->ID ,'sid'=>$sid, 'sub'=>$sub));
+        // This branch used to contain a system for having the user confirm their email address as sent by Vipps, which is no longer relevant as Vipps does this.
+        // It is removed because the user request api is being limited by WP so we can't assume it will continue to work without using internal APIs. so we'll just replace this with a filter (for admins that want to handle this 
+        // in other ways) and an error message.
+        if($session) $session->destroy();
+        $this->deleteBrowserCookie();
+        $handled = apply_filters('login_with_vipps_handle_email_confirmation', false, $user, $session);
+        if (!$handled) {
+            $this->continue_with_vipps_error_login('login_disallowed', __('You need to confirm your email account before Login with Vipps can be used. Login to your account normally and connect with Vipps on your user page, or contact the site admin', 'login-with-vipps'), '', $session);
         }
-        // Now we should have a possibly fresh request, but just to be sure, errorhandling: IOK 2019-10-14
-        if (is_wp_error($requestid)) {
-            if($session) $session->destroy();
-            $this->deleteBrowserCookie();
-            $this->log(__('Error sending confirmation email: ', 'login-with-vipps') . $requestid->get_error_message(), 'ERROR');
-            $this->continue_with_vipps_error_login('confirmation_request_failed', __('Unfortunately, we could not send a confirmation request to your email address. You will need to log in with your username and password and connect with Vipps on your profile page.', 'login-with-vipps'), '', $session);
-            exit();
-        }
-        // Mark the request with the users' id. IOK 2019-10-14
-        wp_update_post(array('ID'=>$requestid, 'post_author'=>$user->ID));
-        wp_send_user_request($requestid); 
-
-        // Prepare the redirect page, which will now have 'subaction' and 'application' in session. IOK 2019-10-14
-        $session->set('subaction','confirm_your_account');
-        $session->set('user',$user->ID);
-        $this->redirect_to_waiting_page('login', $session);
         exit();
     }
 
@@ -1203,6 +1149,7 @@ class VippsLogin {
         // $sid=  $userinfo['sid'];
         $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
 
+        // FIXME Don't require this any more (?) or at least use an option/filter here.
         $user = get_user_by('email',$email);
         if ($user->ID != $userid) {
             if($session) $session->destroy();

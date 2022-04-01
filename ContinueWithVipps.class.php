@@ -62,7 +62,7 @@ class ContinueWithVipps {
     public $oauthkeys = array();
     // We extend the database for this application with a single table for storing sessions needed
     // when negotiating with Vipps IOK 2019-10-14
-    public static $dbversion = 2;
+    public static $dbversion = 3;
     // This is a singleton class. IOK 2019-10-14
     protected static $instance = null;
 
@@ -397,10 +397,12 @@ class ContinueWithVipps {
         // users of this table - which is only this plugin right now - needs to do error handling on the mapped result. IOK 2022-03-25
         $tablecreatestatement2 = "CREATE TABLE `${tablename2}` (
                   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                  vippsid  varchar(32) not null,
+                  vippsphone  varchar(32) not null,
+                  vippsid  varchar(255) not null,
                   userid int not null,
                   modified timestamp DEFAULT CURRENT_TIMESTAMP,
                   KEY vippsid (vippsid),
+                  KEY vippsphone (vippsphone),
                   KEY userid (userid)
                       ) ${charset_collate};";
 
