@@ -720,7 +720,7 @@ class VippsLogin {
         }
     }
 
-    // For some reason we need to go to the waiting page (user is not confirmed). IOK 2019-10-1e
+    // If for some reason we need to go to the waiting page (e.g user is not confirmed). IOK 2019-10-1e
     public function redirect_to_waiting_page($forwhat,$session) {
         $state = $forwhat . "::" . $session->sessionkey;
         $continuepage = $this->ensure_continue_with_vipps_page();
@@ -752,47 +752,36 @@ class VippsLogin {
         return ob_get_clean();
     }
 
-    // This happens right before the waiting page, before output is started. Used to check if the user is now confirmed, in which case login can proceed. IOK 2019-10-14 
+    // This happens right before the waiting page, before output is started. If you need to use the "Before login" waiting page, you can check if your requirements (ie, terms acceptance, email confimation etc)
+    // are now ok, and if so, you could go ahead and use the still active session to log your user in etc. Remember to destroy the session and preferably delete the browser cookie too.
     public function continue_with_vipps_before_page_login($sessionkey) {
         if (!$sessionkey) return;
         $session = VippsSession::get($sessionkey);
-
-
         if (!$session  || !$this->checkBrowserCookie($session['cookie'])) return;
-        if (@$session['subaction'] != 'confirm_your_account') return;
-        $userid = @$session['user'];
-        if (!$userid) return; 
-        $userinfo = @$session['userinfo'];
-        if (!$userinfo) return;
-
-        $vippsphone = get_user_meta($userid,'_vipps_phone',true);
-        $vippsid = get_user_meta($userid,'_vipps_id',true);
-
-        if ($vippsphone == $userinfo['phone_number'] && $vippsid == $userinfo['sub']) { 
-            $user = get_user_by('id', $userid);
-            // $sid=  $userinfo['sid'];
-            $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
-            $this->actually_login_user($user,$sid,$session);
-            exit();
-        }
+        // Check your session here if you are ready to login the/any user etc.
+        do_action('vipps_login_before_waiting_page_actions', $session);
         return false;
     }
 
+    // This is a "the_content" filter added to the waiting page for login sessions.  Typically, you would add something to the session (still alive here)
+    // and dispatch on that. An example is provided below; also we add a simple filter to extend functionality. You would here ask your users to confirm something or select something before actually logging them in.
     public function continue_with_vipps_page_login($session)  {
+        $handled = false;
         if ($session['subaction'] == 'confirm_your_account') {
+            // No longer used, but kept as documentation as to how one could use a 'waiting page' like this. You would a) not delete the session b) set some flag in it,
+            //  redirect to the "continue with vipps" waiting page, and do your output here. IOK 2022-04-01
             print "<p>";
-            _e("Welcome! As this is your first log-in with Vipps, for safety reasons we require that you must confirm that your account as identified by your registered e-mail belongs to you.", 'login-with-vipps');
-            print "<p>";
-            print "<p>";
-            _e("We have sent an email to your account with a confirmation link. Press this, and you will be confirmed!",'login-with-vipps');          
             print "</p>";
-
+            $handled = true;
         } else {
+            do_action('vipps_login_waiting_page_actions', $session);
+            $handled = apply_filters('vipps_login_waiting_page_handled', $handled,  $session);
+        }
+        if (!$handled) { 
             $msg = __("Welcome! If you see this page, an really unexpected error has occur. Unfortunately, we can't do better than to send you to the <a href='%s'>login page</a>", 'login-with-vipps');
             printf($msg, wp_login_url()); 
         }
     }
-
 
     // This is used in a hook when redirecing to wp-login.php. It will format and output any errors that occured during login. IOK 2019-10-14
     // In this situation we use a fresh VippsSession to carry this information.
@@ -967,9 +956,9 @@ class VippsLogin {
         } else  {
             // Else, use  the verified email address to retrieve the user
             $mapped = false;
-            $user = get_user_by('email',$email);
+            $user = get_user_by('email',$email); // IOK FIXME Here, actually check the verified status as provided! It should always be true, but still.
         } 
-        // Allow a filter to find the user
+        // Allow a filter to find the user for special applications (phone number as username etc etc)
         $user = apply_filters( 'login_with_vipps_authenticate_user', $user, $userinfo, $session); 
 
         // Login is parametrized by 'application' stored in the session. Will be 'wordpress', 'woocommerce' etc. IOK 2019-10-14
@@ -1291,62 +1280,5 @@ class VippsLogin {
         exit();
     }
 
-
-    // This core function used to be extensible for action_types, but for some reason, the allowable types were at some point enumerated with no filter to extend. 
-    // This functionality will be removed, but this is a quick fix for the current email confirmation feature. IOK 2021-04-27
-
-    function wp_create_user_request( $email_address = '', $action_name = '', $request_data = array(), $status = 'pending' ) {
-        $email_address = sanitize_email( $email_address );
-        $action_name   = sanitize_key( $action_name );
-
-        if ( ! is_email( $email_address ) ) {
-            return new WP_Error( 'invalid_email', __( 'Invalid email address.' ) );
-        }
-
-    //    if ( ! in_array( $action_name, _wp_privacy_action_request_types(), true ) ) {
-    //       return new WP_Error( 'invalid_action', __( 'Invalid action name.' ) );
-    //   }
-
-        if ( ! in_array( $status, array( 'pending', 'confirmed' ), true ) ) {
-            return new WP_Error( 'invalid_status', __( 'Invalid request status.' ) );
-        }
-
-        $user    = get_user_by( 'email', $email_address );
-        $user_id = $user && ! is_wp_error( $user ) ? $user->ID : 0;
-
-        // Check for duplicates.
-        $requests_query = new WP_Query(
-            array(
-                'post_type'     => 'user_request',
-                'post_name__in' => array( $action_name ), // Action name stored in post_name column.
-                'title'         => $email_address,        // Email address stored in post_title column.
-                'post_status'   => array(
-                    'request-pending',
-                    'request-confirmed',
-                ),
-                'fields'        => 'ids',
-            )
-        );
-
-        if ( $requests_query->found_posts ) {
-            return new WP_Error( 'duplicate_request', __( 'An incomplete personal data request for this email address already exists.' ) );
-        }
-
-        $request_id = wp_insert_post(
-            array(
-                'post_author'   => $user_id,
-                'post_name'     => $action_name,
-                'post_title'    => $email_address,
-                'post_content'  => wp_json_encode( $request_data ),
-                'post_status'   => 'request-' . $status,
-                'post_type'     => 'user_request',
-                'post_date'     => current_time( 'mysql', false ),
-                'post_date_gmt' => current_time( 'mysql', true ),
-            ),
-            true
-        );
-
-        return $request_id;
-    }
 
 }
