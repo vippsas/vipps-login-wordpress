@@ -297,15 +297,16 @@ class VippsLogin {
             $userid = get_current_user_id();
             $justconnected = get_user_meta($userid,'_vipps_just_connected',true);
             $justsynched = get_user_meta($userid,'_vipps_just_synched',true);
+
+            list($vippsphone, $vippsid) = $this->get_vipps_account($userid);
+
             if ($justconnected) {
                 delete_user_meta($userid, '_vipps_just_connected');
-                $vippsphone = get_user_meta($userid,'_vipps_phone',true);
                 $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
             if ($justsynched) {
                 delete_user_meta($userid, '_vipps_just_synched');
-                $vippsphone = get_user_meta($userid,'_vipps_phone',true);
                 $notice = sprintf(__('You are now synchronized with the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
@@ -474,8 +475,7 @@ class VippsLogin {
     function show_extra_profile_fields( $user ) {
         $allow_login = true;
         $allow_login = apply_filters('continue_with_vipps_allow_login', $allow_login, $user, array(), array());
-        $vippsphone = trim(get_user_meta($user->ID,'_vipps_phone',true));
-        $vippsid = trim(get_user_meta($user->ID,'_vipps_id',true));
+        list($vippsphone, $vippsid) = $this->get_vipps_account($user);
         $its_you = (get_current_user_id() == $user->ID);
         $is_admin = current_user_can('manage_options');
         ?>
@@ -552,9 +552,8 @@ class VippsLogin {
         }
 
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
-            $phone = get_user_meta($userid, '_vipps_phone',true);
-            delete_user_meta($userid,'_vipps_phone');
-            delete_user_meta($userid,'_vipps_id');
+            $user = wp_get_current_user();
+            $this->unmap_phone_to_user($user);
             $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
             $continue = ContinueWithVipps::instance();
             $continue->add_admin_notice($notice);
@@ -900,30 +899,79 @@ class VippsLogin {
          return null;
     }
 
+    // Get the account (currently the only one) mapped to a Vipps account by user id
+    public function get_vipps_account($user=null) {
+        $userid = 0;
+        if (is_int($user)) {
+            $userid = $user;
+        } else if (! $user) {
+            $userid = get_current_user_id();
+        } else {
+            $userid = $user->ID;
+        }
+        if (!$userid) {
+            return array(null, null);
+        }
+        $q = $wpdb->prepare("SELECT vippsphone, vippsid  FROM `{$tablename2}` WHERE userid=%d ORDER BY id DESC LIMIT 1", $userid);
+        $result = $wpdb->get_row($q);
+        if (!empty($result)) {
+            return array($result['vippsphone'], $result['vippsid']);
+        }
+        // Try to see if this user *is* mapped, but in the old way. To be deleted later. IOK 2022-04-04
+        $phone = get_user_meta($userid, '_vipps_phone',true);
+        $sub = get_user_meta($userid, '_vipps_id',true); // IOK FIXME
+        if ($phone && $sub) {
+            $this->map_phone_to_user($phone, $sub, get_user_by('id', $userid));
+            return array($phone, $sub);
+        }
+        return array(null, null);
+    }
+
     // This maintains the mapping table from Vipps phones to users, which is used for logins once the user is "connected". Before this, you will 
     // either need to be logged in (and connect), or the users' verified email address will be used. IOK 2022-04-01
     protected function map_phone_to_user($phone, $sub, $user) {
         global $wpdb;
         $tablename2  = $wpdb->prefix . 'vipps_login_users';
-        $ok = $wpdb::insert($tablename2, array( 'vippsphone' => $phone, 'vippsid' => $sub, 'userid' => $user->ID), array('%s','%s', '%d' ));
-        $newentry = $wpdb->insert_id;
 
-        // Since we don't have any uniqueness constraints.. which we should probably add instead. But anyway.
-        if ($ok and $newentry) {
-           $deleteothers = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone = %s AND userid = %d  and id !=%d", $phone, $user->ID, $newentry);
-           $wpdb->query($deleteothers);
-        }
+        // The uniqueness constraint here is for phone x userid, not just phone, so we *can* actually map many-to-many here. But standardly, we won't (see below).
+        $q = $wpdb->prepare("INSERT INTO `{$tablename2}` (vippsphone, vippsid, userid) VALUES (%s, %s, %d) ON DUPLICATE KEY UPDATE vippsid=VALUES(vippsid)", $phone, $sub, $user->ID);
+        $ok = $wpdb->query($q);
+        if ($ok === false) return;
 
+        // We are probably going to delete these after a while as they duplicate the info in the above table. Keep the updating for now just in case these are in use
+        // by developers, but do not use them in the login process. IOK 2022-04-04
+        update_user_meta($user->ID,'_vipps_phone',$phone);
+        update_user_meta($user->ID,'_vipps_id',$sub);
+ 
         //  This is for future reference, allow filters to stop us deleting the *other* linkages so that one Vipps account
         // *could* be used to log in to several accounts.
         if (! apply_filters('login_with_vipps_allow_multiple_acount_binding', false)) {
+
+           $others = $wpdb->prepare("SELECT userid FROM `{$tablename2}` WHERE vippsphone = $s AND userid != %d", $phone, $user->ID);
+           // Handle the usermeta variables, temporarily. We'll delete these at some point in the future. IOK 2022-04-04
+           if (is_array($others)) {
+               foreach($others as $entry) {
+                  $otherid = $entry['userid'];
+                  delete_user_meta($otherid,'_vipps_phone');
+                  delete_user_meta($otherid,'_vipps_id');
+               }
+           }
            $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone  = %s AND userid != %d", $phone, $user->ID);
            $wpdb->query($delete);
-
-           // Handle the user meta values too? Or should we just delete them at this point? FIXME!
         }
 
-        return $newentry;
+        return;
+    }
+    // In reverse. Current version unmaps every connected account, because we only allow one, but we may allow other configurations in the future. IOK 2022-04-04
+    protected function unmap_phone_to_user($user, $phone=null, $sub=null) {
+            $delete = null;
+            if ($phone && $sub) {
+                $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone = %s AND userid = %d", $phone, $user->ID);
+            } else {
+                $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE AND userid = %d", $user->ID);
+            }
+            delete_user_meta($userid,'_vipps_phone');
+            delete_user_meta($userid,'_vipps_id');
     }
 
     // Main login handler action! This should redirect to either a success page (the profile page as default) or it should call the error handler.
@@ -1022,8 +1070,6 @@ class VippsLogin {
             wp_update_user($userdata);
 
             $this->map_phone_to_user($phone, $sub, $user); # This will make logging in use the *phone* for the Vipps account instead of the account from now on.
-            update_user_meta($user_id,'_vipps_phone',$phone);
-            update_user_meta($user_id,'_vipps_id',$sub);
             update_user_meta($user_id, '_vipps_just_connected', 1);
             // This is currently mostly for Woo, but in general: User has no address, so please update addresses when logging in. IOK 2019-10-25
             update_user_meta($user_id,'_vipps_synchronize_addresses', 1);
@@ -1052,18 +1098,10 @@ class VippsLogin {
             exit();
         }
 
-        // IOK CHECK MAPPED INSTEAD FIXME FIXME
-        // And now we have a user, but we must see if the accounts are connected, and if so, log in IOK 2019-10-14
-        $vippsphone = get_user_meta($user->ID,'_vipps_phone',true);
-        $vippsid = get_user_meta($user->ID,'_vipps_id',true);
-        if ($vippsphone == $phone && $vippsid == $sub) { 
+        // Now, if we were previously mapped, we can log in. Call the "map" function anyway in case we need to do some cleanup (we do, at first).
+        if ($mapped) {
+            $this->map_phone_to_user($phone, $sub, $user); 
             $this->actually_login_user($user,$sid,$session);
-            exit();
-        }
-        if ($vippsphone && $vippsid && ($vippsphone != $phone && $vippsid != $sub)) {
-            if($session) $session->destroy();
-            $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('login_disallowed', __('Another Vipps profile is connected to a user with your email address. Unfortunately, we can\'t log you in.', 'login-with-vipps'), '', $session);
             exit();
         }
 
@@ -1074,11 +1112,7 @@ class VippsLogin {
         // We'll leave a filter in the short term to allow any users depending on this to find another solution.
         $require_confirmation = apply_filters('login_with_vipps_require_email_confirmation', false);
         if (!$require_confirmation) {
-            if (!$mapped && $user) {
-                $this->map_phone_to_user($phone, $sub, $user); 
-            }
-            update_user_meta($user->ID,'_vipps_phone',$phone);
-            update_user_meta($user->ID,'_vipps_id',$sub);
+            $this->map_phone_to_user($phone, $sub, $user); 
             update_user_meta($user->ID,'_vipps_just_connected', 1);
             $this->actually_login_user($user,$sid,$session);
             exit();
@@ -1150,18 +1184,22 @@ class VippsLogin {
         $sub =  sanitize_text_field($userinfo['sub']);
         // $sid=  $userinfo['sid'];
         $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
+        $user = get_user_by('id', $userid);
 
-        // FIXME Don't require this any more (?) or at least use an option/filter here.
-        $user = get_user_by('email',$email);
-        if ($user->ID != $userid) {
+        // By default we will only allow 'new' connections where the verified Vipps email address is the same
+        // as the account email. This is to be completely sure this can't be gamed. We may relieve this constraint
+        // in time, and we allow a filter to change the constraint for developers with specific needs. IOK 2022-04-04
+        $ok = $user->email == $email; 
+        $ok = apply_filters('login_with_vipps_allow_connection', $ok, $user, $userinfo);
+        if (!$ok) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_confirm('wrong_user', __('Unfortunately, you cannot connect to this Vipps-profile: The email addresses are not the same.', 'login-with-vipps'), '', $session);
+            $sorrymessage = apply_filters('login_with_vipps_cannot_connect_message', __('Unfortunately, you cannot connect to this Vipps-profile: The email addresses are not the same.', 'login-with-vipps'), $user, $userinfo);
+            $this->continue_with_vipps_error_confirm('wrong_user', $sorrymessage, '', $session);
             exit();
         }
-
-        update_user_meta($userid, '_vipps_phone', $phone);
-        update_user_meta($userid, '_vipps_id', $sub);
+        // Actually connect user to phone/sub here
+        $this->map_phone_to_user($phone, $sub, $user);
         update_user_meta($userid, '_vipps_just_connected', 1);
 
         do_action("continue_with_vipps_{$app}_confirm_before_redirect", $userid, $userinfo, $session);

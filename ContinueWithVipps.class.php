@@ -62,7 +62,7 @@ class ContinueWithVipps {
     public $oauthkeys = array();
     // We extend the database for this application with a single table for storing sessions needed
     // when negotiating with Vipps IOK 2019-10-14
-    public static $dbversion = 3;
+    public static $dbversion = 2;
     // This is a singleton class. IOK 2019-10-14
     protected static $instance = null;
 
@@ -403,7 +403,8 @@ class ContinueWithVipps {
                   modified timestamp DEFAULT CURRENT_TIMESTAMP,
                   KEY vippsid (vippsid),
                   KEY vippsphone (vippsphone),
-                  KEY userid (userid)
+                  KEY userid (userid),
+                  UNIQUE KEY unique_mapping (vippsphone, userid)
                       ) ${charset_collate};";
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );

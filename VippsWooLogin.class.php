@@ -488,9 +488,9 @@ class VippsWooLogin{
         $userid = get_current_user_id();
         if (!$userid) return;
         $justconnected = get_user_meta($userid,'_vipps_just_connected',true);
+        list($vippsphone, $vippsid) = VippsLogin::instance()->get_vipps_account($userid);
         if ($justconnected) {
             delete_user_meta($userid, '_vipps_just_connected');
-            $vippsphone = get_user_meta($userid,'_vipps_phone',true);
             $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>!', 'login-with-vipps'), $vippsphone);
             ?>
                 <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
@@ -507,12 +507,11 @@ class VippsWooLogin{
         $userid = get_current_user_id();
         if (!$userid) print "No user!";
         $user = new WC_Customer($userid);
+        list($vippsphone, $vippsid) = VippsLogin::instance()->get_vipps_account($userid);
 
         $options = get_option('vipps_login_woo_options');
         $allow_login = $options['woo-login'];
         $allow_login = apply_filters('continue_with_vipps_woocommerce_allow_login', $allow_login, $user, array(), array());
-        $vippsphone = trim(get_user_meta($user->get_id(),'_vipps_phone',true));
-        $vippsid = trim(get_user_meta($user->get_id(),'_vipps_id',true));
 
         ?>
             <?php    if ($vippsphone && $vippsid): ?>
@@ -547,10 +546,8 @@ class VippsWooLogin{
         check_admin_referer('disconnect_vipps', 'disconnect_vipps_nonce');
         $userid = get_current_user_id();
         if (!$userid) wp_die(__('You must be logged in to disconnect', 'login-with-vipps'));
-        $phone = get_user_meta($userid, '_vipps_phone',true);
-
-        delete_user_meta($userid,'_vipps_phone');
-        delete_user_meta($userid,'_vipps_id');
+        list($vippsphone, $vippsid) =  VippsLogin::instance()->get_vipps_account($userid);
+        VippsLogin::instance()->unmap_phone_to_user($user);
 
         // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
@@ -559,7 +556,7 @@ class VippsWooLogin{
         if ($cookie) {
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-            $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
+            $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $vippsphone);
             $notices[]=array('notice'=>$notice, 'type'=>'success');
             set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
         }        
