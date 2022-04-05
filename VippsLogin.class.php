@@ -919,7 +919,7 @@ class VippsLogin {
         }
         // Try to see if this user *is* mapped, but in the old way. To be deleted later. IOK 2022-04-04
         $phone = get_user_meta($userid, '_vipps_phone',true);
-        $sub = get_user_meta($userid, '_vipps_id',true); // IOK FIXME
+        $sub = get_user_meta($userid, '_vipps_id',true);
         if ($phone && $sub) {
             $this->map_phone_to_user($phone, $sub, get_user_by('id', $userid));
             return array($phone, $sub);
