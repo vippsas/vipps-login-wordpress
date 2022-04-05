@@ -416,6 +416,19 @@ class ContinueWithVipps {
         foreach ($result as $s) {
             error_log($s);
         }
+        // Initialize the new user mapping table if we have just created this. IOK 2022-04-05
+        if (static::$dbversion == 2) {
+            $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'");
+            $login = VippsLogin::instance();
+            foreach($mapped as $entry) {
+                $uid = $entry['user_id'];
+                $phone = get_user_meta($userid, '_vipps_phone',true);
+                $sub = get_user_meta($userid, '_vipps_id',true);
+                if ($phone && $sub) {
+                   $login->map_phone_to_user($phone, $sub, get_user_by('id', $uid)); 
+                }
+            }
+        }
 
         $ok = true;
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
