@@ -126,7 +126,7 @@ class VippsLogin {
         add_action('continue_with_vipps_error_synch', array($this, 'continue_with_vipps_error_synch'), 10, 4);
         add_action('continue_with_vipps_error_wordpress_synch', array($this, 'continue_with_vipps_error_wordpress_synch'), 10, 4);
 
-        // This is for confirming logins with username/password. Emails must match.
+        // This is for confirming - with Vipps - an already existing user.
         add_action('continue_with_vipps_confirm_login', array($this, 'continue_with_vipps_confirm_login'), 10, 2);
         add_action('continue_with_vipps_error_confirm_login', array($this, 'continue_with_vipps_error_confirm_login'), 10, 4);
     }
@@ -839,6 +839,7 @@ class VippsLogin {
     // can redirect to the final page ('login_redirect').  IOK 2019-10-14
     // This page is also parametrized on the passed application so that for instance Woo can update addressses and so forth. IOK 2019-10-14
     protected function actually_login_user($user,$sid=null,$session=null) {
+error_log(print_r($session, true));
         // Note our session ID. This also will indicate that we have logged in via Vipps. IOK 2020-12-21
         $this->currentSid = array($user->ID, $sid);
 
@@ -1011,7 +1012,9 @@ class VippsLogin {
         } else  {
             // Else, use  the verified email address to retrieve the user
             $mapped = false;
-            $user = get_user_by('email',$email); // IOK FIXME Here, actually check the verified status as provided! It should always be true, but still.
+            if (intval($userinfo['email_verified'])) {
+                $user = get_user_by('email',$email); 
+            }
         } 
         // Allow a filter to find the user for special applications (phone number as username etc etc)
         $user = apply_filters( 'login_with_vipps_authenticate_user', $user, $userinfo, $session); 
@@ -1222,6 +1225,7 @@ class VippsLogin {
     // session is good. Therefore we will just log right in.  If there are other MFA applications active, they may cause an interesting loop at this point, so probably don't do that.
     //  IOK 2019-10-14.
     public function continue_with_vipps_confirm_login ($userinfo,$session) {
+
         $userid = $session['uid'];
         $user = new WP_User($userid);
         $referer = $session['referer'];
@@ -1243,18 +1247,38 @@ class VippsLogin {
         $email = $userinfo['email'];
         // $sid=  $userinfo['sid'];
         $sid = 'no_longer_relevant'; // IOK 2021-03-23 SID no longer avaiable from $userinfo.
+        $phone =  $userinfo['phone_number'];
+        $sub =  $userinfo['sub'];
 
-        $verifieduser = get_user_by('email',$email);
-        if ($verifieduser->ID != $userid) {
+        // First, see if we have this user already mapped
+        $mapped = false;
+        $verifieduser = $this->get_user_by_vipps_phone($phone);
+        if ($verifieduser) {
+            $mapped = true;
+        } else  {
+            // Else, use  the verified email address to retrieve the user
+            $mapped = false;
+            if (intval($userinfo['email_verified'])) {
+                $verifieduser = get_user_by('email',$email); 
+            }
+        }
+        // Allow a filter to find the user for special applications (phone number as username etc etc)
+        $verifieduser = apply_filters( 'login_with_vipps_authenticate_user', $verifieduser, $userinfo, $session);
+
+        if ($verifieduser && $verifieduser->ID != $userid) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            return $this->continue_with_vipps_error_confirm_login('wrong_user', __('Login not confirmed: This user has a different email address than the one registered in your app', 'login-with-vipps'));
+            $sorrytext  = __('Login not confirmed: This user is not the user mapped to the Vipps account, and does not have the same email account', 'login-with-vipps');
+            $sorrytext = apply_filters('login_with_vipps_confirm_login_wrong_usertext', $sorrytext, wp_get_current_user(), $userinfo, $session);
+            return $this->continue_with_vipps_error_confirm_login('wrong_user', $sorrytext);
         }
         $this->deleteBrowserCookie();
         if ($session) $session->destroy();
 
+        $this->map_phone_to_user($phone, $sub, $user);  // Map the user to the Vipps account just in case.
         $this->actually_login_user($user,$sid,$session);
     }
+
     // The error handling punts a bit: Just print the referer and exit.
     public function continue_with_vipps_error_confirm_login ($error,$errordesc,$error_hint='',$sessiondata=array()) {
        $origin = $sessiondata['referer'];
