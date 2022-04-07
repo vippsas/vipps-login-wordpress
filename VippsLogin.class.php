@@ -912,6 +912,8 @@ class VippsLogin {
         if (!$userid) {
             return array(null, null);
         }
+        global $wpdb;
+        $tablename2  = $wpdb->prefix . 'vipps_login_users';
         $q = $wpdb->prepare("SELECT vippsphone, vippsid  FROM `{$tablename2}` WHERE userid=%d ORDER BY id DESC LIMIT 1", $userid);
         $result = $wpdb->get_row($q);
         if (!empty($result)) {
@@ -929,7 +931,7 @@ class VippsLogin {
 
     // This maintains the mapping table from Vipps phones to users, which is used for logins once the user is "connected". Before this, you will 
     // either need to be logged in (and connect), or the users' verified email address will be used. IOK 2022-04-01
-    protected function map_phone_to_user($phone, $sub, $user) {
+    public function map_phone_to_user($phone, $sub, $user) {
         global $wpdb;
         $tablename2  = $wpdb->prefix . 'vipps_login_users';
 
@@ -947,7 +949,7 @@ class VippsLogin {
         // *could* be used to log in to several accounts.
         if (! apply_filters('login_with_vipps_allow_multiple_acount_binding', false)) {
 
-           $others = $wpdb->prepare("SELECT userid FROM `{$tablename2}` WHERE vippsphone = $s AND userid != %d", $phone, $user->ID);
+           $others = $wpdb->prepare("SELECT userid FROM `{$tablename2}` WHERE vippsphone = %s AND userid != %d", $phone, $user->ID);
            // Handle the usermeta variables, temporarily. We'll delete these at some point in the future. IOK 2022-04-04
            if (is_array($others)) {
                foreach($others as $entry) {
@@ -963,7 +965,7 @@ class VippsLogin {
         return;
     }
     // In reverse. Current version unmaps every connected account, because we only allow one, but we may allow other configurations in the future. IOK 2022-04-04
-    protected function unmap_phone_to_user($user, $phone=null, $sub=null) {
+    public function unmap_phone_to_user($user, $phone=null, $sub=null) {
             $delete = null;
             if ($phone && $sub) {
                 $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone = %s AND userid = %d", $phone, $user->ID);

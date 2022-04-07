@@ -396,11 +396,12 @@ class ContinueWithVipps {
         // We also don't use a "foreign key" on the userid just to be sure that referential integrity doesn't cause issues. Therefore
         // users of this table - which is only this plugin right now - needs to do error handling on the mapped result. IOK 2022-03-25
         $tablecreatestatement2 = "CREATE TABLE `${tablename2}` (
-                  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                   vippsphone  varchar(32) not null,
                   vippsid  varchar(255) not null,
                   userid int not null,
                   modified timestamp DEFAULT CURRENT_TIMESTAMP,
+                  PRIMARY KEY  (id),
                   KEY vippsid (vippsid),
                   KEY vippsphone (vippsphone),
                   KEY userid (userid),
@@ -418,12 +419,12 @@ class ContinueWithVipps {
         }
         // Initialize the new user mapping table if we have just created this. IOK 2022-04-05
         if (static::$dbversion == 2) {
-            $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'");
+            $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'", ARRAY_A);
             $login = VippsLogin::instance();
             foreach($mapped as $entry) {
                 $uid = $entry['user_id'];
-                $phone = get_user_meta($userid, '_vipps_phone',true);
-                $sub = get_user_meta($userid, '_vipps_id',true);
+                $phone = get_user_meta($uid, '_vipps_phone',true);
+                $sub = get_user_meta($uid, '_vipps_id',true);
                 if ($phone && $sub) {
                    $login->map_phone_to_user($phone, $sub, get_user_by('id', $uid)); 
                 }
