@@ -881,7 +881,7 @@ class VippsLogin {
         global $wpdb;
          $tablename2  = $wpdb->prefix . 'vipps_login_users';
          $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsphone=%s ORDER BY id DESC LIMIT 1", $phone);
-         $result = $wpdb->get_row($q);
+         $result = $wpdb->get_row($q, ARRAY_A);
          if (!$result) return null;
          $user = get_user_by('id', $result['userid']);
          if (!is_wp_error($user)) return $user;
@@ -892,7 +892,7 @@ class VippsLogin {
         global $wpdb;
          $tablename2  = $wpdb->prefix . 'vipps_login_users';
          $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsid=%s ORDER BY id DESC LIMIT 1", $sub);
-         $result = $wpdb->get_row($q);
+         $result = $wpdb->get_row($q, ARRAY_A);
          if (!$result) return null;
          $user = get_user_by('id', $result['userid']);
          if (!is_wp_error($user)) return $user;
@@ -915,7 +915,7 @@ class VippsLogin {
         global $wpdb;
         $tablename2  = $wpdb->prefix . 'vipps_login_users';
         $q = $wpdb->prepare("SELECT vippsphone, vippsid  FROM `{$tablename2}` WHERE userid=%d ORDER BY id DESC LIMIT 1", $userid);
-        $result = $wpdb->get_row($q);
+        $result = $wpdb->get_row($q, ARRAY_A);
         if (!empty($result)) {
             return array($result['vippsphone'], $result['vippsid']);
         }
@@ -966,14 +966,19 @@ class VippsLogin {
     }
     // In reverse. Current version unmaps every connected account, because we only allow one, but we may allow other configurations in the future. IOK 2022-04-04
     public function unmap_phone_to_user($user, $phone=null, $sub=null) {
+            global $wpdb;
+            $tablename2  = $wpdb->prefix . 'vipps_login_users';
             $delete = null;
             if ($phone && $sub) {
                 $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE vippsphone = %s AND userid = %d", $phone, $user->ID);
             } else {
-                $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE AND userid = %d", $user->ID);
+                $delete = $wpdb->prepare("DELETE FROM {$tablename2} WHERE userid = %d", $user->ID);
             }
-            delete_user_meta($userid,'_vipps_phone');
-            delete_user_meta($userid,'_vipps_id');
+            if ($delete) {
+               $wpdb->query($delete);
+            }
+            delete_user_meta($user->ID,'_vipps_phone');
+            delete_user_meta($user->ID,'_vipps_id');
     }
 
     // Main login handler action! This should redirect to either a success page (the profile page as default) or it should call the error handler.

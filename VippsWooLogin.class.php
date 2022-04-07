@@ -547,7 +547,7 @@ class VippsWooLogin{
         $userid = get_current_user_id();
         if (!$userid) wp_die(__('You must be logged in to disconnect', 'login-with-vipps'));
         list($vippsphone, $vippsid) =  VippsLogin::instance()->get_vipps_account($userid);
-        VippsLogin::instance()->unmap_phone_to_user($user);
+        VippsLogin::instance()->unmap_phone_to_user(get_user_by('id', $userid));
 
         // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
