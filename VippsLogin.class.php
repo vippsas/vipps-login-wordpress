@@ -839,7 +839,6 @@ class VippsLogin {
     // can redirect to the final page ('login_redirect').  IOK 2019-10-14
     // This page is also parametrized on the passed application so that for instance Woo can update addressses and so forth. IOK 2019-10-14
     protected function actually_login_user($user,$sid=null,$session=null) {
-error_log(print_r($session, true));
         // Note our session ID. This also will indicate that we have logged in via Vipps. IOK 2020-12-21
         $this->currentSid = array($user->ID, $sid);
 
@@ -878,21 +877,11 @@ error_log(print_r($session, true));
 
     // Standard method of finding "the" user mapped to this phone number. The table in principle supports 
     // 1-n mappings, but we don't support that out of the box, as that would require user interaction on login.
-    public function get_user_by_vipps_phone($phone) {
+    // The 'sub' is unique per merchant, so we require that too.
+    public function get_user_by_vipps_creds($phone,$sub) {
         global $wpdb;
          $tablename2  = $wpdb->prefix . 'vipps_login_users';
-         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsphone=%s ORDER BY id DESC LIMIT 1", $phone);
-         $result = $wpdb->get_row($q, ARRAY_A);
-         if (!$result) return null;
-         $user = get_user_by('id', $result['userid']);
-         if (!is_wp_error($user)) return $user;
-         return null;
-    }
-    // The same, but uses the 'sub' oauth value. Not currently used.
-    public function get_user_by_vipps_id($sub) {
-        global $wpdb;
-         $tablename2  = $wpdb->prefix . 'vipps_login_users';
-         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsid=%s ORDER BY id DESC LIMIT 1", $sub);
+         $q = $wpdb->prepare("SELECT * FROM `{$tablename2}` WHERE vippsphone=%s AND vippsid=%s ORDER BY id DESC LIMIT 1", $phone, $sub);
          $result = $wpdb->get_row($q, ARRAY_A);
          if (!$result) return null;
          $user = get_user_by('id', $result['userid']);
@@ -1006,7 +995,7 @@ error_log(print_r($session, true));
 
         // First, see if we have this user already mapped:
         $mapped = false;
-        $user = $this->get_user_by_vipps_phone($phone);
+        $user = $this->get_user_by_vipps_creds($phone, $sub);
         if ($user) {
             $mapped = true;
         } else  {
@@ -1252,7 +1241,7 @@ error_log(print_r($session, true));
 
         // First, see if we have this user already mapped
         $mapped = false;
-        $verifieduser = $this->get_user_by_vipps_phone($phone);
+        $verifieduser = $this->get_user_by_vipps_creds($phone, $sub);
         if ($verifieduser) {
             $mapped = true;
         } else  {
