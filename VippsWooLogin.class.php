@@ -389,7 +389,7 @@ class VippsWooLogin{
       
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
     }
@@ -414,7 +414,7 @@ class VippsWooLogin{
         $message = apply_filters('continue_with_vipps_login_banner', $message);
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
     }
@@ -435,7 +435,7 @@ class VippsWooLogin{
         $message = apply_filters('continue_with_vipps_register_banner', $message);
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="woocommerce-info vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
     }

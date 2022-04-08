@@ -109,7 +109,8 @@ SOFTWARE.
  color: #fff;
  background-color: #fe5b24;
  font-size: 14.5px;
- padding: 5px 10px 4px 10px;
+ padding-left: 5px;
+ padding-right: 4px;
  width:80%;
  margin-top: 0;
  margin-bottom: 0;
@@ -126,28 +127,6 @@ SOFTWARE.
 /* This is for a plugin I'm doing testing with. */
 .woocommerce-cart-tab-container .widget_shopping_cart a.button.continue-with-vipps{
  min-width: 190px;
-}
-/* Banner code */
-.woocommerce-info.vipps-info {
- color:#fff;
- background-color: #fe5b24;
- border-color: #fe5b24;
-    
-}
-.woocommerce-info.vipps-info img.vipps-logo {
- margin:0px;
-}
-.woocommerce-info.vipps-info a {
- color:#fff;
- background-color: transparent;
-}
-.woocommerce-info.vipps-info a:hover {
-    color:#fff;
-    font-weight: bolder;
-    background-color: transparent;
-}
-.woocommerce-info.vipps-info::before {
- color:#fff;
 }
 
 /* Make this very specific */
@@ -168,3 +147,51 @@ html body img.inline.vipps-logo {
     display:inline-block;
     background-size: 1em 1em;
 }
+
+/* For the banners - replicate default Woo banner css for this because too many themes override */
+.vipps-banner.vipps-info {
+    color: #fff;
+    background-color: #fe5b24;
+    border-color: #fe5b24;
+    border-color: #fe5b24;
+}
+.vipps-banner.vipps-info img.vipps-logo {
+ margin:0px;
+}
+.vipps-banner.vipps-info::before {
+    color: #fff;
+}
+.vipps-banner.vipps-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before {
+    font-family: "Font Awesome 5 Free";
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 1.05em;
+    left: 1.5em;
+    color: #fff;
+}
+.vipps-banner.vipps-info::after {
+    clear: both;
+}
+.vipps-banner.vipps-info a {
+    color:white;
+    background-color:#fe5b24;
+
+}
+.vipps-banner.vipps-info {
+    margin-bottom: 2.617924em;
+    margin-left: 0;
+    border-radius: 2px;
+    color: #fff;
+    clear: both;
+    border-left: 0.6180469716em solid rgba(0,0,0,.15);
+    padding: 1em 2em 1em 3.5em;
+    position: relative;
+    list-style: none outside;
+}
+.vipps-banner.vipps--info.vipps-info a:hover {
+    color:#fff;
+    font-weight: bolder;
+    background-color: transparent;
+}
+
