@@ -417,19 +417,6 @@ class ContinueWithVipps {
         foreach ($result as $s) {
             error_log($s);
         }
-        // Initialize the new user mapping table if we have just created this. IOK 2022-04-05
-        if (static::$dbversion == 2) {
-            $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'", ARRAY_A);
-            $login = VippsLogin::instance();
-            foreach($mapped as $entry) {
-                $uid = $entry['user_id'];
-                $phone = get_user_meta($uid, '_vipps_phone',true);
-                $sub = get_user_meta($uid, '_vipps_id',true);
-                if ($phone && $sub) {
-                   $login->map_phone_to_user($phone, $sub, get_user_by('id', $uid)); 
-                }
-            }
-        }
 
         $ok = true;
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
@@ -441,7 +428,23 @@ class ContinueWithVipps {
         if($exists != $tablename2) {
             $ok = false;
             $this->add_admin_notice(__('Could not create user identity table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
+        } else {
+            $any = $wpdb->get_row("SELECT userid FROM `{$tablename2}` WHERE 1 LIMIT 1", ARRAY_A);
+            if (empty($any)) {
+                $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'", ARRAY_A);
+                $login = VippsLogin::instance();
+                foreach($mapped as $entry) {
+                    $uid = $entry['user_id'];
+                    $phone = get_user_meta($uid, '_vipps_phone',true);
+                    $sub = get_user_meta($uid, '_vipps_id',true);
+                    if ($phone && $sub) {
+                        $login->map_phone_to_user($phone, $sub, get_user_by('id', $uid)); 
+                    }
+                }
+            }
         }
+
+
         if ($ok) {
             error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
             $options['dbversion']=static::$dbversion;
