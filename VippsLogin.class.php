@@ -557,6 +557,7 @@ class VippsLogin {
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
             $user = wp_get_current_user();
             $this->unmap_phone_to_user($user);
+            $this->log(sprintf(__("Unmapping user %d from Vipps", 'login-with-vipps'), $user->ID));
             $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
             $continue = ContinueWithVipps::instance();
             $continue->add_admin_notice($notice);
@@ -863,6 +864,10 @@ class VippsLogin {
                 return $data;
                 }, 10, 2);
 
+        if ($session && isset($session['userinfo'])) {
+            $this->log(sprintf(__("User %d logged in with Vipps phone %s", 'login-with-vipps'), $user->ID, $session['userinfo']['phone_number']));
+        }
+
         wp_set_auth_cookie($user->ID, false);
         wp_set_current_user($user->ID,$user->user_login); // 'secure'
         do_action('wp_login', $user->user_login, $user);
@@ -1075,6 +1080,7 @@ class VippsLogin {
             update_user_meta($user_id, '_vipps_just_connected', 1);
             // This is currently mostly for Woo, but in general: User has no address, so please update addresses when logging in. IOK 2019-10-25
             update_user_meta($user_id,'_vipps_synchronize_addresses', 1);
+            $this->log(sprintf(__("Vipps user with phone %s just connected to account %d during account creation", 'login-with-vipps'), $phone, $user_id));
 
             $user = get_user_by('id', $user_id);
 
@@ -1116,6 +1122,7 @@ class VippsLogin {
         if (!$require_confirmation) {
             $this->map_phone_to_user($phone, $sub, $user); 
             update_user_meta($user->ID,'_vipps_just_connected', 1);
+            $this->log(sprintf(__("Vipps user with phone %s just connected to account %d during login", 'login-with-vipps'), $phone, $user->ID));
             $this->actually_login_user($user,$sid,$session);
             exit();
         }
@@ -1191,7 +1198,7 @@ class VippsLogin {
         // By default we will only allow 'new' connections where the verified Vipps email address is the same
         // as the account email. This is to be completely sure this can't be gamed. We may relieve this constraint
         // in time, and we allow a filter to change the constraint for developers with specific needs. IOK 2022-04-04
-        $ok = $user->email == $email; 
+        $ok = $user->user_email == $email; 
         $ok = apply_filters('login_with_vipps_allow_connection', $ok, $user, $userinfo);
         if (!$ok) {
             if($session) $session->destroy();
@@ -1203,6 +1210,7 @@ class VippsLogin {
         // Actually connect user to phone/sub here
         $this->map_phone_to_user($phone, $sub, $user);
         update_user_meta($userid, '_vipps_just_connected', 1);
+        $this->log(sprintf(__("Vipps user with phone %s just connected to account %d", 'login-with-vipps'), $phone, $userid));
 
         do_action("continue_with_vipps_{$app}_confirm_before_redirect", $userid, $userinfo, $session);
 
