@@ -159,3 +159,12 @@ html body img.inline.vipps-logo {
  border:0;
  background-color:transparent;
 }
+
+/* For the My Account page */
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before {
+    content: " ";
+    height:1em;
+    width:1em;
+    display:inline-block;
+    background-size: 1em 1em;
+}
