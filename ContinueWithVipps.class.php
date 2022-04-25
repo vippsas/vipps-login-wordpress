@@ -390,7 +390,7 @@ class ContinueWithVipps {
                   KEY expire (expire)
                       ) ${charset_collate};";
 
-        // This really mapps a single vippsid (phone no) to a single user id, but we don't enforce it
+        // This really mapps a single vippsid (and phone no) to a single user id, but we don't enforce it
         // in the database in case further development or plugins would like to allow for having a single Vipps acount
         // allow for login to more than one WP account. Because of this, we use an arbitrary int as a primary key for the mapping.
         // We also don't use a "foreign key" on the userid just to be sure that referential integrity doesn't cause issues. Therefore
@@ -429,6 +429,8 @@ class ContinueWithVipps {
             $ok = false;
             $this->add_admin_notice(__('Could not create user identity table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
         } else {
+            // Initialize the table with the old user-meta values, if it is empty. This code will be removed in future versions.
+            // IOK 2022-04-25
             $any = $wpdb->get_row("SELECT userid FROM `{$tablename2}` WHERE 1 LIMIT 1", ARRAY_A);
             if (empty($any)) {
                 $mapped =  $wpdb->get_results("SELECT user_id FROM `{$wpdb->usermeta}` WHERE meta_key = '_vipps_phone'", ARRAY_A);
@@ -443,7 +445,6 @@ class ContinueWithVipps {
                 }
             }
         }
-
 
         if ($ok) {
             error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
