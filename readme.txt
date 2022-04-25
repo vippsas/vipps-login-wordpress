@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 5.9.2
+Tested up to: 5.9.3
 Requires PHP: 7.0
 Stable tag: 1.2.0
 License: MIT
@@ -112,10 +112,14 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Upgrade Notice ==
-Version 1.1.21: Removed the api_version_2 scope
+= Version 1.2.0 =
+* Added a new table to map Vipps ID's to users; thus allowing users to change their email in WordPress without this affecting their login. 
+* Added a filter to find users that have not yet registered so this can use other data than the email to match Vipps user to WP user.
+* Changed the CSS to be more independent of standard WooCommerce, to avoid themes modifying this too much
+* Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
 
 == Changelog ==
-= 2022.0x.xx Version 1.2.0 =
+= 2022.04.25 Version 1.2.0 =
 * Add support for using the phone number as Vipps ID for users
 * Removes old "verify your email account" code as it was not future-proof. Filters allow developers to reimplement this if neccessary
 * Fix CSS to be more independent of certain themes
