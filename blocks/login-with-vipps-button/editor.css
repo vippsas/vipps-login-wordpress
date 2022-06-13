@@ -7,3 +7,7 @@
 .wp-block-login-with-vipps-login-with-vipps {
 	border: 1px dotted #f00;
 }
+
+.vipps-smile.vipps-component-icon {
+    width: 24px;
+}
