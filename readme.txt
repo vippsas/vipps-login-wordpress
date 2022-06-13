@@ -120,7 +120,7 @@ The rest is a simple matter of programming.
 * Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
 
 == Changelog ==
-= 2022.06.xx Version 1.2.1 =
+= 2022.06.13 Version 1.2.1 =
 * Small fix for Gutenberg blocks
 
 = 2022.04.25 Version 1.2.0 =
