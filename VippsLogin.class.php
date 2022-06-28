@@ -864,10 +864,6 @@ class VippsLogin {
                 return $data;
                 }, 10, 2);
 
-        if ($session && isset($session['userinfo'])) {
-            $this->log(sprintf(__("User %d logged in with Vipps phone %s", 'login-with-vipps'), $user->ID, $session['userinfo']['phone_number']));
-        }
-
         wp_set_auth_cookie($user->ID, false);
         wp_set_current_user($user->ID,$user->user_login); // 'secure'
         do_action('wp_login', $user->user_login, $user);
