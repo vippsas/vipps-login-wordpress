@@ -58,19 +58,21 @@ class VippsSession implements ArrayAccess {
         return $this;
     }
 
-    public function offsetExists ($offset) {
+    public function offsetExists ($offset) : bool {
         return isset($this->contents[$offset]);
     }
-    public function offsetGet ($offset) {
+    public function offsetGet ($offset) : mixed {
         return $this->contents[$offset];
     }
-    public function offsetSet($offset,$value) {
+    public function offsetSet($offset,$value) : void {
         $this->contents[$offset] = $value;
-        return $this->update($this->contents);
+        $this->update($this->contents);
+        return;
     }
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset) : void {
         unset($this->contents[$offset]);
-        return $this->update($this->contents);
+        $this->update($this->contents);
+        return;
     }
     public static function create($input=array(), $expire=3600) {
         global $wpdb;

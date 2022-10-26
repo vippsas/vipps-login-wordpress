@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 6.0.0
-Requires PHP: 7.0
-Stable tag: 1.2.1
+Tested up to: 6.1.0
+Requires PHP: 7.2
+Stable tag: 1.2.2
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -45,6 +45,7 @@ Login with Vipps is free for both websites and end users.
 == Upgrade Notice ==
 Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses; cleanup
 Version 1.2.1: Minor fix for Gutenberg block
+Version 1.2.2: Testing on 6.1
 
 == Feature Highlights ==
 
@@ -120,6 +121,9 @@ The rest is a simple matter of programming.
 * Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
 
 == Changelog ==
+= 2022.10.31 Version 1.2.2 =
+* Testing for 6.1.0
+
 = 2022.06.13 Version 1.2.1 =
 * Small fix for Gutenberg blocks
 
