@@ -121,7 +121,7 @@ The rest is a simple matter of programming.
 * Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
 
 == Changelog ==
-= 2022.10.31 Version 1.2.2 =
+= 2022.10.26 Version 1.2.2 =
 * Testing for 6.1.0
 
 = 2022.06.13 Version 1.2.1 =
