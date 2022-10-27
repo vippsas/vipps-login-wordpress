@@ -61,7 +61,7 @@ class VippsSession implements ArrayAccess {
     public function offsetExists ($offset) : bool {
         return isset($this->contents[$offset]);
     }
-    public function offsetGet ($offset) : mixed {
+    public function offsetGet ($offset) {
         return $this->contents[$offset];
     }
     public function offsetSet($offset,$value) : void {
