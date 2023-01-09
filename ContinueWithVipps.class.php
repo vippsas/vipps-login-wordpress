@@ -305,12 +305,12 @@ class ContinueWithVipps {
 
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars($options['clientid']);?>" autocomplete="off" type="password"></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientid']);?>" autocomplete="off" type="password"></td>
             <td><?php _e("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field",'login-with-vipps'); ?></td>
             </tr>
             <tr>
             <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars($options['clientsecret']);?>" autocomplete="off"  type="password"></td>
+            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientsecret']);?>" autocomplete="off"  type="password"></td>
             <td><?php _e("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field",'login-with-vipps'); ?></td>
             </tr>
 

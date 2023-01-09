@@ -1,8 +1,8 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.2.3
-   Stable tag: 1.2.3
+   Version: 1.2.4
+   Stable tag: 1.2.4
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 4.9.6
-   Tested up to: 6.1.0
+   Tested up to: 6.1.1
    Requires PHP: 7.2
    Text-domain: login-with-vipps
    Domain Path: /languages
@@ -51,11 +51,17 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define('VIPPS_LOGIN_VERSION', '1.2.3');
+define('VIPPS_LOGIN_VERSION', '1.2.4');
 
 // Utility classes used to verify JWT tokens and manage login sessions. IOK 2019-10-14
-require_once(dirname(__FILE__) . '/VippsSession.class.php');
 require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
+
+// Handle the issue with return type 'mixed' IOK 2023-01-09
+if (PHP_MAJOR_VERSION >= 8) {
+   require_once(dirname(__FILE__) . '/VippsSession.class.php');
+} else {
+   require_once(dirname(__FILE__) . '/legacy/VippsSession.class.php');
+}
 
 // This is the main class, a singleton. We'll store it in a global variable for hook-writing-convenience. IOK 2019-10-14
 global $ContinueWithVipps;

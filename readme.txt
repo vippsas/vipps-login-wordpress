@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 6.1.0
+Tested up to: 6.1.1
 Requires PHP: 7.2
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -47,6 +47,7 @@ Version 1.2.0: Adds support for using the phone number as "login key" and changi
 Version 1.2.1: Minor fix for Gutenberg block
 Version 1.2.2: Testing on 6.1
 Version 1.2.3: Fix compatibility with php 7.4
+Version 1.2.4: Fix compatibility with php 8.1
 
 == Feature Highlights ==
 
@@ -122,6 +123,9 @@ The rest is a simple matter of programming.
 * Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
 
 == Changelog ==
+= 2023.01.09 Version 1.2.3 =
+* Fix deprection warning under php8.1
+
 = 2022.10.27 Version 1.2.3 =
 * Fix compatibility with 7.4
 

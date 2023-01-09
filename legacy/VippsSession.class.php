@@ -1,6 +1,9 @@
 <?php 
 /*
       VippsSession:
+
+        This is a version of this class that works with PHP 7.4
+
         This class implements persistent sessions stored in the database
         with a timeout value. It implements the ArrayAccess interface
         so that you can access the stored values as if it was a hash
@@ -61,7 +64,7 @@ class VippsSession implements ArrayAccess {
     public function offsetExists ($offset) : bool {
         return isset($this->contents[$offset]);
     }
-    public function offsetGet (mixed $offset) : mixed {
+    public function offsetGet ($offset) {
         return $this->contents[$offset];
     }
     public function offsetSet($offset,$value) : void {

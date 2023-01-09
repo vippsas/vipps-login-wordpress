@@ -583,7 +583,7 @@ class VippsLogin {
             list ($userid, $sid) = $this->currentSid; 
             if (!$sid) {
                 $options = get_option('vipps_login_options2');
-                $option_roles= $options['required_roles'];
+                $option_roles= isset($options['required_roles']) ? $options['required_roles'] : [];
                 if (!is_array($option_roles)) $option_roles=array();
 
                 $needs_verification = false;
