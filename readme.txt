@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 6.1.1
 Requires PHP: 7.2
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -48,6 +48,7 @@ Version 1.2.1: Minor fix for Gutenberg block
 Version 1.2.2: Testing on 6.1
 Version 1.2.3: Fix compatibility with php 7.4
 Version 1.2.4: Fix compatibility with php 8.1
+Version 1.2.5: Add filter for "invalid user" message
 
 == Feature Highlights ==
 
@@ -115,14 +116,10 @@ These are the main steps:
 
 The rest is a simple matter of programming.
 
-== Upgrade Notice ==
-= Version 1.2.0 =
-* Added a new table to map Vipps ID's to users; thus allowing users to change their email in WordPress without this affecting their login. 
-* Added a filter to find users that have not yet registered so this can use other data than the email to match Vipps user to WP user.
-* Changed the CSS to be more independent of standard WooCommerce, to avoid themes modifying this too much
-* Removed the old "Verify your account" code as it is no longer needed and used internal WP interfaces
-
 == Changelog ==
+= 2023.02.08 Version 1.2.4 =
+* Add filter for the error message when the user is invalid
+
 = 2023.01.09 Version 1.2.3 =
 * Fix deprection warning under php8.1
 

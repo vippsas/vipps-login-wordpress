@@ -828,6 +828,9 @@ class VippsLogin {
         $continue = ContinueWithVipps::instance();
         $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login','referer'=>$referer)) : null;
 
+        // Final chance for tweaking error messages
+        $errordesc = apply_filters('continue_with_vipps_login_errordescription', $errordesc, $error, $sessiondata, $application); 
+
         // This would be for an application to extend the session if needed IOK 2019-10-08 
         do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $error_hint, $session);
 
@@ -1043,7 +1046,11 @@ class VippsLogin {
         if (!$user && !$can_register) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('unknown_user', __('Could not find any user with your registered email. Cannot log in.', 'login-with-vipps'), '', $session);
+ 
+            $msg = __('Could not find any user with your registered email. Cannot log in.', 'login-with-vipps');
+            $msg = apply_filters('login_with_vipps_invalid_user_message', $msg, $userinfo, $session); 
+
+            $this->continue_with_vipps_error_login('unknown_user', $msg, '', $session);
             exit();
         }
 
