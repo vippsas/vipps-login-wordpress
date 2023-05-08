@@ -79,6 +79,7 @@ SOFTWARE.
 }
 
 .continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
+ text-decoration: none;
  font-size: 1em;
  line-height: 2em;
  font-weight: 500;

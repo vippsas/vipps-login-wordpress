@@ -829,7 +829,7 @@ class VippsLogin {
         $session = $createSession ? VippsSession::create(array('application'=>$app, 'error'=>$error,'errordesc'=>$errordesc,'error_hint'=>$error_hint,'action'=>'login','referer'=>$referer)) : null;
 
         // Final chance for tweaking error messages
-        $errordesc = apply_filters('continue_with_vipps_login_errordescription', $errordesc, $error, $sessiondata, $application); 
+        $errordesc = apply_filters('continue_with_vipps_login_errordescription', $errordesc, $error, $sessiondata, $app); 
 
         // This would be for an application to extend the session if needed IOK 2019-10-08 
         do_action("continue_with_vipps_error_{$app}_login", $error, $errordesc, $error_hint, $session);
