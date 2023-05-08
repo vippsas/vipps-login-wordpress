@@ -40,9 +40,6 @@ function login_with_vipps(application, more_data) {
     if (typeof wp !== 'undefined' && typeof wp.hooks !== 'undefined') {
          data = wp.hooks.applyFilters('loginWithVippsExtraData', data);
     }
-    // But let's not overwrite these
-    data['action'] = 'vipps_login_get_link';
-    data['application'] = application;
 
     // for WPML. IOK 2021-08-31
     if (vippsLoginConfig['lang']) {
