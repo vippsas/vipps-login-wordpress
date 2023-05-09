@@ -195,7 +195,8 @@ class VippsLogin {
         $cookie = $this->setBrowserCookie();
         $data['cookie'] = $cookie;
         $data['application'] = $application;
-        $url = ContinueWithVipps::getAuthRedirect('login',$data);
+        $action = apply_filters('login_with_vipps_login_action', 'login', $application, $data);
+        $url = ContinueWithVipps::getAuthRedirect($action ,$data);
         return $url;
     }
 
