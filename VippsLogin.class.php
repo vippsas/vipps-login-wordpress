@@ -61,7 +61,7 @@ class VippsLogin {
             return 0;
         }
         $options = get_option('vipps_login_options2');
-        $usevipps = $options['use_vipps_login'];
+        $usevipps = @$options['use_vipps_login'];
         static::$isactive   = $usevipps;
         return $usevipps;
     }

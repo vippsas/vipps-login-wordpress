@@ -205,11 +205,11 @@ class VippsWooLogin{
              <td><?php _e("Change 'Continue with Vipps' banner text", 'login-with-vipps'); ?></td>
              <td><input style="width:100%" type="text" 
                         name="vipps_login_woo_options[woo-banner-text]" 
-                        value="<?php echo esc_attr($options['woo-banner-text']); ?>"
+                        value="<?php echo esc_attr(@$options['woo-banner-text']); ?>"
                         placeholder="<?php echo sprintf(__('Log in or register an account using %s.', 'login-with-vipps'), 'VIPPS'); ?>">
                  <input style="width:100%" type="text" 
                         name="vipps_login_woo_options[woo-banner-linktext]" 
-                        value="<?php echo esc_attr($options['woo-banner-linktext']); ?>" 
+                        value="<?php echo esc_attr(@$options['woo-banner-linktext']); ?>" 
                         placeholder="<?php _e('Click here to continue', 'login-with-vipps'); ?>" >
             </td>
             <td><?php _e('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text and linktext. VIPPS in all caps will be replaced by the Vipps logo', 'login-with-vipps'); ?></td>
@@ -245,7 +245,7 @@ class VippsWooLogin{
         $allowcreateoncheckout = apply_filters( 'woocommerce_checkout_registration_enabled', 'yes' === get_option( 'woocommerce_enable_signup_and_login_from_checkout' ) );
         $allowcreatedefault = $allowcreateoncheckout||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
-        $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true);
+        $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true, 'woo-banner-linktext'=>'', 'woo-banner-text'=>'', 'woo-banner-clickable'=>false);
         add_option('vipps_login_woo_options',$default, false, true);
         $this->add_rewrite_rules();
         $this->maybe_flush_rewrite_rules();
