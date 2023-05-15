@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 6.2
 Requires PHP: 7.2
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -49,6 +49,7 @@ Version 1.2.2: Testing on 6.1
 Version 1.2.3: Fix compatibility with php 7.4
 Version 1.2.4: Fix compatibility with php 8.1
 Version 1.2.5: Add filter for "invalid user" message
+Version 1.2.6: Removed restrictions on filtering application and action in javascript; simplifying reuse of the Login block
 
 == Feature Highlights ==
 
@@ -117,6 +118,11 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2023.05.15 Version 1.2.6 =
+Small bugfixes, removal on some restrictions to aid implementation of non-login applications
+
+= 2023.03.27 Version 1.2.5 =
+
 = 2023.02.08 Version 1.2.4 =
 * Add filter for the error message when the user is invalid
 
