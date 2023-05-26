@@ -4,7 +4,9 @@ This repository contains the WordPress plugin "Login with Vipps".
 
 Login with Vipps is the easiest way to sign in and create an account. No need to worry about usernames and passwords.
 
-See the main GitHub page for Vipps contact information, etc: [https://github.com/vippsas](https://github.com/vippsas)
+To contact Vipps, see the [contact us](https://developer.vippsmobilepay.com/docs/vipps-developers/contact/) page.
+
+This plugin is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).
 
 ## Description
 Login with Vipps is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number. Vipps, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
@@ -35,7 +37,7 @@ Allows login and registration on your account pages, cart, checkout and via shor
 Users don't need to worry about forgetting usernames and passwords. All they need to sign in is their phone number. For an even smoother sign in experience, the user can choose to be remembered in the browser, enabling automatic sign-ins for later visits.
 
 ### User can register with one click 
-Login with Vipps is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birth date. The identity of all Vipps users is verified using BankID, Norway's leading electronic ID, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
+Login with Vipps is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birthdate. The identity of all Vipps users is verified using BankID, Norway's leading electronic ID, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
 
 
 ### Link existing account 
@@ -69,7 +71,7 @@ Logging into basic Wordpress and into an application like WooCommerce is differe
   * Filter 'continue_with_vipps_*your application*_create_userdata'. For newly registered users, takes an array to be passed to wp_update_user, an array of userinfo from Vipps, and a session. You can here add your extra meta fields
   * Filter 'continue_with_vipps_*your application*_allow_login'. Takes a truth value, a user object, userinfo from Vipps and a session, and returns true only if the user is allowed to log in
 ###  Adding another 'action' apart from logging in 
-You may want to do other things than logging in with the users' confirmed Vipps identity, and this plugin absolutely allows this. This might be submisssions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address.
+You may want to do other things than logging in with the users' confirmed Vipps identity, and this plugin absolutely allows this. This might be submissions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address.
 
 These are the main steps:
  * Define your own action, like 'submitaddress'.
