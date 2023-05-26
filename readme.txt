@@ -72,7 +72,7 @@ You can use the framework of this plugin to implement other solutions that requi
 == Installation ==
 **If you are an existing Vipps customer**, log onto the Vipps portal https://portal.vipps.no and retreive your API keys that you will need to install Login with Vipps
 
-**If you are a new Vipps customer**, apply for an account [here](https://vipps.no/signup/logginnmedvipps) - before downloading the plugin. Choose "Integration through your partner", or if you don't know your partner, choose "direct integration" and fill out the form. When your application is approved, you will recieve the API keys that you will need to install the plugin.
+**If you are a new Vipps customer**, apply for an account [here](https://vipps.no/signup/logginnmedvipps) - before downloading the plugin. Choose "Integration through your partner", or if you don't know your partner, choose "direct integration" and fill out the form. When your application is approved, you will receive the API keys that you will need to install the plugin.
 
  1. Install the plugin using WordPress' [built-in installer](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins). The plugin can also be installed manually by upload the plugin files to the /wp-content/plugins/ directory.
  2. Activate the plugin through the \'Plugins\' screen in WordPress.
@@ -113,7 +113,7 @@ These are the main steps:
  * Define your own action, like 'submitaddress'.
  * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)` (you can also provide an array of sessiondata which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is an URL to which you should redirect your user.
  * Create your error handler. This should be hooked to 'continue_with_vipps_error_*your action*'. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here, and show your user the error. The redirect is important, you should not output content in this action.
- * Create your succes handler. This should be hooked to 'continue_with_vipps_*your action*'. It will recieve an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page. 
+ * Create your succes handler. This should be hooked to 'continue_with_vipps_*your action*'. It will receive an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page. 
 
 The rest is a simple matter of programming.
 

@@ -21,7 +21,7 @@ Login with Vipps suits all websites that need users to sign in and want to tailo
  * 
 ## Requirements
 
- * Wordpress version 4.9 or above
+ * WordPress version 4.9 or above
  * PHP version 7.0 or above
  * Your website must have an SSL certificate and be available through HTTPS
  * OpenSSL must be configured for your PHP installation
@@ -76,9 +76,9 @@ You may want to do other things than logging in with the users' confirmed Vipps 
 These are the main steps:
  * Define your own action, like 'submitaddress'.
  * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)` (you can also provide an array of sessiondata which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is an URL to which you should redirect your user.
- * Create your success handler. This should be
+ * Create your success handler.
  * Create your error handler. This should be hooked to 'continue_with_vipps_error_*your action*'. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here, and show your user the error. The redirect is important, you should not output content in this action.
- * Create your succes handler. This should be hooked to 'continue_with_vipps_*your action*'. It will recieve an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page.
+ * Create your success handler. This should be hooked to 'continue_with_vipps_*your action*'. It will receive an array of user information from Vipps, and a live session. This handler too should end with a redirect to your success page.
 
 The rest is a simple matter of programming.
 
