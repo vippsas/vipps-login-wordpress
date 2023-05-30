@@ -55,7 +55,7 @@ Login with Vipps can be added to all relevant pages in your web shop: login, reg
 
 ### Free of charge
 
-Login with Vipps is free of charge for site owners and end-users. Merchants that already use Vipps online payment can add Sign in with Vipps to their account at [https://portal.vipps.no](https://portal.vipps.no). New site owners need to set-up an agreement with Vipps to use the service. This can be ordered here: [https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang](https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang).
+Login with Vipps is free of charge for site owners and end-users. Merchants that already use Vipps online payment can add Sign in with Vipps to their account at [https://portal.vipps.no](https://portal.vipps.no). New site owners need to set up an agreement with Vipps to use the service. This can be ordered [here](https://portal.vipps.no/login).
 
 ### Customizable for your application
 
@@ -63,7 +63,7 @@ You can use the framework of this plugin to implement other signed actions, such
 
 ## Shortcodes
 
- * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WorPpress or WooCommerce.
+ * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WordPress or WooCommerce.
 * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
 
 ## Customizing the Plugin
@@ -72,10 +72,10 @@ To use 'Continue with Vipps' in your application, there are two levels of custom
 
 ### Adding another 'application' to log into
 
-Logging into basic WordPress and into an application like WooCommerce is different in the details, especially with regards to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the users' address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
+Logging into basic WordPress and into an application like WooCommerce is different in the details, especially in regard to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the users' address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
 
   * Define your application with a name. It should be a simple slug, like 'wordpress' or 'woocommerce'
-  * Create your login button, and make it call the supplied Javascript function "login_with_vipps" with your application name as argument.
+  * Create your login button, and make it call the supplied JavaScript function "login_with_vipps" with your application name as argument.
   * To customize, you can now modify several filters and hooks, the most important of which would be:
   * 'continue_with_vipps_error_*your application*_login_redirect'. This takes and returns an error-page redirect, the error string, and the login session data as an array. You can here return your own error page.
   * 'continue_with_vipps_before_*your application*_login_redirect'. This takes your logged-in user and a session (which can be called as an array) and is called right before the user is redirected. This would be a good place to add a filter to 'login_redirect' for instance.
