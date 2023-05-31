@@ -1,5 +1,9 @@
 # Log in with Vipps for WordPress and WooCommerce
 
+<!-- START_COMMENT -->
+💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/vipps-plugins/). 💥
+<!-- END_COMMENT -->
+
 This repository contains the WordPress plugin "Login with Vipps".
 
 Login with Vipps is the easiest way to sign in and create an account. No need to worry about usernames and passwords.
