@@ -13,8 +13,6 @@ END_METADATA -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/vipps-plugins/). 💥
 <!-- END_COMMENT -->
 
-This module is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).
-
 *Login with Vipps* is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number. Vipps, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
 
 Vipps is the leading smart payment app in Norway, used by more than 75% of Norwegians and tops the list of most positive word of mouth for any brand.
@@ -24,6 +22,9 @@ Vipps is the leading smart payment app in Norway, used by more than 75% of Norwe
 * Anyone with Vipps can create a profile on your website with just one click and can be directly signed in at the next visit.
 * Your customers get what they want faster
 * You get more people signed in, leading to more insight and increased conversion.
+
+This module is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).
+For support, see [Login with Vipps on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).
 
 ## Requirements
 
