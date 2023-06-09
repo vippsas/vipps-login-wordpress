@@ -1,13 +1,15 @@
 <!-- START_METADATA
 ---
-title: Login for WordPress and WooCommerce
+title: Vipps Login for WordPress and WooCommerce
 sidebar_position: 1
 pagination_next: null
 pagination_prev: null
 ---
 END_METADATA -->
 
-# Login for WordPress and WooCommerce
+# Vipps Login for WordPress and WooCommerce
+
+*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).*
 
 <!-- START_COMMENT -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/vipps-plugins/). 💥
