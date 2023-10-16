@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 6.2
+Tested up to: 6.4
 Requires PHP: 7.2
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -118,6 +118,10 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2023.xx.xx Version 1.2.7 =
+Fix some 8.2 deprecations
+
+
 = 2023.05.15 Version 1.2.6 =
 Small bugfixes, removal on some restrictions to aid implementation of non-login applications
 
