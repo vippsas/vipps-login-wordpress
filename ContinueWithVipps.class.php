@@ -382,7 +382,7 @@ class ContinueWithVipps {
         // 'state', the primary key, is created large enough to contain a SHA256 hash, but is 
         // varchar just in case. IOK 2019-10-14
         // For the syntax here, remember to consult https://codex.wordpress.org/Creating_Tables_with_Plugins
-        $tablecreatestatement = "CREATE TABLE `${tablename}` (
+        $tablecreatestatement = "CREATE TABLE `{$tablename}` (
             state varchar(44) NOT NULL,
                   expire timestamp DEFAULT CURRENT_TIMESTAMP,
                   content text DEFAULT '',
@@ -395,7 +395,7 @@ class ContinueWithVipps {
         // allow for login to more than one WP account. Because of this, we use an arbitrary int as a primary key for the mapping.
         // We also don't use a "foreign key" on the userid just to be sure that referential integrity doesn't cause issues. Therefore
         // users of this table - which is only this plugin right now - needs to do error handling on the mapped result. IOK 2022-03-25
-        $tablecreatestatement2 = "CREATE TABLE `${tablename2}` (
+        $tablecreatestatement2 = "CREATE TABLE `{$tablename2}` (
                   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                   vippsphone  varchar(32) not null,
                   vippsid  varchar(255) not null,
