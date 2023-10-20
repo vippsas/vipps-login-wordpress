@@ -11,7 +11,12 @@ END_METADATA -->
 
 ![Support and development by WP Hosting ](./docs/images/wphosting.svg#gh-light-mode-only)![Support and development by WP Hosting](./docs/images/wphosting_dark.svg#gh-dark-mode-only)
 
-*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).*
+![Vipps](./docs/images/vipps.png) *Available for Vipps.*
+
+![MobilePay](./docs/images/mp.png) *Availability for MobilePay has not yet been determined.*
+
+
+*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
 
 <!-- START_COMMENT -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/plugins/). 💥
@@ -26,9 +31,6 @@ Vipps is the leading smart payment app in Norway, used by more than 75% of Norwe
 * Anyone with Vipps can create a profile on your website with just one click and can be directly signed in at the next visit.
 * Your customers get what they want faster
 * You get more people signed in, leading to more insight and increased conversion.
-
-This module is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress).
-For support, see [Login with Vipps on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).
 
 ## Requirements
 
