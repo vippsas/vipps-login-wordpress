@@ -388,7 +388,7 @@ class ContinueWithVipps {
                   content text DEFAULT '',
                   PRIMARY KEY  (state),
                   KEY expire (expire)
-                      ) ${charset_collate};";
+                      ) {$charset_collate};";
 
         // This really mapps a single vippsid (and phone no) to a single user id, but we don't enforce it
         // in the database in case further development or plugins would like to allow for having a single Vipps acount
@@ -406,7 +406,7 @@ class ContinueWithVipps {
                   KEY vippsphone (vippsphone),
                   KEY userid (userid),
                   UNIQUE KEY unique_mapping (vippsphone, userid)
-                      ) ${charset_collate};";
+                      ) {$charset_collate};";
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
         $result = dbDelta( $tablecreatestatement, true );

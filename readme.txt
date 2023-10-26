@@ -1,5 +1,5 @@
 === Login with Vipps ===
-Contributors: wphostingdev,iverok,pmbakken,perwilhelmsen
+Contributors: wphostingdev,iverok,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
 Tested up to: 6.4
