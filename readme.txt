@@ -2,7 +2,7 @@
 Contributors: wphostingdev,iverok,perwilhelmsen
 Tags: woocommerce,vipps,login
 Requires at least: 4.9.6
-Tested up to: 6.4
+Tested up to: 6.4.1
 Requires PHP: 7.2
 Stable tag: 1.2.7
 License: MIT
@@ -43,6 +43,7 @@ Login with Vipps is free for both websites and end users.
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.2.7: Minor fixes
 Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses; cleanup
 Version 1.2.1: Minor fix for Gutenberg block
 Version 1.2.2: Testing on 6.1
@@ -118,9 +119,8 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2023.xx.xx Version 1.2.7 =
+= 2023.11.28 Version 1.2.7 =
 Fix some 8.2 deprecations
-
 
 = 2023.05.15 Version 1.2.6 =
 Small bugfixes, removal on some restrictions to aid implementation of non-login applications

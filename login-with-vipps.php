@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 4.9.6
-   Tested up to: 6.4
+   Tested up to: 6.4.1
    Requires PHP: 7.2
    Text-domain: login-with-vipps
    Domain Path: /languages
