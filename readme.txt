@@ -30,8 +30,8 @@ Login with Vipps is free for both websites and end users.
 
 == Get started ==
 
- * If you are a user of Vipps for E-Commerce, you can add Login with Vipps to your account on https://portal.vipps.no and find your API-keys there - see "Installation" for more details.
- * If you do not have an account with Vipps, you can order this here: https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang . When the order has been processed, you will be notified and you will be able to retrieve the API-keys on https://portal.vipps.no . Then see "Installation" for the next steps.
+ * If you are a user of Vipps for E-Commerce, you can add Login with Vipps to your account on https://portal.vippsmobilepay.com and find your API-keys there - see "Installation" for more details.
+ * If you do not have an account with Vipps, you can order this here: https://vipps.no/produkter-og-tjenester/bedrift/innlogging-og-identifisering/logg-inn-med-vipps/#kom-i-gang . When the order has been processed, you will be notified and you will be able to retrieve the API-keys on https://portal.vippsmobilepay.com . Then see "Installation" for the next steps.
 
 == Requirements ==
 
@@ -71,20 +71,20 @@ You can use the framework of this plugin to implement other solutions that requi
  * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
 
 == Installation ==
-**If you are an existing Vipps customer**, log onto the Vipps portal https://portal.vipps.no and retreive your API keys that you will need to install Login with Vipps
+**If you are an existing Vipps customer**, log onto the Vipps portal https://portal.vippsmobilepay.com and retreive your API keys that you will need to install Login with Vipps
 
 **If you are a new Vipps customer**, apply for an account [here](https://vipps.no/signup/logginnmedvipps) - before downloading the plugin. Choose "Integration through your partner", or if you don't know your partner, choose "direct integration" and fill out the form. When your application is approved, you will receive the API keys that you will need to install the plugin.
 
  1. Install the plugin using WordPress' [built-in installer](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins). The plugin can also be installed manually by upload the plugin files to the /wp-content/plugins/ directory.
  2. Activate the plugin through the \'Plugins\' screen in WordPress.
- 3. From the [Vipps portal](https://portal.vipps.no), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
+ 3. From the [Vipps portal](https://portal.vippsmobilepay.com), get your Client ID and Client Secret and add them to the Settings-page for this plugin (see screenshot 1)
  4. Note your callback URL from the plugins settings-page and add that to the Vipps Portal (see screenshot 2)
  5. Modify the options as needed 
 
 == Screenshots ==
-1. Retrieving your Client ID and Client Secret from the [Vipps Portal](https://portal.vipps.no)
+1. Retrieving your Client ID and Client Secret from the [Vipps Portal](https://portal.vippsmobilepay.com)
 2. Registerering your redirect URI 
-3. Activating Login with Vipps at the [Vipps Portal](https://portal.vipps.no)
+3. Activating Login with Vipps at the [Vipps Portal](https://portal.vippsmobilepay.com)
 
 == Customizing the Plugin ==
 To use 'Continue with Vipps' in your application, there are two levels of customizations available, except for a mass of filters and hooks.
