@@ -11,7 +11,6 @@
         const RichText = wp.blockEditor.RichText;
 
         const useBlockProps = wp.blockEditor.useBlockProps;
-        const BlockControls = wp.blockEditor.BlockControls;
         const InspectorControls = wp.blockEditor.InspectorControls;
 
 
@@ -56,8 +55,9 @@
                  },
 
 	    edit: function( props ) {
+                let blockProps = useBlockProps();
                 let logo =  LoginWithVippsBlockConfig['logosrc'];
-		let attributes = props.attributes;
+        		let attributes = props.attributes;
                 let formats = ['core/bold', 'core/italic'];
 
                 // Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
@@ -71,34 +71,33 @@
                 }
                 if (!found) appOptions.push({label: current, value: current});
 
-		return el(
-		    'span',
-		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
+            console.log("Attributes are %j", attributes);
+
+		return  el("div", blockProps, 
+
+                el(
+                    'span',
+                    { className: 'continue-with-vipps-wrapper inline ' + props.className },
                     el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, 
-                              title:attributes.title, 'data-application':attributes.application},
-                      el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
-                      el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
-                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
-                    ),
+                        title:attributes.title, 'data-application':attributes.application},
+                        el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
+                        el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
+                        el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
+                    )
+                ),
 
-// This is for the menu-bar over the block - not used here
-/*
-                   el(BlockControls, {}, 
-                        el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment  } )
-                   ),
-*/
-
-// This is for left-hand block properties thing
-                   el(InspectorControls, {},
+                    // This is for left-hand block properties thing
+                    el(InspectorControls, {},
                         el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , 
-                                            label: LoginWithVippsBlockConfig['Application'], value:attributes.application, 
-                                            options: appOptions,
-                                            help:  LoginWithVippsBlockConfig['ApplicationsText']  }),
+                            label: LoginWithVippsBlockConfig['Application'], value:attributes.application, 
+                            options: appOptions,
+                            help:  LoginWithVippsBlockConfig['ApplicationsText']  }),
                         el(TextControl, { onChange: x=>props.setAttributes({title: x}) , 
-                                          label:  LoginWithVippsBlockConfig['Title'] , value:attributes.title,
-                                          help:  LoginWithVippsBlockConfig['TitleText']   })
-                   ),
-                 )
+                            label:  LoginWithVippsBlockConfig['Title'] , value:attributes.title,
+                            help:  LoginWithVippsBlockConfig['TitleText']   })
+                    ),
+                
+            );
 
             },
 
