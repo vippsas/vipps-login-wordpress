@@ -41,15 +41,15 @@
                        attribute: "title" 
                   },
                   prelogo: {
-                      default: [LoginWithVippsBlockConfig['DefaultTextPrelogo']],
-                      type: "array",
-                      source: "children",
+                      default: LoginWithVippsBlockConfig['DefaultTextPrelogo'],
+                      type: "text",
+                      source: "html",
                       selector: ".prelogo",
                   },
                   postlogo: {
-                      default: [LoginWithVippsBlockConfig['DefaultTextPostlogo']],
-                      type: "array",
-                      source: "children",
+                      default: LoginWithVippsBlockConfig['DefaultTextPostlogo'],
+                      type: "text",
+                      source: "html",
                       selector: ".postlogo",
                   },
                  },
@@ -70,8 +70,6 @@
                    } 
                 }
                 if (!found) appOptions.push({label: current, value: current});
-
-            console.log("Attributes are %j", attributes);
 
 		return  el("div", blockProps, 
 
