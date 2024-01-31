@@ -21,7 +21,6 @@
                 icon: el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']}),
 		supports: {
 			html: true,
-                        anchor: true,
                         customClassName: true,
 		},
 
@@ -73,10 +72,11 @@
 
                 let wrapperclassname = 'continue-with-vipps-wrapper inline';
                 let classname = 'button vipps-orange vipps-button continue-with-vipps';
-                
-                if (props.className) {
-                    wrapperclassname += " " + props.className;
-                    classname += " " + props.className;
+
+
+                if (attributes.className) {
+                    wrapperclassname += " " + attributes.className;
+                    classname += " " + attributes.className;
                 }
 
                 return  el("div", blockProps, 
@@ -104,8 +104,16 @@
 
 	    save: function( props ) {
 		var attributes = props.attributes;
-		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className   },
-                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action", 
+                let wrapperclassname = 'continue-with-vipps-wrapper inline';
+                let classname = 'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action';
+                
+                if (attributes.className) {
+                    wrapperclassname += " " + attributes.className;
+                    classname += " " + attributes.className;
+                }
+
+		return el( 'span', { className: wrapperclassname },
+                    el("a", { className: classname,
                               title:attributes.title, 'data-application':attributes.application, href: "javascript: void(0);" },
                     el( RichText.Content, {
                        tagName: 'span',
