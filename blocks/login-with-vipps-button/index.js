@@ -15,13 +15,13 @@
 
 
 	registerBlockType( 'login-with-vipps/login-with-vipps-button', {
+                apiVersion: 3,
 		title: LoginWithVippsBlockConfig['BlockTitle'],
 		category: 'widgets',
                 icon: el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']}),
 		supports: {
 			html: true,
                         anchor: true,
-                        align:true,
                         customClassName: true,
 		},
 
@@ -71,31 +71,34 @@
                 }
                 if (!found) appOptions.push({label: current, value: current});
 
-		return  el("div", blockProps, 
-
-                el(
-                    'span',
-                    { className: 'continue-with-vipps-wrapper inline ' + props.className },
-                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps " + props.className, 
-                        title:attributes.title, 'data-application':attributes.application},
-                        el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
-                        el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
-                        el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
-                    )
-                ),
-
-                    // This is for left-hand block properties thing
-                    el(InspectorControls, {},
-                        el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , 
-                            label: LoginWithVippsBlockConfig['Application'], value:attributes.application, 
-                            options: appOptions,
-                            help:  LoginWithVippsBlockConfig['ApplicationsText']  }),
-                        el(TextControl, { onChange: x=>props.setAttributes({title: x}) , 
-                            label:  LoginWithVippsBlockConfig['Title'] , value:attributes.title,
-                            help:  LoginWithVippsBlockConfig['TitleText']   })
-                    ),
+                let wrapperclassname = 'continue-with-vipps-wrapper inline';
+                let classname = 'button vipps-orange vipps-button continue-with-vipps';
                 
-            );
+                if (props.className) {
+                    wrapperclassname += " " + props.className;
+                    classname += " " + props.className;
+                }
+
+                return  el("div", blockProps, 
+                        el('span', { className: wrapperclassname },
+                            el("a", { className: classname, title:attributes.title, 'data-application':attributes.application},
+                                el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
+                                el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
+                                el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
+                              )
+                          ),
+
+                        // This is for left-hand block properties thing
+                        el(InspectorControls, {},
+                            el(SelectControl, { onChange: x=>props.setAttributes({application: x}) , 
+                                label: LoginWithVippsBlockConfig['Application'], value:attributes.application, 
+                                options: appOptions,
+                                help:  LoginWithVippsBlockConfig['ApplicationsText']  }),
+                            el(TextControl, { onChange: x=>props.setAttributes({title: x}) , 
+                                label:  LoginWithVippsBlockConfig['Title'] , value:attributes.title,
+                                help:  LoginWithVippsBlockConfig['TitleText']   })
+                          ),
+                        );
 
             },
 
