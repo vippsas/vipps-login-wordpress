@@ -2,6 +2,7 @@
 ---
 title: Vipps Login for WordPress and WooCommerce
 sidebar_position: 1
+description: Allow customers to log in to WordPress and WooCommerce websites using the Vipps app.
 pagination_next: null
 pagination_prev: null
 ---
