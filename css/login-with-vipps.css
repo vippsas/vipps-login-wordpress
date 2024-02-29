@@ -132,6 +132,7 @@ SOFTWARE.
 /* Make this very specific */
 html body img.inline.vipps-logo {
  height: 2ex;
+ max-width: 4rem;
  display:inline;
  vertical-align: text-bottom;
  padding:0;
