@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 4.9.6
-   Tested up to: 6.4.3
+   Tested up to: 6.5.0
    Requires PHP: 7.2
    Text-domain: login-with-vipps
    Domain Path: /languages
@@ -51,7 +51,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define('VIPPS_LOGIN_VERSION', '1.2.7');
+define('VIPPS_LOGIN_VERSION', '1.2.8');
 
 // Utility classes used to verify JWT tokens and manage login sessions. IOK 2019-10-14
 require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
