@@ -123,6 +123,7 @@ The rest is a simple matter of programming.
 
 = 2024.03.21 Version 1.2.8 =
 Send debugging headers to Vipps
+Updating blocks and css
 
 = 2023.11.28 Version 1.2.7 =
 Fix some 8.2 deprecations
