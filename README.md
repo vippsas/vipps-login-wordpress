@@ -2,6 +2,7 @@
 ---
 title: Vipps Login for WordPress and WooCommerce
 sidebar_position: 1
+description: Allow customers to log in to WordPress and WooCommerce websites using the Vipps app.
 pagination_next: null
 pagination_prev: null
 ---
@@ -63,9 +64,9 @@ Already registered users can link their current accounts when signing in with Vi
 
 Login with Vipps can be added to all relevant pages in your web shop: login, registration, cart, and checkout pages.
 
-### Free of charge
+### Vipps Login
 
-Login with Vipps is free of charge for site owners and end-users. Merchants that already use Vipps online payment can add Sign in with Vipps to their account at [https://portal.vipps.no](https://portal.vipps.no). New site owners need to set up an agreement with Vipps to use the service. This can be ordered [here](https://portal.vipps.no/login).
+New site owners need to set up an agreement with Vipps to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
 
 ### Customizable for your application
 
