@@ -151,8 +151,8 @@ class VippsLogin {
 
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', $loginconfig);
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
-        $smile = plugins_url("img/vipps-smile-orange.png", __FILE__);
-        wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$smile}'); }");
+        $logo = plugins_url("img/vmp-logo.png", __FILE__);
+        wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
     }
 
 
