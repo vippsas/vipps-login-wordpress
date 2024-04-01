@@ -352,10 +352,11 @@ class VippsWooLogin{
     }
     // Banner text overriden by settings IOK 2020-09-25
     protected function overidden_banner_text($message) {
+        $company_name = VippsLogin::CompanyName();
         $options = get_option('vipps_login_woo_options');
         if (@$options['woo-banner-text'] || @$options['woo-banner-linktext']) {
            $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
-           $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>";
+           $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>";
            $message = @$options['woo-banner-text'];
            $message = preg_replace('!VIPPS!', $logoimg,$message); 
            if (@$options['woo-banner-linktext']) {
@@ -370,7 +371,7 @@ class VippsWooLogin{
 
     public function continue_with_vipps_banner() {
         if (!$this->is_active()) return false;
-
+        $company_name = VippsLogin::CompanyName();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
 
@@ -382,7 +383,7 @@ class VippsWooLogin{
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click to continue', 'login-with-vipps');
 
-        $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>";
+        $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>";
         $message = sprintf($text, $logoimg)  . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
@@ -398,6 +399,7 @@ class VippsWooLogin{
         if ($this->loginbuttonshown) return false;
         $this->loginbuttonshown=1;
 
+        $company_name = VippsLogin::CompanyName();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
         $text  = '';
@@ -409,7 +411,7 @@ class VippsWooLogin{
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click here to continue', 'login-with-vipps');
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_login_banner', $message);
         ob_start();
@@ -422,6 +424,7 @@ class VippsWooLogin{
         if (!$this->is_active()) return false;
         if ($this->loginbuttonshown) return false;
         $this->loginbuttonshown=1;
+        $company_name = VippsLogin::CompanyName();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
         if (!$can_register) return;
@@ -430,7 +433,7 @@ class VippsWooLogin{
         $linktext = __('Click here to continue', 'login-with-vipps');
         $text = __('Create an account using ', 'login-with-vipps');
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_register_banner', $message);
         ob_start();
@@ -534,9 +537,10 @@ class VippsWooLogin{
 
     public function  synch_address_button () {
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $company_name = VippsLogin::CompanyName();
         ?>
             <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
-            <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='Vipps'/>"); ?>
+            <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>"); ?>
             </button> 
             <?php
     }
