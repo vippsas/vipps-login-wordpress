@@ -71,7 +71,7 @@ function login_with_vipps_block_init() {
 
 
         $localizations['logosrc'] = plugins_url('../img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
-        $localizations['vippssmileurl'] = plugins_url('../img/vmp-logo.png',__FILE__);
+        $localizations['vippssmileurl'] = plugins_url('../img/vipps-smile-orange.png',__FILE__);
 
 	$index_js = 'login-with-vipps-button/index.js';
 	wp_register_script(
