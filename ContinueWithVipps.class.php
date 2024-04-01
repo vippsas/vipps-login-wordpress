@@ -84,9 +84,9 @@ class ContinueWithVipps {
         // Future strings for translation IOK 2021-09-23
         print __("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%1\$s'>%1\$s' documentation</a>", 'login-with-vipps');
         print __("Your redirect-URI is:", 'login-with-vipps');
-        print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
-        print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
-        print __("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
+        print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
+        print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
+        print __("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
     }
 
     public function log ($what,$type='info') {
@@ -307,18 +307,18 @@ class ContinueWithVipps {
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientid']);?>" autocomplete="off" type="password"></td>
-            <td><?php _e("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field",'login-with-vipps'); ?></td>
+            <td><?php _e("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field",'login-with-vipps'); ?></td>
             </tr>
             <tr>
             <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientsecret']);?>" autocomplete="off"  type="password"></td>
-            <td><?php _e("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field",'login-with-vipps'); ?></td>
+            <td><?php _e("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field",'login-with-vipps'); ?></td>
             </tr>
 
             <tr>
             <th><?php _e("Your redirect-URI is:", 'login-with-vipps'); ?></th>
             <td><b><?php echo esc_html($callback); ?></b>
-            <td><?php _e("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps'); ?></td>
+            <td><?php _e("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps'); ?></td>
             </tr>
 
 
