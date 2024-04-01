@@ -296,6 +296,7 @@ class ContinueWithVipps {
 
         $callback = $this->make_callback_url();
 
+        $selected_login_method = @$options['login_method'];
         ?>
             <div class='wrap'>
             <h2><?php printf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></h2>
@@ -304,6 +305,16 @@ class ContinueWithVipps {
             <?php settings_fields('vipps_login_options'); ?>
             <table class="form-table" style="width:100%">
 
+            <tr>
+            <td><?php printf(__('Login method', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
+            <td width=30%>
+                        <select name='vipps_login_options[login_method]' id='vipps_login_options_login_method' style="width: 100%">
+                            <option value='Vipps' <?php selected($selected_login_method, 'Vipps'); ?>><?php _e('Vipps', 'login-with-vipps'); ?></option>
+                            <option value='MobilePay' <?php selected($selected_login_method, 'MobilePay'); ?>><?php _e('MobilePay', 'login-with-vipps'); ?></option>
+                        </select>
+            </td>
+            <td><?php _e("Choose which login method you'd like to enable for your users.",'login-with-vipps'); ?></td>
+            </tr>
             <tr>
             <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
             <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientid']);?>" autocomplete="off" type="password"></td>
