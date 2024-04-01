@@ -159,8 +159,6 @@ class VippsWooLogin{
 
         ?>
 
-            <form action='options.php' method='post'>
-            <?php settings_fields('vipps_login_woo_options'); ?>
             <table class="form-table" style="width:100%">
             <tr><th colspan=3><h3><?php _e('WooCommerce options', 'login-with-vipps'); ?></th></tr>
             <tr>
@@ -222,8 +220,6 @@ class VippsWooLogin{
 
            <tr>
             </table>
-            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
-            </form>
             <?php
     }
 
@@ -371,26 +367,31 @@ class VippsWooLogin{
 
     public function continue_with_vipps_banner() {
         if (!$this->is_active()) return false;
-        $company_name = VippsLogin::CompanyName();
+        $login_method = VippsLogin::instance()->get_login_method();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
 
         if ($can_register) {
-            $text = __('Log in or register an account with %s to continue your checkout.', 'login-with-vipps');
+            $text = sprintf(__('Log in or register an account with %s to continue your checkout.', 'login-with-vipps'), $login_method);
         } else {
-            $text = __('Are you registered as a customer? Log in with %s to continue your checkout.', 'login-with-vipps');
+            $text = sprintf(__('Are you registered as a customer? Log in with %s to continue your checkout.', 'login-with-vipps'), $login_method);
         }
         $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
         $linktext = __('Click to continue', 'login-with-vipps');
 
-        $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>";
+        $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>";
         $message = sprintf($text, $logoimg)  . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
-      
+
+        $class = 'vipps-banner vipps-info';
+        if ($login_method == 'MobilePay') {
+            $class = 'mobilepay-banner mobilepay-info';
+        }
+
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-checkout"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-checkout"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
     }
@@ -399,24 +400,28 @@ class VippsWooLogin{
         if ($this->loginbuttonshown) return false;
         $this->loginbuttonshown=1;
 
-        $company_name = VippsLogin::CompanyName();
+        $login_method = VippsLogin::instance()->get_login_method();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
         $text  = '';
         if ($can_register) {
-            $text = __('Log in or register an account using %s.', 'login-with-vipps');
+            $text = sprintf(__('Log in or register an account using %s.', 'login-with-vipps'), $login_method);
         } else {
-            $text = __('Are you registered as a customer? Log in with %s.', 'login-with-vipps');
+            $text = sprintf(__('Are you registered as a customer? Log in with %s.', 'login-with-vipps'), $login_method);
         }
-        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $logo = plugins_url('img/vmp-logo.png',__FILE__);
         $linktext = __('Click here to continue', 'login-with-vipps');
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $class = 'vipps-banner vipps-info';
+        if ($login_method == 'MobilePay') {
+            $class = 'mobilepay-banner mobilepay-info';
+        }
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_login_banner', $message);
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-login"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-login"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
     }
@@ -424,21 +429,26 @@ class VippsWooLogin{
         if (!$this->is_active()) return false;
         if ($this->loginbuttonshown) return false;
         $this->loginbuttonshown=1;
-        $company_name = VippsLogin::CompanyName();
         // This is actually the filter used for customers, so we feed it dummy values - this is decided by an option.
         $can_register = $this->users_can_register(true, array(), array());
         if (!$can_register) return;
 
-        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $login_method = VippsLogin::instance()->get_login_method();
+        $logo = plugins_url('img/vmp-logo.png',__FILE__);
         $linktext = __('Click here to continue', 'login-with-vipps');
-        $text = __('Create an account using ', 'login-with-vipps');
+        $text = sprintf(__('Create an account using %s', 'login-with-vipps'), $login_method);
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_register_banner', $message);
+        $class = 'vipps-banner vipps-info';
+        if ($login_method == 'MobilePay') {
+            $class = 'mobilepay-banner mobilepay-info';
+        }
+
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="vipps-info vipps-banner vipps-register"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-register"><?php echo $message;?></div>
             <?php
         echo apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
     }

@@ -330,6 +330,10 @@ class VippsLogin {
         }
     }
 
+    public function get_login_method() {
+        return get_option('vipps_login_options')['login_method'];
+    }
+
     // Extra options to be added to the admin-page for Login With Vipps. IOK 2019-10-14
     public function extra_option_fields () {
         $options = get_option('vipps_login_options2');
@@ -348,8 +352,6 @@ class VippsLogin {
         $required_roles = @$options['required_roles'];
 
         ?>
-            <form action='options.php' method='post'>
-            <?php settings_fields('vipps_login_options2'); ?>
             <table class="form-table" style="width:100%">
             <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
 
@@ -403,8 +405,6 @@ class VippsLogin {
             <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose. A blank page will have been installed for you when activating the plugin, this is the default page which will be used. Do *not* use any system pages or anything that is being used for other things.','login-with-vipps'); ?></td>
             </tr>
             </table>
-            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
-            </form>
             <?php
     }
 

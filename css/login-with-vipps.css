@@ -155,13 +155,19 @@ html body img.inline.vipps-logo {
     border-color: #FF5B24;
     border-color: #FF5B24;
 }
+.mobilepay-banner.mobilepay-info {
+    color: #fff;
+    background-color: #5A78FF;
+    border-color: #5A78FF;
+    border-color: #5A78FF;
+}
 .vipps-banner.vipps-info img.vipps-logo {
  margin:0px;
 }
 .vipps-banner.vipps-info::before {
     color: #fff;
 }
-.vipps-banner.vipps-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before {
+.vipps-banner.vipps-info::before, .mobilepay-banner.mobilepay-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before {
     font-family: "Font Awesome 5 Free";
     content: "";
     display: inline-block;
@@ -179,6 +185,17 @@ html body img.inline.vipps-logo {
 
 }
 .vipps-banner.vipps-info {
+    margin-bottom: 2.617924em;
+    margin-left: 0;
+    border-radius: 2px;
+    color: #fff;
+    clear: both;
+    border-left: 0.6180469716em solid rgba(0,0,0,.15);
+    padding: 1em 2em 1em 3.5em;
+    position: relative;
+    list-style: none outside;
+}
+.mobilepay-banner.mobilepay-info {
     margin-bottom: 2.617924em;
     margin-left: 0;
     border-radius: 2px;
