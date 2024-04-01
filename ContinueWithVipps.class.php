@@ -80,9 +80,9 @@ class ContinueWithVipps {
     // translating return values from the Vipps API 2019-10-14
     private function translation_dummy () {
         print __('User cancelled the login', 'login-with-vipps');
-        print __("Having downloaded Log in with Vipps: It is quick and easy to get started! Get your API keys in the Vipps Portal and add them to the plugin to activate Log in with Vipps.", 'login-with-vipps');
+        print __('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps');
         // Future strings for translation IOK 2021-09-23
-        print __("You'll find more descriptions and illustrations about the setup of Log in with Vipps in <a href='%s'>Vipps' documentation</a>", 'login-with-vipps');
+        print __("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%1\$s'>%1\$s' documentation</a>", 'login-with-vipps');
         print __("Your redirect-URI is:", 'login-with-vipps');
         print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
         print __("Go to <a target='_blank' href='https://portal.vipps.no'>https://portal.vipps.no</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
@@ -94,7 +94,7 @@ class ContinueWithVipps {
           $logger = wc_get_logger();
           $context = array('source'=>'login-with-vipps');
           $logger->log($type,$what,$context);
-          error_log("Login with Vipps (" . sanitize_title($type) . ") " . $what);
+          error_log(sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()) . " (" . sanitize_title($type) . ") " . $what);
         } else {
           error_log($what);
         }
@@ -170,7 +170,6 @@ class ContinueWithVipps {
 
     // Offer support if plugin not yet configured
     public function add_configure_help_login_banner () {
-
         $dismissed = get_option('_login_vipps_dismissed_notices');
         if (isset($dismissed['configure05'])) return;
         $options = get_option('vipps_login_options');
@@ -205,9 +204,9 @@ class ContinueWithVipps {
             ?>
             <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure05'>
             <a target="_blank"  href="<?php echo $configurl; ?>">
-            <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="Logg inn med Vipps-logo">
+            <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
              <div>
-                 <p style="font-size:1rem"><?php echo sprintf(__("Having downloaded Log in with Vipps: It is quick and easy to get started! Get your API keys in the Vipps Portal and add them to the plugin to activate Log in with Vipps.", 'login-with-vipps')); ?></p>
+                 <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
              </div>
              </a>
             </div>
@@ -228,7 +227,8 @@ class ContinueWithVipps {
     }
 
     public function admin_menu () {
-        add_options_page(__('Login with Vipps', 'login-with-vipps'), __('Login with Vipps','login-with-vipps'), 'manage_options', 'vipps_login_options',array($this,'toolpage'));
+        $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
+        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_options',array($this,'toolpage'));
     }
 
     public function ajax_vipps_dismiss_notice() {
@@ -250,8 +250,9 @@ class ContinueWithVipps {
             if (isset($dismissed[$key])) return;
         }
         add_action('admin_notices', function() use ($text,$type, $key) {
+                $company_name = VippsLogin::CompanyName();
                 $logo = plugins_url('img/vipps_logo_rgb.png',__FILE__);
-                $text= "<img style='height:40px;float:left;' src='$logo' alt='Vipps-logo'> $text";
+                $text= "<img style='height:40px;float:left;' src='$logo' alt='$company_name-logo'> $text";
                 echo "<div class='notice notice-vipps-login notice-$type is-dismissible'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
                 });
     }
@@ -297,7 +298,7 @@ class ContinueWithVipps {
 
         ?>
             <div class='wrap'>
-            <h2><?php _e('Login with Vipps', 'login-with-vipps'); ?></h2>
+            <h2><?php printf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></h2>
 
             <form action='options.php' method='post'>
             <?php settings_fields('vipps_login_options'); ?>
@@ -324,7 +325,7 @@ class ContinueWithVipps {
 
             </table>
             <div> <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
-        <div style="clear:both;margin-top:2rem;"><p><strong><?php echo sprintf(__("You'll find more descriptions and illustrations about the setup of Log in with Vipps in <a href='%s'>Vipps' documentation</a>", 'login-with-vipps'), 'https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api-faq.md#how-can-i-activate-and-set-up-vipps-login'); ?></strong></p></div>
+        <div style="clear:both;margin-top:2rem;"><p><strong><?php echo sprintf(__("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%2\$s'>%1\$s' documentation</a>", 'login-with-vipps'), VippsLogin::CompanyName(), 'https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api-faq.md#how-can-i-activate-and-set-up-vipps-login'); ?></strong></p></div>
 
 
             </form>
@@ -422,12 +423,12 @@ class ContinueWithVipps {
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename'");
         if($exists != $tablename) {
             $ok = false;
-            $this->add_admin_notice(__('Could not create session table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
+            $this->add_admin_notice(sprintf(__('Could not create session table. The Login with %1$s plugin is not correctly installed.', 'login-with-vipps'), VippsLogin::CompanyName()));
         }
         $exists = $wpdb->get_var("SHOW TABLES LIKE '$tablename2'");
         if($exists != $tablename2) {
             $ok = false;
-            $this->add_admin_notice(__('Could not create user identity table. The Login with Vipps plugin is not correctly installed.', 'login-with-vipps'));
+            $this->add_admin_notice(sprintf(__('Could not create user identity table. The Login with %1$s plugin is not correctly installed.', 'login-with-vipps'), VippsLogin::CompanyName()));
         } else {
             // Initialize the table with the old user-meta values, if it is empty. This code will be removed in future versions.
             // IOK 2022-04-25
@@ -447,7 +448,7 @@ class ContinueWithVipps {
         }
 
         if ($ok) {
-            error_log(__("Installed database tables for Login With Vipps", 'login-with-vipps'));
+            error_log(sprintf(__('Installed database tables for Login With %1$s', 'login-with-vipps'), VippsLogin::CompanyName()));
             $options['dbversion']=static::$dbversion;
             update_option('vipps_login_options',$options,false);
         }
@@ -490,7 +491,7 @@ class ContinueWithVipps {
             // When errors happen, we always destroy the current session. You may need to create a new one if you need to pass  info. IOK 2019-10-19
             if($session) $session->destroy();
             do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
-            wp_die(sprintf(__("Unhandled error when using Continue with Vipps for action %s: %s", 'login-with-vipps'), esc_html($forwhat), esc_html($error)));
+            wp_die(sprintf(__('Unhandled error when using Continue with %1$s for action %2$s: %3$s', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($forwhat), esc_html($error)));
         }
 
         $code =  sanitize_text_field(@$_REQUEST['code']);
@@ -527,7 +528,8 @@ class ContinueWithVipps {
                 } else {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when trying to use Vipps:' . ' ' . $authtoken['headers']['status'], 'login-with-vipps'),'', $session);
+                        $err_message = sprintf(__('A problem occurred when trying to use %1$s:', 'login-with-vipps'), VippsLogin::CompanyName()) . ' ' . $authtoken['headers']['status'];
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error', $err_message, '', $session);
                     }
                     wp_die($authtoken['headers']['status']);
                 }
@@ -536,16 +538,18 @@ class ContinueWithVipps {
                 if ($userinfo['response'] != 200) {
                     if($session) $session->destroy();
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('A problem occurred when getting user info from Vipps:' . ' ' . $userinfo['headers']['status'], 'login-with-vipps'),'', $session);
+                        $err_message = sprintf(__('A problem occurred when getting user info from %1$s:', 'login-with-vipps'), VippsLogin::CompanyName()) . ' ' . $userinfo['headers']['status'];
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',$err_message, '', $session);
                     }
                     wp_die($userinfo['response']);
                 }
                 if ($userinfo['content']['sub'] != $idtoken_sub) {
                     if($session) $session->destroy();
+                    $err_message = sprintf(__('There is a problem with verifying your ID token from %1$s. Unfortunately, you cannot continue with %1$s at this time.', 'login-with-vipps'), VippsLogin::CompanyName());
                     if ($forwhat) { 
-                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time.', 'login-with-vipps'),'', $session);
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error', $err_message, '', $session);
                     }
-                    wp_die(__('There is a problem with verifying your ID token from Vipps. Unfortunately, you cannot continue with Vipps at this time', 'login-with-vipps'));
+                    wp_die($err_message);
                 }
 
                 $userinfo = @$userinfo['content'];
@@ -561,7 +565,7 @@ class ContinueWithVipps {
         // Ok so if we get here, we have a session with the userinfo in place. Now redirect to the application code! IOK 2019-10-14
         do_action('continue_with_vipps_' .  $forwhat, $userinfo, $session);
         if($session) $session->destroy();
-        wp_die(sprintf(__('You successfully completed the action "%s" using Vipps - unfortunately, this website doesn\'t know how to handle that.', 'login-with-vipps'), $forwhat ));
+        wp_die(sprintf(__('You successfully completed the action "%2$s" using %1$s - unfortunately, this website doesn\'t know how to handle that.', 'login-with-vipps'), VippsLogin::CompanyName(), $forwhat ));
     }
 
 
