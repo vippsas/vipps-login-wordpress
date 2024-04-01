@@ -42,6 +42,11 @@ class VippsLogin {
     protected static $instance = null;
     protected static $isactive = null;
 
+
+    public static function CompanyName() { 
+        return __("Vipps MobilePay", 'woo-vipps');
+    }
+
     function __construct() {
     }
     // This is a singleton class; access the single instance with this method. IOK 2019-10-14
@@ -306,12 +311,12 @@ class VippsLogin {
 
             if ($justconnected) {
                 delete_user_meta($userid, '_vipps_just_connected');
-                $notice = sprintf(__('You are now connected to the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
+                $notice = sprintf(__('You are now connected to the %1$s profile <b>%2$s</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
             if ($justsynched) {
                 delete_user_meta($userid, '_vipps_just_synched');
-                $notice = sprintf(__('You are now synchronized with the Vipps profile <b>%s</b>.', 'login-with-vipps'), $vippsphone);
+                $notice = sprintf(__('You are now synchronized with the %1$s profile <b>%2$s</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $vippsphone);
                 add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-success notice-vipps is-dismissible'><p>$notice</p></div>"; });
             }
         } 
@@ -349,28 +354,28 @@ class VippsLogin {
             <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
 
             <tr>
-            <td><?php _e('Enable Login with Vipps', 'login-with-vipps'); ?></td>
+            <td><?php printf(__('Enable Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
             <input type='checkbox' name='vipps_login_options2[use_vipps_login]' value=1 <?php if ( $usevipps) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Turn Login with Vipps on and off', 'login-with-vipps'); ?>
+            <?php printf(__('Turn Login with %1$s on and off', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
             </td>
             </tr>
 
 
             <tr>
-            <td><?php _e('Add Vipps to login page', 'login-with-vipps'); ?></td>
+            <td><?php _e('Add  to login page', 'login-with-vipps'); ?></td>
             <td width=30%> <input type='hidden' name='vipps_login_options2[login_page]' value=0>
             <input type='checkbox' name='vipps_login_options2[login_page]' value=1 <?php if ( $loginpage) echo ' CHECKED '; ?> >
             </td>
             <td>
-            <?php _e('Log in with Vipps on the Wordpress login page', 'login-with-vipps'); ?>
+            <?php printf(__('Log in with %1$s on the Wordpress login page', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
             </td>
             </tr>
 
             <tr>
-            <td><?php _e('Require Vipps to log in for users in these roles', 'login-with-vipps'); ?></td>
+            <td><?php printf(__('Require %1$s to log in for users in these roles', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
             <td width=30%> 
             <label for="vipps_require__all_"><?php _e("Everybody", "login-with-vipps"); ?> </label>
                    <input type='checkbox' id=vipps_require__all_  name='vipps_login_options2[required_roles][_all_]' value="1" 
@@ -386,12 +391,12 @@ class VippsLogin {
 
             </td>
             <td>
-            <?php _e('Users in these roles *must* use login with Vipps. You can also require this for a given user on the profile page', 'login-with-vipps'); ?>
+            <?php printf(__('Users in these roles *must* use login with %1$s. You can also require this for a given user on the profile page', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
             </td>
             </tr>
 
             <tr>
-            <td><?php _e('Continue with Vipps page', 'login-with-vipps'); ?></td>
+            <td><?php printf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
             <td width=30%>
             <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-with-vipps'))); ?>
             </td>
@@ -462,12 +467,12 @@ class VippsLogin {
         $authorid = 0;
         if ($author) $authorid = $author->ID;
 
-        $defaultname = __('Continue with Vipps', 'login-with-vipps');
+        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName());
 
         $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
         $newid = wp_insert_post($pagedata);
         if (is_wp_error($newid)) {
-            return new WP_Error(__("Could not find or create the \"Continue with Vipps\" page.", 'login-with-vipps') . ": " .  $newid->get_error_message());
+            return new WP_Error(sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), VippsLogin::CompanyName()) . ": " .  $newid->get_error_message());
         }
 
         $options['continuepageid'] = $newid;
@@ -483,34 +488,34 @@ class VippsLogin {
         $its_you = (get_current_user_id() == $user->ID);
         $is_admin = current_user_can('manage_options');
         ?>
-            <h2 class='vipps-profile-section-header'><?php _e('Log in with Vipps', 'login-with-vipps'); ?> </h2>
+            <h2 class='vipps-profile-section-header'><?php printf(__('Log in with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?> </h2>
             <?php if ($allow_login): ?>
             <table class="form-table">
             <tr>
-            <th><?php _e('Use Vipps to login to your account', 'login-with-vipps'); ?></th>
+            <th><?php printf(__('Use %1$s to login to your account', 'login-with-vipps'), VippsLogin::CompanyName()); ?></th>
             <td>
             <?php if ($vippsphone && $vippsid): ?>
             <?php if ($its_you): ?>
-            <p> <?php printf(__('You are connected to the Vipps profile with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('You are connected to the %1$s profile with the phone number <b>%2$s</b>', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($vippsphone)); ?></p>
             <?php else: ?>
-            <p> <?php printf(__('The user is connected to the Vipps profile with the phone number <b>%s</b>', 'login-with-vipps'), esc_html($vippsphone)); ?></p>
+            <p> <?php printf(__('The user is connected to the %1$s profile with the phone number <b>%2$s</b>', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($vippsphone)); ?></p>
             <?php endif; ?> 
             <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Unlink account','login-with-vipps'); ?></button></p>
-            <span class="description"><?php _e("As long as your profile is connected to Vipps, you can log in with Vipps.",'login-with-vipps'); ?></span>
+            <span class="description"><?php printf(__('As long as your profile is connected to %1$s, you can log in with %1$s.','login-with-vipps'), VippsLogin::CompanyName()); ?></span>
             <?php else: ?>
             <?php if ($its_you): ?>
-            <p> <?php _e('You are not connected to any Vipps profile', 'login-with-vipps'); ?></p>
+            <p> <?php printf(__('You are not connected to any %1$s profile', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
             <p><button type="button" onclick="connect_vipps_account('wordpress');return false"; class="button vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-with-vipps'); ?></button></p>
             <?php else: ?>
-            <p> <?php _e('The user is not connected to a Vipps profile.', 'login-with-vipps'); ?></p>
+            <p> <?php printf(__('The user is not connected to a %1$s profile.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
             <?php endif; ?> 
-            <span class="description"><?php _e("You can connect to your Vipps profile if you use the same email address in the Vipps app and on this site.", 'login-with-vipps'); ?></span>
+            <span class="description"><?php printf(__('You can connect to your %1$s profile if you use the same email address in the %1$s app and on this site.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></span>
             <?php endif; ?>
             </td>
             </tr>
             <?php if ($is_admin): ?>
             <tr>
-            <th><?php _e("Require this user to confirm their login with Vipps if logging in normally", 'login-with-vipps'); ?></th>
+            <th><?php printf(__('Require this user to confirm their login with %1$s if logging in normally', 'login-with-vipps'), VippsLogin::CompanyName()); ?></th>
             <td>
                <input type="hidden" name="_require_vipps_confirm" value=0>
 
@@ -523,7 +528,7 @@ class VippsLogin {
                <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_default" 
                       <?php if (!get_user_meta($user->ID, "_require_vipps_confirm", true)) echo "checked=checked" ?>
                       value=""><label for="_require_vipps_confirm_default"> <?php _e("Only if member of restricted groups", 'login-with-vipps'); ?></label><br>
-               <span class="description"><?php _e("If you check this, this user will not be allowed to log in without confirming this operation with their Vipps app - email addresses must match.",'login-with-vipps'); ?></span>
+               <span class="description"><?php printf(__('If you check this, this user will not be allowed to log in without confirming this operation with their %1$s app - email addresses must match.','login-with-vipps'), VippsLogin::CompanyName()); ?></span>
 
        
 
@@ -535,9 +540,9 @@ class VippsLogin {
             <?php else: ?>
             <table class="form-table">
             <tr>
-            <th><?php _e('Login with Vipps is disabled', 'login-with-vipps'); ?></th>
+            <th><?php printf(__('Login with %1$s is disabled', 'login-with-vipps'), VippsLogin::CompanyName()); ?></th>
             <td>
-            <span class="description"><?php _e("It is unfortunately not possible for your account to use Vipps to log in to this system due to the site administrators policy."); ?></span>
+            <span class="description"><?php printf(__('It is unfortunately not possible for your account to use %1$s to log in to this system due to the site administrators policy.'), VippsLogin::CompanyName()); ?></span>
             </td>
             </tr>
             </table>
@@ -558,8 +563,8 @@ class VippsLogin {
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
             $user = wp_get_current_user();
             $this->unmap_phone_to_user($user);
-            $this->log(sprintf(__("Unmapping user %d from Vipps", 'login-with-vipps'), $user->ID));
-            $notice = sprintf(__('Connection to Vipps profile %s <b>removed</b>.', 'login-with-vipps'), $phone);
+            $this->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::CompanyName(), $user->ID));
+            $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $phone);
             $continue = ContinueWithVipps::instance();
             $continue->add_admin_notice($notice);
             $continue->store_admin_notices();
@@ -679,7 +684,7 @@ class VippsLogin {
         ob_start();
         ?>
             <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
-            alt="<?php _e('Log in without password using Vipps', 'login-with-vipps'); ?>" src="<?php echo $logo; ?>">!</a>
+            alt="<?php printf(__('Log in without password using %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?>" src="<?php echo $logo; ?>">!</a>
             <?php
         echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
     }
@@ -729,7 +734,7 @@ class VippsLogin {
         $state = $forwhat . "::" . $session->sessionkey;
         $continuepage = $this->ensure_continue_with_vipps_page();
         if (is_wp_error($continuepage)) {
-            wp_die(__("Cannot redirect to Vipps waiting page as it doesn't exist. If you just tried to log in, check your email.", 'login-with-vipps'));
+            wp_die(sprintf(__('Cannot redirect to %1$s waiting page as it doesn\'t exist. If you just tried to log in, check your email.', 'login-with-vipps'), VippsLogin::CompanyName()));
         }
         $waiturl = get_permalink($continuepage);
         $redir = add_query_arg(array('state'=>urlencode($state)), $waiturl);
@@ -746,7 +751,7 @@ class VippsLogin {
         $session = VippsSession::get($sessionkey);
 
         if (!$session  || !$this->checkBrowserCookie($session['cookie'])) {
-            $message = __('This page is used to handle your requests when continuing from Vipps and further action is required to complete your task. But in this case, it doesn\'t seem to be an open session', 'login-with-vipps');  
+            $message = sprintf(__('This page is used to handle your requests when continuing from %1$s and further action is required to complete your task. But in this case, it doesn\'t seem to be an open session', 'login-with-vipps'), VippsLogin::CompanyName());  
             $message = apply_filters('continue_with_vipps_waiting_page_expired_session_' . $action, $message,  $session);
             if ($session) $session->destroy();
             return $message;
@@ -1084,7 +1089,7 @@ class VippsLogin {
             update_user_meta($user_id, '_vipps_just_connected', 1);
             // This is currently mostly for Woo, but in general: User has no address, so please update addresses when logging in. IOK 2019-10-25
             update_user_meta($user_id,'_vipps_synchronize_addresses', 1);
-            $this->log(sprintf(__("Vipps user with phone %s just connected to account %d during account creation", 'login-with-vipps'), $phone, $user_id));
+            $this->log(sprintf(__('%1$s user with phone %2$s just connected to account %3$d during account creation', 'login-with-vipps'), VippsLogin::CompanyName(), $phone, $user_id));
 
             $user = get_user_by('id', $user_id);
 
@@ -1106,7 +1111,7 @@ class VippsLogin {
         if (!$allow_login) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $this->continue_with_vipps_error_login('login_disallowed', __('It is unfortunately not allowed for your account to log-in using Vipps', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('login_disallowed', sprintf(__('It is unfortunately not allowed for your account to log-in using %1$s', 'login-with-vipps'), VippsLogin::CompanyName()), '', $session);
             exit();
         }
 
@@ -1126,7 +1131,7 @@ class VippsLogin {
         if (!$require_confirmation) {
             $this->map_phone_to_user($phone, $sub, $user); 
             update_user_meta($user->ID,'_vipps_just_connected', 1);
-            $this->log(sprintf(__("Vipps user with phone %s just connected to account %d during login", 'login-with-vipps'), $phone, $user->ID));
+            $this->log(sprintf(__('%1$s user with phone %2$s just connected to account %3$d during login', 'login-with-vipps'), VippsLogin::CompanyName(), $phone, $user->ID));
             $this->actually_login_user($user,$sid,$session);
             exit();
         }
@@ -1138,7 +1143,7 @@ class VippsLogin {
         $this->deleteBrowserCookie();
         $handled = apply_filters('login_with_vipps_handle_email_confirmation', false, $user, $session);
         if (!$handled) {
-            $this->continue_with_vipps_error_login('login_disallowed', __('You need to confirm your email account before Login with Vipps can be used. Login to your account normally and connect with Vipps on your user page, or contact the site admin', 'login-with-vipps'), '', $session);
+            $this->continue_with_vipps_error_login('login_disallowed', sprintf(__('You need to confirm your email account before Login with %1$s can be used. Login to your account normally and connect with %1$s on your user page, or contact the site admin', 'login-with-vipps'), VippsLogin::CompanyName()), '', $session);
         }
         exit();
     }
@@ -1167,7 +1172,7 @@ class VippsLogin {
         $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
-        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not connect to your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
+        $notices = "<div class='notice notice-error is-dismissible'><p>" . sprintf(__('Could not connect to your %1$s profile: ', 'login-with-vipps'), VippsLogin::CompanyName()) . esc_html($errordesc) . "<p></div>";
         set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
     }
 
@@ -1207,14 +1212,14 @@ class VippsLogin {
         if (!$ok) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $sorrymessage = apply_filters('login_with_vipps_cannot_connect_message', __('Unfortunately, you cannot connect to this Vipps-profile: The email addresses are not the same.', 'login-with-vipps'), $user, $userinfo);
+            $sorrymessage = apply_filters('login_with_vipps_cannot_connect_message', sprintf(__('Unfortunately, you cannot connect to this %1$s-profile: The email addresses are not the same.', 'login-with-vipps'), VippsLogin::CompanyName()), $user, $userinfo);
             $this->continue_with_vipps_error_confirm('wrong_user', $sorrymessage, '', $session);
             exit();
         }
         // Actually connect user to phone/sub here
         $this->map_phone_to_user($phone, $sub, $user);
         update_user_meta($userid, '_vipps_just_connected', 1);
-        $this->log(sprintf(__("Vipps user with phone %s just connected to account %d", 'login-with-vipps'), $phone, $userid));
+        $this->log(sprintf(__('%1$s user with phone %2$s just connected to account %1$d', 'login-with-vipps'), VippsLogin::CompanyName(), $phone, $userid));
 
         do_action("continue_with_vipps_{$app}_confirm_before_redirect", $userid, $userinfo, $session);
 
@@ -1272,7 +1277,7 @@ class VippsLogin {
         if ($verifieduser && $verifieduser->ID != $userid) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
-            $sorrytext  = __('Login not confirmed: This user is not the user mapped to the Vipps account, and does not have the same email account', 'login-with-vipps');
+            $sorrytext  = sprintf(__('Login not confirmed: This user is not the user mapped to the %1$s account, and does not have the same email account', 'login-with-vipps'), VippsLogin::CompanyName());
             $sorrytext = apply_filters('login_with_vipps_confirm_login_wrong_usertext', $sorrytext, wp_get_current_user(), $userinfo, $session);
             return $this->continue_with_vipps_error_confirm_login('wrong_user', $sorrytext);
         }
@@ -1287,7 +1292,7 @@ class VippsLogin {
     public function continue_with_vipps_error_confirm_login ($error,$errordesc,$error_hint='',$sessiondata=array()) {
        $origin = $sessiondata['referer'];
        if (!$origin) $origin = wp_login_url();
-       $message .= "<h2>" . __("Cannot log in: It is required for this account to verify login with the Vipps app", 'login-with-vipps') . "</h2>";
+       $message .= "<h2>" . sprint(__('Cannot log in: It is required for this account to verify login with the %1$s app', 'login-with-vipps'), VippsLogin::CompanyName()) . "</h2>";
        $message .= "<p>" . "<b>" . esc_html($error) . "<b>: " .  esc_html($errordesc) . "</p>";
        $message .= "<p>" . sprintf(__("<a href='%s'>Return to your previous page</a> to try again</a>", 'login-with-vipps'), esc_attr($origin)) . "</p>";
        wp_die($message);
@@ -1314,7 +1319,7 @@ class VippsLogin {
         $cookie = sanitize_text_field(@$_COOKIE[LOGGED_IN_COOKIE]);
         if (!$cookie) return;
         $cookiehash =  hash('sha256',$cookie,false);
-        $notices = "<div class='notice notice-error is-dismissible'><p>" . __("Could not synchronize your Vipps profile: ", 'login-with-vipps') . esc_html($errordesc) . "<p></div>";
+        $notices = "<div class='notice notice-error is-dismissible'><p>" . sprintf(__('Could not synchronize your %1$s profile: ', 'login-with-vipps'), VippsLogin::CompanyName()) . esc_html($errordesc) . "<p></div>";
         set_transient('_vipps_login_save_admin_notices_' . $cookiehash,$notices, 5*60);
     }
 
