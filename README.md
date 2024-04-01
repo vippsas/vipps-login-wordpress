@@ -64,9 +64,9 @@ Already registered users can link their current accounts when signing in with Vi
 
 Login with Vipps can be added to all relevant pages in your web shop: login, registration, cart, and checkout pages.
 
-### Free of charge
+### Vipps Login
 
-Login with Vipps is free of charge for site owners and end-users. Merchants that already use Vipps online payment can add Sign in with Vipps to their account at [https://portal.vippsmobilepay.com](https://portal.vippsmobilepay.com). New site owners need to set up an agreement with Vipps to use the service. This can be ordered [here](https://portal.vippsmobilepay.com).
+New site owners need to set up an agreement with Vipps to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
 
 ### Customizable for your application
 

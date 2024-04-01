@@ -660,6 +660,12 @@ class ContinueWithVipps {
         } else {
             $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
         }
+
+        $headers['Vipps-System-Name'] = 'Wordpress';
+        $headers['Vipps-System-Version'] = get_bloginfo('version');
+        $headers['Vipps-System-Plugin-Name'] = 'login-with-vipps';
+        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION;
+
         $response = $this->http_call($url,$args,'POST',$headers,'url');
         return $response;
     }
