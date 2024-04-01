@@ -1,5 +1,5 @@
 .notice.notice-vipps-login.notice-info {
-    border-left-color: #fe5b24;
+    border-left-color: #FF5B24;
     min-height: 56px;
 }
 .notice.notice-vipps-login.notice-info > div {
@@ -8,8 +8,8 @@
 }
 
 .notice.notice-vipps-login.notice-info.notice-vipps-neg {
-    border-color: #fe5b24 !important;
-    background-color: #fe5b24 !important;
+    border-color: #FF5B24 !important;
+    background-color: #FF5B24 !important;
     color: white !important;
     min-height: 56px;
 }

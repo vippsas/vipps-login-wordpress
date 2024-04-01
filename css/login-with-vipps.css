@@ -66,7 +66,7 @@ SOFTWARE.
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
  display: inline-block;
  color: #fff;
- background-color: #fe5b24;
+ background-color: #FF5B24;
  border: 0;
  padding:0;
  font-size: 22px;
@@ -95,7 +95,7 @@ SOFTWARE.
 }
 
 .vippsorange, .button.vippsorange, button.vippsorange{
- background-color: #fe5b24;
+ background-color: #FF5B24;
  color: #fff;
 }
 
@@ -107,7 +107,7 @@ SOFTWARE.
 .widget_shopping_cart .continue-with-vipps-wrapper.widget a.button.continue-with-vipps{
  float: none;
  color: #fff;
- background-color: #fe5b24;
+ background-color: #FF5B24;
  font-size: 14.5px;
  padding-left: 5px;
  padding-right: 4px;
@@ -120,7 +120,7 @@ SOFTWARE.
 }
 .widget_shopping_cart .continue-with-vipps-wrapper a.button.continue-with-vipps:hover{
  color: #fff;
- background-color: #fe5b24;
+ background-color: #FF5B24;
  border: 0;
 }
 
@@ -151,9 +151,9 @@ html body img.inline.vipps-logo {
 /* For the banners - replicate default Woo banner css for this because too many themes override */
 .vipps-banner.vipps-info {
     color: #fff;
-    background-color: #fe5b24;
-    border-color: #fe5b24;
-    border-color: #fe5b24;
+    background-color: #FF5B24;
+    border-color: #FF5B24;
+    border-color: #FF5B24;
 }
 .vipps-banner.vipps-info img.vipps-logo {
  margin:0px;
@@ -175,7 +175,7 @@ html body img.inline.vipps-logo {
 }
 .vipps-banner.vipps-info a {
     color:white;
-    background-color:#fe5b24;
+    background-color:#FF5B24;
 
 }
 .vipps-banner.vipps-info {

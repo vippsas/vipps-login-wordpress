@@ -31,13 +31,14 @@
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
  display: inline-block;
  color: #fff;
- background-color: #fe5b24;
+ background-color: #FF5B24;
  border: 0;
  padding:0;
  font-size: 22px;
  height: 48px;
  line-height: 48px;
  font-weight: 400;
+ border-radius: 5px;
  text-align:center;
  cursor: pointer;
  box-sizing: border-box;
