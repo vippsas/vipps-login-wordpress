@@ -28,6 +28,8 @@
 .continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img {
     opacity: 0.7;
 }
+
+
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
  display: inline-block;
  color: #fff;
@@ -59,4 +61,9 @@
  border: 0;
 }
 
-
+.mobilepay-background {
+    background-color: #5A78FF;
+}
+.vipps-background {
+    background-color: #FF5B24;
+}

@@ -143,11 +143,7 @@ class VippsLogin {
 
         $loginconfig = array( 'ajax_url' => admin_url( 'admin-ajax.php' ));
 
-        // If WPML is installed, ensure ajax gets passed a language parameter IOK 2021-08-31
-        global $sitepress;
-        if (is_object($sitepress) && method_exists($sitepress, 'get_current_language')) {
-            $loginconfig['lang'] = $sitepress->get_current_language();
-        }
+        $loginconfig['lang'] = $this->get_customer_language();
 
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', $loginconfig);
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
@@ -331,8 +327,30 @@ class VippsLogin {
     }
 
     public function get_login_method() {
-        return get_option('vipps_login_options')['login_method'];
+        $method = get_option('vipps_login_options')['login_method'];
+        if (!$method) {
+            return 'Vipps'; // Default to Vipps if not set
+        }
+        return $method;
     }
+
+    // Try to get the current language in the format Vipps wants, one of 'en' and 'no'
+    // Follows the same implementation as the main VippsMobilePay plugin
+    public function get_customer_language() {
+        $user = wp_get_current_user();
+        $user_locale = get_user_meta($user->ID, 'locale', true);
+        $language = substr($user_locale, 0, 2); 
+        if (function_exists('pll_current_language')) {
+           $language = pll_current_language('slug');
+        } elseif (has_filter('wpml_current_language')){
+            $language=apply_filters('wpml_current_language',null);
+        } 
+        if (! $language) $language = substr(get_bloginfo('language'),0,2);
+        if ($language == 'nb' || $language == 'nn') $language = 'no';
+        if ($language == 'da') $language = 'dk';
+        if (! in_array($language, ['en', 'no', 'dk', 'fi'])) $language = 'en';
+        return $language;
+     }
 
     // Extra options to be added to the admin-page for Login With Vipps. IOK 2019-10-14
     public function extra_option_fields () {
@@ -680,13 +698,37 @@ class VippsLogin {
 
     // The HTML for this button. IOK 2019-10-14
     public function login_button_html($text, $application) {
-        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $logo = $this->get_transparent_logo();
+        $bg = $this->get_background_class();
         ob_start();
         ?>
-            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps" title="<?php echo $text; ?>"><?php echo $text;?> <img
+            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo $bg;?>" title="<?php echo $text; ?>"><?php echo $text;?> <img
             alt="<?php printf(__('Log in without password using %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?>" src="<?php echo $logo; ?>">!</a>
             <?php
         echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
+    }
+
+
+    // The logo for the login button, depending on the login method.
+    public function get_transparent_logo() {
+        $method = $this->get_login_method();
+        if ($method == 'MobilePay') {
+            return plugins_url('img/mobilepay_logo_negativ_rgb_transparent.png',__FILE__);
+        }
+        if ($method == 'Vipps') {
+            return plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        }
+    }
+
+    // The background for the login button, depending on the login method.
+    public function get_background_class() {
+        $method = $this->get_login_method();
+        if ($method == 'MobilePay') {
+            return 'mobilepay-background';
+        }
+        if ($method == 'Vipps') {
+            return 'vipps-background';
+        }
     }
 
     // The login form does not have any action that runs right before the form, where we want to be. So we cheat, rewriting the page using javascript. IOK 2019-10-14

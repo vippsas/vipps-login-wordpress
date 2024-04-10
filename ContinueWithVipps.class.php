@@ -335,13 +335,13 @@ class ContinueWithVipps {
 
 
             </table>
-            <div style="clear:both;margin-top:2rem;"><p><strong><?php echo sprintf(__("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%2\$s'>%1\$s' documentation</a>", 'login-with-vipps'), VippsLogin::CompanyName(), 'https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api-faq.md#how-can-i-activate-and-set-up-vipps-login'); ?></strong></p></div>
-            
-            <?php  do_action('continue_with_vipps_extra_option_fields'); ?>
-            
             <div> <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
+        <div style="clear:both;margin-top:2rem;"><p><strong><?php echo sprintf(__("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%2\$s'>%1\$s' documentation</a>", 'login-with-vipps'), VippsLogin::CompanyName(), 'https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api-faq.md#how-can-i-activate-and-set-up-vipps-login'); ?></strong></p></div>
+
+
             </form>
 
+            <?php  do_action('continue_with_vipps_extra_option_fields'); ?>
 
 
             </div>

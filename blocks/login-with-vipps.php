@@ -54,24 +54,29 @@ function login_with_vipps_block_init() {
           $applications[] = array('label' => __("Log in to WooCommerce", 'login-with-vipps'), 'value'=>'woocommerce');
         }
 
+
+
+        $login_method = VippsLogin::instance()->get_login_method();
         $localizations = array();
-        $localizations['BlockTitle'] = sprintf(__('Log in with %1$s-button', 'login-with-vipps'), VippsLogin::CompanyName()); 
+        $localizations['BlockTitle'] = sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method); 
 
         $localizations['applications'] = apply_filters('login_with_vipps_applications', $applications);
         $localizations['defaultapp'] = ($gotWoo ? 'woocommerce' : 'wordpress');
 
         $localizations['Application'] = __('Application', 'login-with-vipps');
-        $localizations['ApplicationsText'] = sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), VippsLogin::CompanyName());
+        $localizations['ApplicationsText'] = sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method);
         $localizations['Title'] = __('Title', 'login-with-vipps');
         $localizations['TitleText'] = __('This will be used as the title/popup of the button', 'login-with-vipps');
  
         $localizations['DefaultTextPrelogo'] = __('Log in with', 'login-with-vipps'); 
         $localizations['DefaultTextPostlogo'] = __('!', 'login-with-vipps'); 
-        $localizations['DefaultTitle'] = sprintf(__('Log in with %1$s!', 'login-with-vipps'), VippsLogin::CompanyName()); 
+        $localizations['DefaultTitle'] = sprintf(__('Log in with %1$s!', 'login-with-vipps'), $login_method); 
 
 
-        $localizations['logosrc'] = plugins_url('../img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
-        $localizations['vippssmileurl'] = plugins_url('../img/vipps-smile-orange.png',__FILE__);
+        $localizations['logosrc'] = VippsLogin::instance()->get_transparent_logo();
+        $localizations['logourl'] = plugins_url('../img/vmp-logo.png',__FILE__);
+        $localizations['loginmethod'] = VippsLogin::instance()->get_login_method();
+
 
 	$index_js = 'login-with-vipps-button/index.js';
 	wp_register_script(

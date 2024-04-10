@@ -77,6 +77,12 @@ SOFTWARE.
  cursor: pointer;
  box-sizing: border-box;
 }
+.continue-with-vipps-wrapper a.button.continue-with-vipps.mobilepay-background {
+ background-color: #5A78FF;
+}
+.continue-with-vipps-wrapper a.button.continue-with-vipps.vipps-background {
+ background-color: #FF5B24;
+}
 
 .continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
  text-decoration: none;
@@ -212,5 +218,3 @@ html body img.inline.vipps-logo {
     font-weight: bolder;
     background-color: transparent;
 }
-
-    

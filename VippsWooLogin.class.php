@@ -159,6 +159,8 @@ class VippsWooLogin{
 
         ?>
 
+            <form action='options.php' method='post'>
+            <?php settings_fields('vipps_login_woo_options'); ?>
             <table class="form-table" style="width:100%">
             <tr><th colspan=3><h3><?php _e('WooCommerce options', 'login-with-vipps'); ?></th></tr>
             <tr>
@@ -220,6 +222,8 @@ class VippsWooLogin{
 
            <tr>
             </table>
+            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
+            </form>
             <?php
     }
 
@@ -351,7 +355,7 @@ class VippsWooLogin{
         $company_name = VippsLogin::CompanyName();
         $options = get_option('vipps_login_woo_options');
         if (@$options['woo-banner-text'] || @$options['woo-banner-linktext']) {
-           $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+           $logo = VippsLogin::instance()->get_transparent_logo();
            $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>";
            $message = @$options['woo-banner-text'];
            $message = preg_replace('!VIPPS!', $logoimg,$message); 
@@ -376,7 +380,7 @@ class VippsWooLogin{
         } else {
             $text = sprintf(__('Are you registered as a customer? Log in with %s to continue your checkout.', 'login-with-vipps'), $login_method);
         }
-        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $logo = VippsLogin::instance()->get_transparent_logo();
         $linktext = __('Click to continue', 'login-with-vipps');
 
         $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>";
@@ -434,7 +438,7 @@ class VippsWooLogin{
         if (!$can_register) return;
 
         $login_method = VippsLogin::instance()->get_login_method();
-        $logo = plugins_url('img/vmp-logo.png',__FILE__);
+        $logo = VippsLogin::instance()->get_transparent_logo();
         $linktext = __('Click here to continue', 'login-with-vipps');
         $text = sprintf(__('Create an account using %s', 'login-with-vipps'), $login_method);
 
@@ -546,7 +550,7 @@ class VippsWooLogin{
     }
 
     public function  synch_address_button () {
-        $logo = plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        $logo = VippsLogin::instance()->get_transparent_logo();
         $company_name = VippsLogin::CompanyName();
         ?>
             <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
