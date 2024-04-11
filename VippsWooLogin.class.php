@@ -442,7 +442,7 @@ class VippsWooLogin{
         $linktext = __('Click here to continue', 'login-with-vipps');
         $text = sprintf(__('Create an account using %s', 'login-with-vipps'), $login_method);
 
-        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
+        $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$text'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_register_banner', $message);
         $class = 'vipps-banner vipps-info';
@@ -551,10 +551,10 @@ class VippsWooLogin{
 
     public function  synch_address_button () {
         $logo = VippsLogin::instance()->get_transparent_logo();
-        $company_name = VippsLogin::CompanyName();
+        $login_method = VippsLogin::instance()->get_login_method();
         ?>
             <button type="button" onclick="vipps_synch_address('woocommerce');return false"; class="button vippsorange vipps-synch" value="1" name="vipps-synch">
-            <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>"); ?>
+            <?php printf(__('Get addresses','login-with-vipps'),  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>"); ?>
             </button> 
             <?php
     }

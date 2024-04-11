@@ -698,12 +698,13 @@ class VippsLogin {
 
     // The HTML for this button. IOK 2019-10-14
     public function login_button_html($text, $application) {
+        $login_method = $this->get_login_method();
         $logo = $this->get_transparent_logo();
         $bg = $this->get_background_class();
         ob_start();
         ?>
-            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo $bg;?>" title="<?php echo $text; ?>"><?php echo $text;?> <img
-            alt="<?php printf(__('Log in without password using %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?>" src="<?php echo $logo; ?>">!</a>
+            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo $bg;?>" title="<?php echo sprintf("%s %s", $text, $login_method); ?>"><?php echo $text;?> <img
+            alt="<?php printf(__('Log in without password using %1$s', 'login-with-vipps'), $login_method); ?>" src="<?php echo $logo; ?>">!</a>
             <?php
         echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
     }
