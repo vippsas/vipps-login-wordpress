@@ -66,7 +66,6 @@ SOFTWARE.
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
  display: inline-block;
  color: #fff;
- background-color: #FF5B24;
  border: 0;
  padding:0;
  font-size: 22px;
@@ -76,6 +75,13 @@ SOFTWARE.
  text-align:center;
  cursor: pointer;
  box-sizing: border-box;
+}
+
+.mobilepay-background {
+    background-color: #5A78FF!important;
+}
+.vipps-background {
+    background-color: #FF5B24!important;
 }
 
 .continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
