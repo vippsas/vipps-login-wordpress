@@ -18,7 +18,7 @@
                 apiVersion: 3,
 		title: LoginWithVippsBlockConfig['BlockTitle'],
 		category: 'widgets',
-                icon: el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vippssmileurl']}),
+                icon: el('img', {"class": "vipps-smile vipps-component-icon", "src": LoginWithVippsBlockConfig['vmplogosrc']}),
 		supports: {
 			html: true,
                         customClassName: true,
@@ -51,12 +51,16 @@
                       source: "html",
                       selector: ".postlogo",
                   },
+                  loginmethod: {
+                      default: LoginWithVippsBlockConfig['loginmethod'] || 'Vipps',
+                      type: "string",
+                      source: "attribute",
+                  }
                  },
 
 	    edit: function( props ) {
-                let blockProps = useBlockProps();
-                let logo =  LoginWithVippsBlockConfig['logosrc'];
-        		let attributes = props.attributes;
+                let logo =  LoginWithVippsBlockConfig['loginmethodlogosrc'];
+		let attributes = props.attributes;
                 let formats = ['core/bold', 'core/italic'];
 
                 // Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
@@ -70,23 +74,24 @@
                 }
                 if (!found) appOptions.push({label: current, value: current});
 
-                let wrapperclassname = 'continue-with-vipps-wrapper inline';
-                let classname = 'button vipps-orange vipps-button continue-with-vipps';
+                let backgroundColorClass = props.attributes.loginmethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
 
+		return el(
+		    'span',
+		    { className: 'continue-with-vipps-wrapper inline ' + props.className },
+                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action " + backgroundColorClass + " " + props.className, 
+                              title:attributes.title, 'data-application':attributes.application},
+                      el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
+                      el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['loginmethodlogosrc'], className: 'vipps-block-logo-img' }),
+                      el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
+                    ),
 
-                if (attributes.className) {
-                    wrapperclassname += " " + attributes.className;
-                    classname += " " + attributes.className;
-                }
-
-                return  el("div", blockProps, 
-                        el('span', { className: wrapperclassname },
-                            el("a", { className: classname, title:attributes.title, 'data-application':attributes.application},
-                                el(RichText, { tagName: 'span', className:'prelogo', inline:true, allowedFormats:formats, value:attributes.prelogo, onChange: v => props.setAttributes({prelogo: v}) }),
-                                el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
-                                el(RichText, { tagName: 'span', className:'postlogo', inline:true, allowedFormats:formats, value:attributes.postlogo, onChange: v => props.setAttributes({postlogo: v}) }),
-                              )
-                          ),
+// This is for the menu-bar over the block - not used here
+/*
+                   el(BlockControls, {}, 
+                        el(AlignmentToolbar,{ value: attributes.alignment, onChange: onChangeAlignment  } )
+                   ),
+*/
 
                         // This is for left-hand block properties thing
                         el(InspectorControls, {},
@@ -104,23 +109,16 @@
 
 	    save: function( props ) {
 		var attributes = props.attributes;
-                let wrapperclassname = 'continue-with-vipps-wrapper inline';
-                let classname = 'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action';
-                
-                if (attributes.className) {
-                    wrapperclassname += " " + attributes.className;
-                    classname += " " + attributes.className;
-                }
-
-		return el( 'span', { className: wrapperclassname },
-                    el("a", { className: classname,
+                let backgroundColorClass = props.attributes.loginmethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
+		return el( 'span', { className: 'continue-with-vipps-wrapper inline ' + props.className   },
+                    el("a", { className: "button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action " + backgroundColorClass + " " + props.className, 
                               title:attributes.title, 'data-application':attributes.application, href: "javascript: void(0);" },
                     el( RichText.Content, {
                        tagName: 'span',
                        className: 'prelogo',
                        value:attributes.prelogo,
                      }),
-                      el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['logosrc'] }),
+                      el("img", {alt:attributes.title, src: LoginWithVippsBlockConfig['loginmethodlogosrc'], className: 'vipps-block-logo-img' }),
                     el( RichText.Content, {
                        tagName: 'span',
                        className: 'postlogo',

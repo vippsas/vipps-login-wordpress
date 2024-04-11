@@ -73,8 +73,8 @@ function login_with_vipps_block_init() {
         $localizations['DefaultTitle'] = sprintf(__('Log in with %1$s!', 'login-with-vipps'), $login_method); 
 
 
-        $localizations['logosrc'] = VippsLogin::instance()->get_transparent_logo();
-        $localizations['logourl'] = plugins_url('../img/vmp-logo.png',__FILE__);
+        $localizations['loginmethodlogosrc'] = VippsLogin::instance()->get_transparent_logo();
+        $localizations['vmplogosrc'] = plugins_url('../img/vmp-logo.png',__FILE__);
         $localizations['loginmethod'] = VippsLogin::instance()->get_login_method();
 
 

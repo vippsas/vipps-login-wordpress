@@ -17,7 +17,7 @@
 }
 .continue-with-vipps-wrapper a.button.continue-with-vipps img {
     max-width: 100%;
-    margin:0px;
+    margin:0px 2px;
     display:inline;
     height: 2ex;
     vertical-align: text-bottom;
@@ -62,8 +62,8 @@
 }
 
 .mobilepay-background {
-    background-color: #5A78FF;
+    background-color: #5A78FF!important;
 }
 .vipps-background {
-    background-color: #FF5B24;
+    background-color: #FF5B24!important;
 }
