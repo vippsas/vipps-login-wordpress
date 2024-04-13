@@ -351,6 +351,59 @@ class VippsLogin {
         if (! in_array($language, ['en', 'no', 'dk', 'fi'])) $language = 'en';
         return $language;
      }
+     
+     
+     public function init_form_login_options2() {
+        $options = get_option('vipps_login_options2');
+        $continuepageid = $options['continuepageid'];
+        $continuepageoptions = array(
+           ''=>__('Create a new page', 'login-with-vipps'),
+        );
+        foreach(get_pages() as $page) {
+            $continuepageoptions[$page->post_name] = $page->post_title;
+        }
+
+        $roles = array();
+        foreach(wp_roles()->roles as $role=>$roledata) {
+            $roles[$role] = $roledata['name'];
+        }
+
+        $fields = array(
+            'use_vipps_login' => array(
+                'type' => 'checkbox',
+                'title' => sprintf(__('Enable Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'description' => sprintf(__('Turn Login with %1$s on and off', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'default' => false,
+            ),
+            'login_page' => array(
+                'type' => 'checkbox',
+                'title' => sprintf(__('Add %1$s to login page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'description' => sprintf(__('Log in with %1$s on the Wordpress login page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'default' => false,
+            ),
+            'required_roles' => array(
+                'type' => 'multicheck',
+                'title' => sprintf(__('Require %1$s to log in for users in these roles', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'description' => sprintf(__('Users in these roles *must* use login with %1$s. You can also require this for a given user on the profile page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'options' => $roles,
+                'default' => array(),
+            ),
+            'continuepageid' => array(
+                'type' => 'select',
+                'title' => sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'description' => __('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose. A blank page will have been installed for you when activating the plugin, this is the default page which will be used. Do *not* use any system pages or anything that is being used for other things.', 'login-with-vipps'),
+                'options' => $continuepageoptions,
+                'default' => 0,
+            )
+        );
+
+        return array(
+            'title' => sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'key' => 'vipps_login_options2',
+            'fields' => $fields,
+        );
+    }
+
 
     // Extra options to be added to the admin-page for Login With Vipps. IOK 2019-10-14
     public function extra_option_fields () {

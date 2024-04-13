@@ -149,6 +149,61 @@ class VippsWooLogin{
         return false;
     }
 
+
+    public function init_form_login_woo_options() {
+        $fields = array(
+            'woo-login' => array(
+                'title' => __('Enable Login with Vipps for WooCommerce', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Enable Login with Vipps on your customer\'s pages in WooCommerce', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-create-users' => array(
+                'title' => __('Allow users to register as customers in WooCommerce using Login with Vipps', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Enable new users to be created as customers if using Login with Vipps with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-cart-login' => array(
+                'title' => __('Show "Continue with Vipps" in Cart page and widgets', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('If you are using Vipps Express Checkout, that will be shown instead.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-checkout-login' => array(
+                'title' => __('Show "Continue with Vipps" on the Checkout page', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('This will replace Vipps Express Checkout on the checkout page.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-banner-text' => array(
+                'title' => __('Change "Continue with Vipps" banner text', 'login-with-vipps'),
+                'type' => 'text',
+                'placeholder' => __('Log in or register an account using VIPPS.', 'login-with-vipps'), // 'VIPPS' will be replaced by the VIPPS logo
+                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'default' => '',
+            ),
+            'woo-banner-linktext' => array(
+                'title' => __('Change "Continue with Vipps" banner link text', 'login-with-vipps'),
+                'type' => 'text',
+                'placeholder' => __('Click here to continue', 'login-with-vipps'),
+                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'default' => '',
+            ),
+            'woo-banner-clickable' => array(
+                'title' => __('Make the entire banner clickable', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Normally, WooCommerce-banners like this will use a "click here"-text. If you don\'t, check here to make the entire banner clickable like a button', 'login-with-vipps'),
+                'default' => 0,
+            ),
+        );
+        return array(
+            'title' => sprintf(__('WooCommerce options for %s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'key' => 'vipps_login_woo_options',
+            'fields' => $fields,
+        );
+    }
+
     // We are going to add some extra configuration options here. IOK 2019-10-14
     public function extra_option_fields () {
         $options = get_option('vipps_login_woo_options');
