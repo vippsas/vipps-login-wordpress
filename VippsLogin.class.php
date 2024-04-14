@@ -65,7 +65,7 @@ class VippsLogin {
             static::$isactive = 0;
             return 0;
         }
-        $options = get_option('vipps_login_options2');
+        $options = get_option('vipps_login_settings');
         $usevipps = @$options['use_vipps_login'];
         static::$isactive   = $usevipps;
         return $usevipps;
@@ -154,7 +154,7 @@ class VippsLogin {
 
     public function login_enqueue_scripts() {
         if (!static::is_active()) return;
-        $options = get_option('vipps_login_options2');
+        $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
         wp_enqueue_script('jquery');
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
@@ -292,10 +292,6 @@ class VippsLogin {
         }
         add_action('show_user_profile', array($this,'show_extra_profile_fields'));
 
-        // We also add some more options. These are put on the main "Log in with Vipps" options screen. IOK 2019-10-14
-        register_setting('vipps_login_options2','vipps_login_options2', array($this,'validate'));
-        add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
-
         // Error- and successhandling on the profile page: Add some feedback in standard WP idioms. IOK 2019-10-14
         global $pagenow;
         if ($pagenow == 'profile.php') {
@@ -327,7 +323,7 @@ class VippsLogin {
     }
 
     public function get_login_method() {
-        $method = get_option('vipps_login_options')['login_method'];
+        $method = get_option('vipps_login_settings')['login_method'];
         if (!$method) {
             return 'Vipps'; // Default to Vipps if not set
         }
@@ -354,16 +350,26 @@ class VippsLogin {
      
      
      public function init_form_login_options2() {
-        $options = get_option('vipps_login_options2');
-        $continuepageid = $options['continuepageid'];
+        $options = get_option('vipps_login_settings');
         $continuepageoptions = array(
            ''=>__('Create a new page', 'login-with-vipps'),
         );
+        $continuepageid = $options['continuepageid'];
+
+        $continuepage = $this->ensure_continue_with_vipps_page();
+        if (is_wp_error($continuepage)) {
+            $notice = $continuepage->get_error_message();
+            add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-error is-dismissible'><p>$notice</p></div>"; });
+        } else {
+            $continuepageid = $continuepage->ID;
+        }
         foreach(get_pages() as $page) {
             $continuepageoptions[$page->post_name] = $page->post_title;
         }
 
-        $roles = array();
+        $roles = array(
+            '_all_' => __('Everybody', 'login-with-vipps'),
+        );
         foreach(wp_roles()->roles as $role=>$roledata) {
             $roles[$role] = $roledata['name'];
         }
@@ -399,99 +405,8 @@ class VippsLogin {
 
         return array(
             'title' => sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
-            'key' => 'vipps_login_options2',
             'fields' => $fields,
         );
-    }
-
-
-    // Extra options to be added to the admin-page for Login With Vipps. IOK 2019-10-14
-    public function extra_option_fields () {
-        $options = get_option('vipps_login_options2');
-        $continuepageid = $options['continuepageid'];
-
-        $continuepage = $this->ensure_continue_with_vipps_page();
-        if (is_wp_error($continuepage)) {
-            $notice = $continuepage->get_error_message();
-            add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-error is-dismissible'><p>$notice</p></div>"; });
-        } else {
-            $continuepageid = $continuepage->ID;
-        }
-        $usevipps = @$options['use_vipps_login'];
-        $loginpage = @$options['login_page'];
-
-        $required_roles = @$options['required_roles'];
-
-        ?>
-            <table class="form-table" style="width:100%">
-            <tr><th colspan=3><h3><?php _e('Login settings', 'login-with-vipps'); ?></th></tr>
-
-            <tr>
-            <td><?php printf(__('Enable Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_options2[use_vipps_login]' value=0>
-            <input type='checkbox' name='vipps_login_options2[use_vipps_login]' value=1 <?php if ( $usevipps) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('Turn Login with %1$s on and off', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-
-
-            <tr>
-            <td><?php _e('Add  to login page', 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_options2[login_page]' value=0>
-            <input type='checkbox' name='vipps_login_options2[login_page]' value=1 <?php if ( $loginpage) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('Log in with %1$s on the Wordpress login page', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-
-            <tr>
-            <td><?php printf(__('Require %1$s to log in for users in these roles', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> 
-            <label for="vipps_require__all_"><?php _e("Everybody", "login-with-vipps"); ?> </label>
-                   <input type='checkbox' id=vipps_require__all_  name='vipps_login_options2[required_roles][_all_]' value="1" 
-                          <?php if (isset($required_roles['_all_']) && $required_roles['_all_']) echo ' checked=checked'; ?> >
-                   <br>
-<?php foreach(wp_roles()->roles as $role=>$roledata): $r=esc_attr($role); ?>
-            <span style="margin-right:1em" white-space:nowrap"><label for="vipps_require_<?php echo $r; ?>"><?php echo esc_html($roledata['name']); ?></label>
-             <input type='checkbox' id="vipps_require_<?php echo $r; ?>"
-                    name='vipps_login_options2[required_roles][<?php echo $r; ?>]' value=1 
-                    <?php if (isset($required_roles[$role]) && $required_roles[$role]) echo ' checked=checked'; ?>>
-            </span>
-<?php endforeach; ?>
-
-            </td>
-            <td>
-            <?php printf(__('Users in these roles *must* use login with %1$s. You can also require this for a given user on the profile page', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-
-            <tr>
-            <td><?php printf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%>
-            <?php wp_dropdown_pages(array('name'=>'vipps_login_options2[continuepageid]','selected'=>$continuepageid,'show_option_none'=>__('Create a new page', 'login-with-vipps'))); ?>
-            </td>
-            <td><?php _e('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose. A blank page will have been installed for you when activating the plugin, this is the default page which will be used. Do *not* use any system pages or anything that is being used for other things.','login-with-vipps'); ?></td>
-            </tr>
-            </table>
-            <?php
-    }
-
-    // And validation for the extra options. IOK 2019-10-14
-    public function validate ($input) {
-        $current =  get_option('vipps_login_options2');
-        if (empty($input)) return $current;
-
-        $valid = array();
-        foreach($input as $k=>$v) {
-            switch ($k) {
-                default:
-                    $valid[$k] = $v;
-            }
-        }
-        return $valid;
     }
 
     // Upon activation, this plugin will create a new page that is used for one thing only: Waiting for the user to confirm that the
@@ -503,7 +418,7 @@ class VippsLogin {
             $continueid = $continuepage->ID;
         }
         $default = array('continuepageid'=>$continueid, 'use_vipps_login'=>true,'login_page'=>true,'require_confirmation'=>false);
-        add_option('vipps_login_options2',$default,false);
+        add_option('vipps_login_settings',$default,false);
     }
 
     public static function deactivate () {
@@ -512,14 +427,14 @@ class VippsLogin {
 
     // Returns the page object of the 'continue with vipps' page, creating it if neccessary. 2019-10-14
     public function ensure_continue_with_vipps_page() {
-        $options = get_option('vipps_login_options2');
+        $options = get_option('vipps_login_settings');
         $continuepageid = $options['continuepageid'];
         if ($continuepageid) {
             $page = get_post($continuepageid);
             if ($page) return $page;
             if (!$page) {
                 $options['continuepageid'] = 0;
-                update_option('vipps_login_options2', $options);
+                update_option('vipps_login_settings', $options);
             }
         }
 
@@ -547,7 +462,7 @@ class VippsLogin {
         }
 
         $options['continuepageid'] = $newid;
-        update_option('vipps_login_options2', $options);
+        update_option('vipps_login_settings', $options);
         return get_post($newid);
     }
 
@@ -659,7 +574,7 @@ class VippsLogin {
         if ($this->currentSid) {
             list ($userid, $sid) = $this->currentSid; 
             if (!$sid) {
-                $options = get_option('vipps_login_options2');
+                $options = get_option('vipps_login_settings');
                 $option_roles= isset($options['required_roles']) ? $options['required_roles'] : [];
                 if (!is_array($option_roles)) $option_roles=array();
 
@@ -730,13 +645,13 @@ class VippsLogin {
 
     // The login-button on the front page. Moved up in front of the main form using javascript. IOK 2019-10-14
     public function login_form_continue_with_vipps () {
-        $options = get_option('vipps_login_options2');
+        $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
         $this->wp_login_button(__('Log in with', 'login-with-vipps'));
         $this->move_continue_button_over_login_form();
     }
     public function register_form_continue_with_vipps () {
-        $options = get_option('vipps_login_options2');
+        $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
         $this->wp_login_button(__('Continue with', 'login-with-vipps'));
         $this->move_continue_button_over_login_form();

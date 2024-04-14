@@ -67,7 +67,7 @@ class ContinueWithVipps {
     protected static $instance = null;
 
     function __construct() {
-        $this->settings = get_option('vipps_login_options', array());
+        $this->settings = get_option('vipps_login_settings', array());
     }
 
     // This class should only get instantiated with this method. IOK 2019-10-14 
@@ -86,7 +86,7 @@ class ContinueWithVipps {
         print __("Your redirect-URI is:", 'login-with-vipps');
         print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
         print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
-        print __("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
+        print __("Copy the URI above. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
     }
 
     public function log ($what,$type='info') {
@@ -140,14 +140,27 @@ class ContinueWithVipps {
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
 
+        // Migrate old settings to new settings, this was necessary so that the settings could be stored/modified in the same form on the settings page.
+        // This is a one-time operation, and will only run if there's no settings in the new format.
+        $current_login_options = get_option('vipps_login_options', false);
+        $current_login_options2 = get_option('vipps_login_options2', false);
+        $current_woo_login_options = get_option('vipps_woo_login_options', false);
+        $should_migrate = empty(get_option('vipps_login_settings'));
+        if ($should_migrate) {
+            add_option('vipps_login_settings', array_merge(
+                $current_login_options,
+                $current_login_options2,
+                $current_woo_login_options
+            ));
+        }
     }
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
     public function plugins_loaded () {
         $ok = load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
-        $options =   get_option('vipps_login_options'); 
+        $options =   get_option('vipps_login_settings'); 
         if (!@$options['installtime']) {
             $options['installtime'] = time();
-            update_option('vipps_login_options',$options,false);
+            update_option('vipps_login_settings',$options,false);
         }
         $this->options = $options;
         // Just in case the tables were updated without 'activate' having been run IOK 2019-09-18
@@ -163,7 +176,7 @@ class ContinueWithVipps {
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
-        register_setting('vipps_login_options','vipps_login_options', array($this,'validate'));
+        register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
         VippsSession::clean();
     }
 
@@ -172,10 +185,10 @@ class ContinueWithVipps {
     public function add_configure_help_login_banner () {
         $dismissed = get_option('_login_vipps_dismissed_notices');
         if (isset($dismissed['configure05'])) return;
-        $options = get_option('vipps_login_options');
+        $options = get_option('vipps_login_settings');
 
         global $pagenow;
-        if ($pagenow == 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] == 'vipps_login_options') {
+        if ($pagenow == 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] == 'vipps_login_settings') {
             return; // Show only on other pages, not the vipps login settings page
         }
 
@@ -198,8 +211,8 @@ class ContinueWithVipps {
         add_action('admin_notices', function () {
             $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
-            $settingsurl = admin_url('options-general.php?page=vipps_login_options');
-            $options = get_option('vipps_login_options');
+            $settingsurl = admin_url('options-general.php?page=vipps_login_settings');
+            $options = get_option('vipps_login_settings');
 
             ?>
             <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure05'>
@@ -228,8 +241,8 @@ class ContinueWithVipps {
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
-        // add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_options',array($this,'toolpage'));
-        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_options',array($this,'init_form_elements'));
+        // add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'toolpage'));
+        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'init_form_elements'));
     }
 
     public function ajax_vipps_dismiss_notice() {
@@ -287,26 +300,27 @@ class ContinueWithVipps {
         }
     }
 
-    public function render_form_field($key, $field, $category_key) {
+    // Render the form field based on the type, escaping the values and attributes to prevent XSS attacks
+    public function render_form_field($key, $field, $values) {
         $type = $field['type'];
         $title = $field['title'];
         $placeholder = @$field['placeholder'];
         $description = @$field['description'];
         $default = @$field['default'];
         $options = @$field['options'];
-        $name = $category_key.'['.$key.']';
+        $name = 'vipps_login_settings[' . $key . ']';
 
-        $values = get_option($category_key, array());
+        // Get the value from the database, or use the default value
         $value = @$field['default'];
         if (isset($values[$key])) {
             $value = $values[$key];
         }
-        
-        // Render the form field based on the type, escaping the values and attributes to prevent XSS attacks
+
         // Add title/label
         $html = "<tr valign='top'><th scope='row'>". esc_html($title)."</th>";
         $html .= '<td>';
         switch($type) {
+            // Create a select dropdown
             case 'select':
                 $html .= "<select class='regular-text' name='" . esc_attr($name) . "' id='" . esc_attr($key) . "'>";
                 foreach($options as $option => $label) {
@@ -315,61 +329,72 @@ class ContinueWithVipps {
                 $html .= "</select>";
                 $html .= "<p class='description'>" . $description . "</p>"; 
                 break;
+            // Create a text input
             case 'text':
                 $html .= "<input class='regular-text' placeholder='".esc_attr($placeholder)."' name='" . esc_attr($name) . "' id='" . esc_attr($key) . "' type='text' value='" . esc_attr($value) . "' />";
                 $html .= "<p class='description'>" . $description . "</p>";                 
                 break;
+            // Create a password input
             case 'password':
-                $html .= "<input class='regular-text' name='" . esc_attr($name) . "' id='" . esc_attr($key) . "' type='password' value='" . esc_attr($value) . "' />";
+                $html .= "<input class='regular-text vippspw' name='" . esc_attr($name) . "' id='" . esc_attr($key) . "' type='password' value='" . esc_attr($value) . "' />";
                 $html .= "<p class='description'>" . $description . "</p>"; 
                 break;
+            // Create a description field, for now only used for the redirect URI
             case 'description':
                 $html .= "<strong>" . $default . "</strong>";
                 $html .= "<p class='description'>" . $description . "</p>"; 
                 break;
+            // Create a checkbox, with a hidden field to ensure the value is always passed
             case 'checkbox':
-                $html .= "<input name='" . esc_attr($name) . "' id='" . esc_attr($key) . "' type='checkbox' value='1' " . checked($value, 1, false) . " />";
+                $html .= "<input name='" . esc_attr($name) . "' type='hidden' value=0>";
+                $html .= "<input name='" . esc_attr($name) . "' id='" . esc_attr($key) . "' type='checkbox' value=1 ".checked($value, 1, false) . " />";
                 $html .= "<label for='" . esc_attr($key) . "'>" . $description . "</label>"; 
                 break;
+            // Creates a list of checkboxes
             case 'multicheck':
                 foreach($options as $option => $label) {
-                    $html .= "<input name='" . esc_attr($name) . "[]' id='" . esc_attr($key) . "' type='checkbox' value='" . esc_attr($option) . "' " . checked(in_array($option, $value), true, false) . " />";
-                    $html .= "<label for='" . esc_attr($key) . "'>" . esc_html($label) . "</label><br>";
+                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='" . esc_attr($option) . "' " . checked(in_array($option, $value), true, false) . " />";
+                    $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
                 }
                 $html .= "<p class='description'>" . $description . "</p>"; 
                 break;
             }
-        
         $html .= '</td>';
-
         $html .= '</tr>';
 
         echo $html;
     }
 
-    // Collects the setting sections, then renders the form elements for each section.
+    // The settings page for the plugin. This page will contain all the settings for the plugin, and will be accessible from the admin menu.
+    // This function collects all the form elements and renders them on the page.
     public function init_form_elements() {
         if (!is_admin() || !current_user_can('manage_options')) {
             die(__("Insufficient privileges",'login-with-vipps'));
         }
-        $login_form = $this->init_form_login_options();
-        $login_form2 = VippsLogin::instance()->init_form_login_options2();
-        $woo_login_form = VippsWooLogin::instance()->init_form_login_woo_options();
 
-        $form = array(
-            $login_form, $login_form2, $woo_login_form
-        );
-        
+        // Group the form fields into an array, so we can loop through them and render them in the same way.
+        $main_options = $this->init_form_login_options();
+        $main_options2 = VippsLogin::instance()->init_form_login_options2();
+        $woo_options = VippsWooLogin::instance()->init_form_login_woo_options(); // Only show if WooCommerce is present
+        $form_fields = array($main_options, $main_options2);
+        if ($woo_options) {
+            $form_fields[] = $woo_options;
+        }
+        // Get the current values from the database
+        $values = get_option('vipps_login_settings', array());
+
         ?>
         <div class="wrap">
             <form method="post" action="options.php">
-                <table class="form-table" style="width:100%">
-                    <?php foreach($form as $key => $form) {
+                <?php settings_fields('vipps_login_settings'); ?>
+                
+                <?php foreach($form_fields as $key => $form_fields) {
                     ?>
-                    <tr><td colspan="100%"><h2><?php _e($form['title']) ?></h2></td></tr>
-                    <?php foreach ($form['fields'] as $key => $option) echo $this->render_form_field($key, $option, $form['key']); 
-                    }?>  
-                </table>
+                        <h2><?php _e($form_fields['title']) ?></h2>
+                        <table class="form-table" style="width:100%">
+                            <?php foreach ($form_fields['fields'] as $key => $option) echo $this->render_form_field($key, $option, $values); ?>
+                        </table>
+                <?php } ?>  
                 <button type="submit" class="button-primary"><?php _e('Save Changes', 'login-with-vipps')?></button>
             </form>
         </div>
@@ -407,78 +432,14 @@ class ContinueWithVipps {
             )
             );
         return array(
-            'title' => __('Integration settings', 'login-with-vipps'),
-            'key' => 'vipps_login_options',
+            'title' => sprintf(__('%1$s integration settings', 'login-with-vipps'), VippsLogin::CompanyName()),
             'fields' => $fields
         );
     }
 
-    // This is the main options-page for this plugin. The classes VippsLogin and VippsWooLogin adds more options to this screen just to 
-    // keep the option-data local to each class. IOK 2019-10-14
-    public function toolpage () {
-        if (!is_admin() || !current_user_can('manage_options')) {
-            die(__("Insufficient privileges",'login-with-vipps'));
-        }
-        $options = get_option('vipps_login_options'); 
-
-        $callback = $this->make_callback_url();
-
-        $selected_login_method = @$options['login_method'];
-        ?>
-            <div class='wrap'>
-            <h2><?php printf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></h2>
-
-            <form action='options.php' method='post'>
-            <?php settings_fields('vipps_login_options'); ?>
-            <table class="form-table" style="width:100%">
-
-            <tr>
-            <td><?php printf(__('Login method', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%>
-                        <select name='vipps_login_options[login_method]' id='vipps_login_options_login_method' style="width: 100%">
-                            <option value='Vipps' <?php selected($selected_login_method, 'Vipps'); ?>><?php _e('Vipps', 'login-with-vipps'); ?></option>
-                            <option value='MobilePay' <?php selected($selected_login_method, 'MobilePay'); ?>><?php _e('MobilePay', 'login-with-vipps'); ?></option>
-                        </select>
-            </td>
-            <td><?php _e("Choose which login method you'd like to enable for your users.",'login-with-vipps'); ?></td>
-            </tr>
-            <tr>
-            <td><?php _e('Client ID', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientid]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientid']);?>" autocomplete="off" type="password"></td>
-            <td><?php _e("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field",'login-with-vipps'); ?></td>
-            </tr>
-            <tr>
-            <td><?php _e('Client Secret', 'login-with-vipps'); ?></td>
-            <td width=30%><input id=configpath style="width:20em" name="vipps_login_options[clientsecret]" class='vippspw' value="<?php echo htmlspecialchars(@$options['clientsecret']);?>" autocomplete="off"  type="password"></td>
-            <td><?php _e("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field",'login-with-vipps'); ?></td>
-            </tr>
-
-            <tr>
-            <th><?php _e("Your redirect-URI is:", 'login-with-vipps'); ?></th>
-            <td><b><?php echo esc_html($callback); ?></b>
-            <td><?php _e("Copy the URI to the left. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps'); ?></td>
-            </tr>
-
-
-
-            </table>
-            <div> <input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
-        <div style="clear:both;margin-top:2rem;"><p><strong><?php echo sprintf(__("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%2\$s'>%1\$s' documentation</a>", 'login-with-vipps'), VippsLogin::CompanyName(), 'https://github.com/vippsas/vipps-login-api/blob/master/vipps-login-api-faq.md#how-can-i-activate-and-set-up-vipps-login'); ?></strong></p></div>
-
-
-            </form>
-
-            <?php  do_action('continue_with_vipps_extra_option_fields'); ?>
-
-
-            </div>
-
-            <?php
-    }
-
     // Validating user options. Currenlty a trivial function. IOK 2019-10-19
     public function validate ($input) {
-        $current =  get_option('vipps_login_options'); 
+        $current =  get_option('vipps_login_settings'); 
 
         $valid = $current;
         foreach($input as $k=>$v) {
@@ -494,7 +455,8 @@ class ContinueWithVipps {
     public function activate () {
         // Options
         $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time());
-        add_option('vipps_login_options',$default,false);
+        add_option('vipps_login_settings',$default,false);
+        
         $this->dbtables();
     }
 
@@ -512,7 +474,7 @@ class ContinueWithVipps {
         $tablename = $wpdb->prefix . 'vipps_login_sessions'; // Used to manage the ephemeral login sessions 
         $tablename2  = $wpdb->prefix . 'vipps_login_users'; // Used to map Vipps ids to users after a connection has been made
         $charset_collate = $wpdb->get_charset_collate();
-        $options = get_option('vipps_login_options');
+        $options = get_option('vipps_login_settings');
         $version = static::$dbversion;
         if (@$options['dbversion'] == $version) {
             return false;
@@ -588,7 +550,7 @@ class ContinueWithVipps {
         if ($ok) {
             error_log(sprintf(__('Installed database tables for Login With %1$s', 'login-with-vipps'), VippsLogin::CompanyName()));
             $options['dbversion']=static::$dbversion;
-            update_option('vipps_login_options',$options,false);
+            update_option('vipps_login_settings',$options,false);
         }
         return true;
     }

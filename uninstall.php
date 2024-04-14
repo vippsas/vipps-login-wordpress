@@ -39,6 +39,7 @@ function login_with_vipps_cleanup() {
     $prefix = $wpdb->prefix;
     $tablename = $wpdb->prefix . 'vippsLoginSessions';
     delete_option('vipps_login_options');
+    delete_option('vipps_login_settings');
     $dropquery = "DROP TABLE IF EXISTS `{$tablename}`";
     $wpdb->query($dropquery);
 }
