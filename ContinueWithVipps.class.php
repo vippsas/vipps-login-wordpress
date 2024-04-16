@@ -352,6 +352,7 @@ class ContinueWithVipps {
             // Creates a list of checkboxes
             case 'multicheck':
                 foreach($options as $option => $label) {
+                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' type='hidden' value=0>";
                     $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='" . esc_attr($option) . "' " . checked(in_array($option, $value), true, false) . " />";
                     $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
                 }
