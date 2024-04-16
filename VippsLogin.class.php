@@ -327,7 +327,7 @@ class VippsLogin {
     }
 
     public function get_login_method() {
-        $method = get_option('vipps_login_options')['login_method'];
+        $method = get_option('vipps_login_options')['login_method'] ?? false;
         if (!$method) {
             return 'Vipps'; // Default to Vipps if not set
         }
