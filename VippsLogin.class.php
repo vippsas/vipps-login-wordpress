@@ -364,7 +364,7 @@ class VippsLogin {
             $continuepageid = $continuepage->ID;
         }
         foreach(get_pages() as $page) {
-            $continuepageoptions[$page->post_name] = $page->post_title;
+            $continuepageoptions[$page->ID] = $page->post_title;
         }
 
         $roles = array(
