@@ -323,11 +323,11 @@ class VippsLogin {
     }
 
     public function get_login_method() {
-        $method = get_option('vipps_login_settings')['login_method'];
-        if (!$method) {
-            return 'Vipps'; // Default to Vipps if not set
+        $settings = get_option('vipps_login_settings', array());
+        if(!isset($settings['login_method'])) {
+            return 'Vipps';
         }
-        return $method;
+        return $settings['login_method'];
     }
 
     // Try to get the current language in the format Vipps wants, one of 'en' and 'no'

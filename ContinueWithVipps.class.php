@@ -142,16 +142,15 @@ class ContinueWithVipps {
 
         // Migrate old settings to new settings, this was necessary so that the settings could be stored/modified in the same form on the settings page.
         // This is a one-time operation, and will only run if there's no settings in the new format.
-        $current_login_options = get_option('vipps_login_options', false);
-        $current_login_options2 = get_option('vipps_login_options2', false);
-        $current_woo_login_options = get_option('vipps_woo_login_options', false);
-        $should_migrate = empty(get_option('vipps_login_settings'));
-        if ($should_migrate) {
-            add_option('vipps_login_settings', array_merge(
-                $current_login_options,
-                $current_login_options2,
-                $current_woo_login_options
-            ));
+        $current_login_options = get_option('vipps_login_options', array());
+        $current_login_options2 = get_option('vipps_login_options2', array());
+        $current_woo_login_options = get_option('vipps_login_woo_options', array());
+        $new_settings = get_option('vipps_login_settings');
+        $merged_settings = array_merge($current_login_options, $current_login_options2, $current_woo_login_options);
+        // should migrate if there are more keys in the old settings than in the new settings
+        $should_migrate = count(array_diff_key($merged_settings, $new_settings)) > 0;
+        if ($should_migrate){
+            update_option('vipps_login_settings', $merged_settings);
         }
     }
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
@@ -234,7 +233,7 @@ class ContinueWithVipps {
         wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
 
         wp_enqueue_script('login-vipps-admin');
-        if ($suffix == 'settings_page_vipps_login_options') {
+        if ($suffix == 'settings_page_vipps_login_settings') {
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
