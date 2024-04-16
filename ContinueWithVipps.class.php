@@ -426,7 +426,7 @@ class ContinueWithVipps {
             'redirect-uri' => array(
                 'type' => 'description',
                 'title' => __('Your redirect-URI is:', 'login-with-vipps'),
-                'description' => sprintf(__('Copy the URI to the left. Then go to <a target="_blank" href="%s">https://portal.vippsmobilepay.com</a> and choose "Developer". Find your point of sale and press "Setup login". Press "Activate Login" and paste the URI into the field "URI". Then press "Save". If you change your websites name or your permalink setup, you will need to register the new URI the same way.', 'login-with-vipps'), 'https://portal.vippsmobilepay.com'),
+                'description' => sprintf(__('Copy the URI above. Then go to <a target="_blank" href="%s">https://portal.vippsmobilepay.com</a> and choose "Developer". Find your point of sale and press "Setup login". Press "Activate Login" and paste the URI into the field "URI". Then press "Save". If you change your websites name or your permalink setup, you will need to register the new URI the same way.', 'login-with-vipps'), 'https://portal.vippsmobilepay.com'),
                 'default' => $this->make_callback_url(),
             )
             );
