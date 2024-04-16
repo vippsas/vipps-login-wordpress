@@ -122,9 +122,6 @@ class VippsWooLogin{
 
     public function admin_init () {
         if (!class_exists( 'WooCommerce' )) return;
-        // Extra ettings that will end up on the simple "Login with Vipps" options screen IOK 2019-10-14
-        register_setting('vipps_login_woo_options','vipps_login_woo_options', array($this,'validate'));
-        add_action('continue_with_vipps_extra_option_fields', array($this,'extra_option_fields'));
     }
 
     // Return any Vipps payment gateway if installed. IOK 2019-10-14
@@ -149,96 +146,61 @@ class VippsWooLogin{
         return false;
     }
 
-    // We are going to add some extra configuration options here. IOK 2019-10-14
-    public function extra_option_fields () {
-        $options = get_option('vipps_login_woo_options');
-        $woologin= $options['woo-login'];
-        $woocreate = $options['woo-create-users'];
-        $woocart = $options['woo-cart-login'];
-        $woocheckout = $options['woo-checkout-login'];
 
-        ?>
-
-            <form action='options.php' method='post'>
-            <?php settings_fields('vipps_login_woo_options'); ?>
-            <table class="form-table" style="width:100%">
-            <tr><th colspan=3><h3><?php _e('WooCommerce options', 'login-with-vipps'); ?></th></tr>
-            <tr>
-            <td><?php printf(__('Enable Login with %1$s for WooCommerce', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-login]' value=1 <?php if ( $woologin ) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('Enable Login with %1$s on your customer\'s pages in WooCommerce', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-            <tr>
-            <td><?php printf(__('Allow users to register as customers in WooCommerce using Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-create-users]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-create-users]' value=1 <?php if ( $woocreate) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('Enable new users to be created as customers if using Login with %1$s with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-            <tr>
-            <td><?php printf(__('Show "Continue with %1$s" in Cart page and widgets', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-cart-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-cart-login]' value=1 <?php if ( $woocart) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('If you are using %1$s Express Checkout, that will be shown instead.', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-
-            <tr>
-            <td><?php printf(__('Show "Continue with %1$s" on the Checkout page', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-checkout-login]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-checkout-login]' value=1 <?php if ( $woocheckout) echo ' CHECKED '; ?> >
-            </td>
-            <td>
-            <?php printf(__('This will replace %1$s Express Checkout on the checkout page.', 'login-with-vipps'), VippsLogin::CompanyName()); ?>
-            </td>
-            </tr>
-
-            <tr>
-             <td><?php printf(__('Change \'Continue with %1$s\' banner text', 'login-with-vipps'), VippsLogin::CompanyName()); ?></td>
-             <td><input style="width:100%" type="text" 
-                        name="vipps_login_woo_options[woo-banner-text]" 
-                        value="<?php echo esc_attr(@$options['woo-banner-text']); ?>"
-                        placeholder="<?php echo sprintf(__('Log in or register an account using %s.', 'login-with-vipps'), 'VIPPS'); ?>">
-                 <input style="width:100%" type="text" 
-                        name="vipps_login_woo_options[woo-banner-linktext]" 
-                        value="<?php echo esc_attr(@$options['woo-banner-linktext']); ?>" 
-                        placeholder="<?php _e('Click here to continue', 'login-with-vipps'); ?>" >
-            </td>
-            <td><?php printf(__('The "Continue with %1$s" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text and linktext. %2$s in all caps will be replaced by the %1$s logo', 'login-with-vipps'), VippsLogin::CompanyName(), strtoupper(VippsLogin::CompanyName())); ?></td>
-           </tr>
-           <tr>
-             <td><?php _e("Make the entire banner clickable", 'login-with-vipps'); ?></td>
-            <td width=30%> <input type='hidden' name='vipps_login_woo_options[woo-banner-clickable]' value=0>
-            <input type='checkbox' name='vipps_login_woo_options[woo-banner-clickable]' value=1 <?php if ( @$options['woo-banner-clickable']) echo ' CHECKED '; ?> >
-            <td><?php _e('Normally, WooCommerce-banners like this will use a "click here"-text. If you don\'t, check here to make the entire banner clickable like a button', 'login-with-vipps'); ?></td>
-
-           <tr>
-            </table>
-            <div><input type="submit" style="float:left" class="button-primary" value="<?php _e('Save Changes') ?>" /> </div>
-            </form>
-            <?php
-    }
-
-    // Validate the extra options added by this plugin. IOK 2019-10-14
-    public function validate ($input) {
-        $current =  get_option('vipps_login_woo_options');
-        if (empty($input)) return $current;
-        $valid = array();
-        foreach($input as $k=>$v) {
-            switch ($k) {
-                default:
-                    $valid[$k] = $v;
-            }
+    public function init_form_login_woo_options() {
+        if (!class_exists( 'WooCommerce' )) {
+            return null;
         }
-        return $valid;
+        $fields = array(
+            'woo-login' => array(
+                'title' => __('Enable Login with Vipps for WooCommerce', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Enable Login with Vipps on your customer\'s pages in WooCommerce', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-create-users' => array(
+                'title' => __('Allow users to register as customers in WooCommerce using Login with Vipps', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Enable new users to be created as customers if using Login with Vipps with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-cart-login' => array(
+                'title' => __('Show "Continue with Vipps" in Cart page and widgets', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('If you are using Vipps Express Checkout, that will be shown instead.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-checkout-login' => array(
+                'title' => __('Show "Continue with Vipps" on the Checkout page', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('This will replace Vipps Express Checkout on the checkout page.', 'login-with-vipps'),
+                'default' => 1,
+            ),
+            'woo-banner-text' => array(
+                'title' => __('Change "Continue with Vipps" banner text', 'login-with-vipps'),
+                'type' => 'text',
+                'placeholder' => __('Log in or register an account using VIPPS.', 'login-with-vipps'), // 'VIPPS' will be replaced by the VIPPS logo
+                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'default' => '',
+            ),
+            'woo-banner-linktext' => array(
+                'title' => __('Change "Continue with Vipps" banner link text', 'login-with-vipps'),
+                'type' => 'text',
+                'placeholder' => __('Click here to continue', 'login-with-vipps'),
+                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'default' => '',
+            ),
+            'woo-banner-clickable' => array(
+                'title' => __('Make the entire banner clickable', 'login-with-vipps'),
+                'type' => 'checkbox',
+                'description' => __('Normally, WooCommerce-banners like this will use a "click here"-text. If you don\'t, check here to make the entire banner clickable like a button', 'login-with-vipps'),
+                'default' => 0,
+            ),
+        );
+        return array(
+            'title' => sprintf(__('WooCommerce options for %s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'fields' => $fields,
+        );
     }
 
     public function activate () {
@@ -246,7 +208,7 @@ class VippsWooLogin{
         $allowcreatedefault = $allowcreateoncheckout||  ('yes' === get_option( 'woocommerce_enable_myaccount_registration' )) ;
 
         $default = array('rewriteruleversion'=>0, 'woo-login'=>true, 'woo-create-users'=>$allowcreatedefault, 'woo-cart-login'=>true,'woo-checkout-login'=>true, 'woo-banner-linktext'=>'', 'woo-banner-text'=>'', 'woo-banner-clickable'=>false);
-        add_option('vipps_login_woo_options',$default, false, true);
+        add_option('vipps_login_settings',$default, false, true);
         $this->add_rewrite_rules();
         $this->maybe_flush_rewrite_rules();
 
@@ -271,12 +233,12 @@ class VippsWooLogin{
         add_rewrite_endpoint( 'vipps', EP_ROOT | EP_PAGES );
     }
     public function maybe_flush_rewrite_rules() {
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         $rewrite = intval(@$options['rewriteruleversion']);
         if ($this->rewriteruleversion > $rewrite) {
             $this->add_rewrite_rules();
             $options['rewriteruleversion'] = $this->rewriteruleversion;
-            update_option('vipps_login_woo_options', $options, true);
+            update_option('vipps_login_settings', $options, true);
         }
     }
     public function add_vipps_endpoint_query_var ($vars) {
@@ -287,7 +249,7 @@ class VippsWooLogin{
     // We can turn this on and off  for woocommerce in particular. IOK 2019-10-14
     public function is_active() {
         if (!VippsLogin::is_active()) return false;
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         return intval($options['woo-login']);
     }
 
@@ -306,7 +268,7 @@ class VippsWooLogin{
 
         $gw = $this->is_gateway_active();
 
-        $options =  get_option('vipps_login_woo_options');
+        $options =  get_option('vipps_login_settings');
         $show_continue_with_vipps = intval($options['woo-checkout-login']);
         $express_checkout = $gw && $gw->show_express_checkout();
 
@@ -331,7 +293,7 @@ class VippsWooLogin{
         if (is_user_logged_in()) return false;
         if (!$this->is_active()) return false;
 
-        $options =  get_option('vipps_login_woo_options');
+        $options =  get_option('vipps_login_settings');
         $show_continue_with_vipps = intval($options['woo-checkout-login']);
         $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_checkout', $show_continue_with_vipps);
         if (!$show_continue_with_vipps) return;
@@ -343,7 +305,7 @@ class VippsWooLogin{
     }
 
     protected function clickable_banner() {
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         $clickable = '';
         if (@$options['woo-banner-clickable']) {
              $clickable = " onclick='login_with_vipps(\"woocommerce\");' style='cursor: pointer;' ";
@@ -353,7 +315,7 @@ class VippsWooLogin{
     // Banner text overriden by settings IOK 2020-09-25
     protected function overidden_banner_text($message) {
         $company_name = VippsLogin::CompanyName();
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         if (@$options['woo-banner-text'] || @$options['woo-banner-linktext']) {
            $logo = VippsLogin::instance()->get_transparent_logo();
            $logoimg =  "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$company_name'/>";
@@ -526,7 +488,7 @@ class VippsWooLogin{
         $user = new WC_Customer($userid);
         list($vippsphone, $vippsid) = VippsLogin::instance()->get_vipps_account($userid);
 
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         $allow_login = $options['woo-login'];
         $allow_login = apply_filters('continue_with_vipps_woocommerce_allow_login', $allow_login, $user, array(), array());
 
@@ -697,7 +659,7 @@ class VippsWooLogin{
     // Standard Woo has several options for this depending on whether it is done on 'my account' or in the checkout page.
     // We take the easy way out and just use our own option, settable on the option screen. IOK 2019-10-14
     public function users_can_register($can_register,$userinfo,$session) {
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         if ($options['woo-create-users']) return true;
         return false;
     }
@@ -751,7 +713,7 @@ class VippsWooLogin{
     // IOK 2019-10-14 currently, we just say 'yes' here, but we may want to disallow login for e.g. admins in this context.
     // will only affect Woocommerce logins.
     public function allow_login($allow, $user, $userinfo, $session) {
-        $options = get_option('vipps_login_woo_options');
+        $options = get_option('vipps_login_settings');
         $allow= $options['woo-login'];
         return $allow;
     }
