@@ -412,6 +412,7 @@ class ContinueWithVipps {
                     'Vipps' => __('Vipps', 'login-with-vipps'),
                     'MobilePay' => __('MobilePay', 'login-with-vipps'),
                 ),
+                'default' => VippsLogin::instance()->get_login_method(),
                 'description' => __('Choose which login method you\'d like to enable for your users.', 'login-with-vipps'),
             ),
             'clientid' => array(
