@@ -352,8 +352,7 @@ class ContinueWithVipps {
             // Creates a list of checkboxes
             case 'multicheck':
                 foreach($options as $option => $label) {
-                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' type='hidden' value=0>";
-                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='" . esc_attr($option) . "' " . checked(in_array($option, $value), true, false) . " />";
+                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='1'" . checked(array_key_exists($option, $value), true, false) . " />";
                     $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
                 }
                 $html .= "<p class='description'>" . $description . "</p>"; 
@@ -438,19 +437,20 @@ class ContinueWithVipps {
         );
     }
 
-    // Validating user options. Currenlty a trivial function. IOK 2019-10-19
+    // Validating user options, unsetting any options that are not in the form fields.
     public function validate ($input) {
-        $current =  get_option('vipps_login_settings'); 
+        $current =  get_option('vipps_login_settings');
+        if (empty($input)) return $current;
 
-        $valid = $current;
+        $valid = array();
         foreach($input as $k=>$v) {
             switch ($k) {
-                default: 
+                default:
                     $valid[$k] = $v;
             }
         }
         return $valid;
-    }
+    }   
 
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
     public function activate () {
