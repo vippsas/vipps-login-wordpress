@@ -377,26 +377,26 @@ class VippsLogin {
         $fields = array(
             'use_vipps_login' => array(
                 'type' => 'checkbox',
-                'title' => sprintf(__('Enable Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
-                'description' => sprintf(__('Turn Login with %1$s on and off', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'title' => sprintf(__('Enable Login with %1$s', 'login-with-vipps'), $this->get_login_method()),
+                'description' => sprintf(__('Turn Login with %1$s on and off', 'login-with-vipps'), $this->get_login_method()),
                 'default' => false,
             ),
             'login_page' => array(
                 'type' => 'checkbox',
-                'title' => sprintf(__('Add %1$s to login page', 'login-with-vipps'), VippsLogin::CompanyName()),
-                'description' => sprintf(__('Log in with %1$s on the Wordpress login page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'title' => sprintf(__('Add %1$s to login page', 'login-with-vipps'), $this->get_login_method()),
+                'description' => sprintf(__('Log in with %1$s on the Wordpress login page', 'login-with-vipps'), $this->get_login_method()),
                 'default' => false,
             ),
             'required_roles' => array(
                 'type' => 'multicheck',
-                'title' => sprintf(__('Require %1$s to log in for users in these roles', 'login-with-vipps'), VippsLogin::CompanyName()),
-                'description' => sprintf(__('Users in these roles *must* use login with %1$s. You can also require this for a given user on the profile page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'title' => sprintf(__('Require users in these roles to log in with %1$s', 'login-with-vipps'), $this->get_login_method()),
+                'description' => sprintf(__('Users in these roles *must* use login with %1$s. You can also require this for a given user on the profile page', 'login-with-vipps'), $this->get_login_method()),
                 'options' => $roles,
                 'default' => array(),
             ),
             'continuepageid' => array(
                 'type' => 'select',
-                'title' => sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName()),
+                'title' => sprintf(__('Continue with %1$s page', 'login-with-vipps'), $this->get_login_method()),
                 'description' => __('Sometimes, the user may need to confirm their email or answer follow up questions to complete sign in. This page, which you may leave blank, will be used for this purpose. A blank page will have been installed for you when activating the plugin, this is the default page which will be used. Do *not* use any system pages or anything that is being used for other things.', 'login-with-vipps'),
                 'options' => $continuepageoptions,
                 'default' => 0,
@@ -404,7 +404,7 @@ class VippsLogin {
         );
 
         return array(
-            'title' => sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'title' => sprintf(__('Login with %1$s', 'login-with-vipps'), $this->get_login_method()),
             'fields' => $fields,
         );
     }
@@ -453,12 +453,12 @@ class VippsLogin {
         $authorid = 0;
         if ($author) $authorid = $author->ID;
 
-        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::CompanyName());
+        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
 
         $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
         $newid = wp_insert_post($pagedata);
         if (is_wp_error($newid)) {
-            return new WP_Error(sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), VippsLogin::CompanyName()) . ": " .  $newid->get_error_message());
+            return new WP_Error(sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()) . ": " .  $newid->get_error_message());
         }
 
         $options['continuepageid'] = $newid;
@@ -501,7 +501,7 @@ class VippsLogin {
             </tr>
             <?php if ($is_admin): ?>
             <tr>
-            <th><?php printf(__('Require this user to confirm their login with %1$s if logging in normally', 'login-with-vipps'), VippsLogin::CompanyName()); ?></th>
+            <th><?php printf(__('Require this user to confirm their login with %1$s if logging in normally', 'login-with-vipps'), $this->get_login_method()); ?></th>
             <td>
                <input type="hidden" name="_require_vipps_confirm" value=0>
 
@@ -526,9 +526,9 @@ class VippsLogin {
             <?php else: ?>
             <table class="form-table">
             <tr>
-            <th><?php printf(__('Login with %1$s is disabled', 'login-with-vipps'), VippsLogin::CompanyName()); ?></th>
+            <th><?php printf(__('Login with %1$s is disabled', 'login-with-vipps'), $this->get_login_method()); ?></th>
             <td>
-            <span class="description"><?php printf(__('It is unfortunately not possible for your account to use %1$s to log in to this system due to the site administrators policy.'), VippsLogin::CompanyName()); ?></span>
+            <span class="description"><?php printf(__('It is unfortunately not possible for your account to use %1$s to log in to this system due to the site administrators policy.'), $this->get_login_method()); ?></span>
             </td>
             </tr>
             </table>
@@ -1154,7 +1154,7 @@ class VippsLogin {
         $this->deleteBrowserCookie();
         $handled = apply_filters('login_with_vipps_handle_email_confirmation', false, $user, $session);
         if (!$handled) {
-            $this->continue_with_vipps_error_login('login_disallowed', sprintf(__('You need to confirm your email account before Login with %1$s can be used. Login to your account normally and connect with %1$s on your user page, or contact the site admin', 'login-with-vipps'), VippsLogin::CompanyName()), '', $session);
+            $this->continue_with_vipps_error_login('login_disallowed', sprintf(__('You need to confirm your email account before Login with %1$s can be used. Login to your account normally and connect with %1$s on your user page, or contact the site admin', 'login-with-vipps'), $this->get_login_method()), '', $session);
         }
         exit();
     }

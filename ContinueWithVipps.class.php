@@ -592,7 +592,7 @@ class ContinueWithVipps {
             // When errors happen, we always destroy the current session. You may need to create a new one if you need to pass  info. IOK 2019-10-19
             if($session) $session->destroy();
             do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
-            wp_die(sprintf(__('Unhandled error when using Continue with %1$s for action %2$s: %3$s', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($forwhat), esc_html($error)));
+            wp_die(sprintf(__('Unhandled error when using Continue with %1$s for action %2$s: %3$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), esc_html($forwhat), esc_html($error)));
         }
 
         $code =  sanitize_text_field(@$_REQUEST['code']);
@@ -646,7 +646,7 @@ class ContinueWithVipps {
                 }
                 if ($userinfo['content']['sub'] != $idtoken_sub) {
                     if($session) $session->destroy();
-                    $err_message = sprintf(__('There is a problem with verifying your ID token from %1$s. Unfortunately, you cannot continue with %1$s at this time.', 'login-with-vipps'), VippsLogin::CompanyName());
+                    $err_message = sprintf(__('There is a problem with verifying your ID token from %1$s. Unfortunately, you cannot continue with %1$s at this time.', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
                     if ($forwhat) { 
                         do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error', $err_message, '', $session);
                     }

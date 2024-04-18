@@ -153,41 +153,41 @@ class VippsWooLogin{
         }
         $fields = array(
             'woo-login' => array(
-                'title' => __('Enable Login with Vipps for WooCommerce', 'login-with-vipps'),
+                'title' => sprintf(__('Enable Login with %1$s for WooCommerce', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'checkbox',
-                'description' => __('Enable Login with Vipps on your customer\'s pages in WooCommerce', 'login-with-vipps'),
+                'description' => sprintf(__('Enable Login with %1$s on your customer\'s pages in WooCommerce', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'default' => 1,
             ),
             'woo-create-users' => array(
-                'title' => __('Allow users to register as customers in WooCommerce using Login with Vipps', 'login-with-vipps'),
+                'title' => sprintf(__('Allow users to register as customers in WooCommerce using Login with %1$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'checkbox',
-                'description' => __('Enable new users to be created as customers if using Login with Vipps with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'),
+                'description' => sprintf(__('Enable new users to be created as customers if using Login with %1$s with WooCommerce. If you are using the payment gateway, this will have been configured to create new users when using Express Checkout - checkout the payment gateway settings to modify this.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'default' => 1,
             ),
             'woo-cart-login' => array(
-                'title' => __('Show "Continue with Vipps" in Cart page and widgets', 'login-with-vipps'),
+                'title' => sprintf(__('Show "Continue with %1$s" in Cart page and widgets', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'checkbox',
-                'description' => __('If you are using Vipps Express Checkout, that will be shown instead.', 'login-with-vipps'),
+                'description' => __('If you are using Express Checkout, that will be shown instead.', 'login-with-vipps'),
                 'default' => 1,
             ),
             'woo-checkout-login' => array(
-                'title' => __('Show "Continue with Vipps" on the Checkout page', 'login-with-vipps'),
+                'title' => sprintf(__('Show "Continue with %1$s" on the Checkout page', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'checkbox',
-                'description' => __('This will replace Vipps Express Checkout on the checkout page.', 'login-with-vipps'),
+                'description' => __('This will replace Express Checkout on the checkout page.', 'login-with-vipps'),
                 'default' => 1,
             ),
             'woo-banner-text' => array(
-                'title' => __('Change "Continue with Vipps" banner text', 'login-with-vipps'),
+                'title' => sprintf(__('Change "Continue with %1$s" banner text', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'text',
-                'placeholder' => __('Log in or register an account using VIPPS.', 'login-with-vipps'), // 'VIPPS' will be replaced by the VIPPS logo
-                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'placeholder' => sprintf(__('Log in or register an account using %1$s.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+                'description' => sprintf(__('The "Continue with %1$s" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'default' => '',
             ),
             'woo-banner-linktext' => array(
-                'title' => __('Change "Continue with Vipps" banner link text', 'login-with-vipps'),
+                'title' => sprintf(__('Change "Continue with %1$s" banner link text', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'type' => 'text',
                 'placeholder' => __('Click here to continue', 'login-with-vipps'),
-                'description' => __('The "Continue with Vipps" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'),
+                'description' => sprintf(__('The "Continue with %1$s" banner will have slightly different text depending on context, and some of these are rather long. You can change these dynamically if using hooks and filters, or you can use this override to change the standard text.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
                 'default' => '',
             ),
             'woo-banner-clickable' => array(
@@ -198,7 +198,7 @@ class VippsWooLogin{
             ),
         );
         return array(
-            'title' => sprintf(__('WooCommerce options for %s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'title' => sprintf(__('Login with %1$s for WooCommerce', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
             'fields' => $fields,
         );
     }
