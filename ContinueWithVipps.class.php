@@ -142,16 +142,15 @@ class ContinueWithVipps {
 
         // Migrate old settings to new settings, this was necessary so that the settings could be stored/modified in the same form on the settings page.
         // This is a one-time operation, and will only run if there's no settings in the new format.
-        $current_login_options = get_option('vipps_login_options', false);
-        $current_login_options2 = get_option('vipps_login_options2', false);
-        $current_woo_login_options = get_option('vipps_woo_login_options', false);
-        $should_migrate = empty(get_option('vipps_login_settings'));
-        if ($should_migrate) {
-            add_option('vipps_login_settings', array_merge(
-                $current_login_options,
-                $current_login_options2,
-                $current_woo_login_options
-            ));
+        $current_login_options = get_option('vipps_login_options', array());
+        $current_login_options2 = get_option('vipps_login_options2', array());
+        $current_woo_login_options = get_option('vipps_login_woo_options', array());
+        $new_settings = get_option('vipps_login_settings');
+        $merged_settings = array_merge($current_login_options, $current_login_options2, $current_woo_login_options);
+        // should migrate if there are more keys in the old settings than in the new settings
+        $should_migrate = count(array_diff_key($merged_settings, $new_settings)) > 0;
+        if ($should_migrate){
+            update_option('vipps_login_settings', $merged_settings);
         }
     }
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
@@ -234,7 +233,7 @@ class ContinueWithVipps {
         wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
 
         wp_enqueue_script('login-vipps-admin');
-        if ($suffix == 'settings_page_vipps_login_options') {
+        if ($suffix == 'settings_page_vipps_login_settings') {
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
@@ -353,7 +352,7 @@ class ContinueWithVipps {
             // Creates a list of checkboxes
             case 'multicheck':
                 foreach($options as $option => $label) {
-                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='" . esc_attr($option) . "' " . checked(in_array($option, $value), true, false) . " />";
+                    $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='1'" . checked(array_key_exists($option, $value), true, false) . " />";
                     $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
                 }
                 $html .= "<p class='description'>" . $description . "</p>"; 
@@ -412,6 +411,7 @@ class ContinueWithVipps {
                     'Vipps' => __('Vipps', 'login-with-vipps'),
                     'MobilePay' => __('MobilePay', 'login-with-vipps'),
                 ),
+                'default' => VippsLogin::instance()->get_login_method(),
                 'description' => __('Choose which login method you\'d like to enable for your users.', 'login-with-vipps'),
             ),
             'clientid' => array(
@@ -427,7 +427,7 @@ class ContinueWithVipps {
             'redirect-uri' => array(
                 'type' => 'description',
                 'title' => __('Your redirect-URI is:', 'login-with-vipps'),
-                'description' => sprintf(__('Copy the URI to the left. Then go to <a target="_blank" href="%s">https://portal.vippsmobilepay.com</a> and choose "Developer". Find your point of sale and press "Setup login". Press "Activate Login" and paste the URI into the field "URI". Then press "Save". If you change your websites name or your permalink setup, you will need to register the new URI the same way.', 'login-with-vipps'), 'https://portal.vippsmobilepay.com'),
+                'description' => sprintf(__('Copy the URI above. Then go to <a target="_blank" href="%s">https://portal.vippsmobilepay.com</a> and choose "Developer". Find your point of sale and press "Setup login". Press "Activate Login" and paste the URI into the field "URI". Then press "Save". If you change your websites name or your permalink setup, you will need to register the new URI the same way.', 'login-with-vipps'), 'https://portal.vippsmobilepay.com'),
                 'default' => $this->make_callback_url(),
             )
             );
@@ -437,19 +437,20 @@ class ContinueWithVipps {
         );
     }
 
-    // Validating user options. Currenlty a trivial function. IOK 2019-10-19
+    // Validating user options, unsetting any options that are not in the form fields.
     public function validate ($input) {
-        $current =  get_option('vipps_login_settings'); 
+        $current =  get_option('vipps_login_settings');
+        if (empty($input)) return $current;
 
-        $valid = $current;
+        $valid = array();
         foreach($input as $k=>$v) {
             switch ($k) {
-                default: 
+                default:
                     $valid[$k] = $v;
             }
         }
         return $valid;
-    }
+    }   
 
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
     public function activate () {
@@ -591,7 +592,7 @@ class ContinueWithVipps {
             // When errors happen, we always destroy the current session. You may need to create a new one if you need to pass  info. IOK 2019-10-19
             if($session) $session->destroy();
             do_action('continue_with_vipps_error_' .  $forwhat, $error,$errordesc,$error_hint, $session);
-            wp_die(sprintf(__('Unhandled error when using Continue with %1$s for action %2$s: %3$s', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($forwhat), esc_html($error)));
+            wp_die(sprintf(__('Unhandled error when using Continue with %1$s for action %2$s: %3$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), esc_html($forwhat), esc_html($error)));
         }
 
         $code =  sanitize_text_field(@$_REQUEST['code']);
@@ -645,7 +646,7 @@ class ContinueWithVipps {
                 }
                 if ($userinfo['content']['sub'] != $idtoken_sub) {
                     if($session) $session->destroy();
-                    $err_message = sprintf(__('There is a problem with verifying your ID token from %1$s. Unfortunately, you cannot continue with %1$s at this time.', 'login-with-vipps'), VippsLogin::CompanyName());
+                    $err_message = sprintf(__('There is a problem with verifying your ID token from %1$s. Unfortunately, you cannot continue with %1$s at this time.', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
                     if ($forwhat) { 
                         do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error', $err_message, '', $session);
                     }
