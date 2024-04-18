@@ -470,7 +470,7 @@ class VippsWooLogin{
         list($vippsphone, $vippsid) = VippsLogin::instance()->get_vipps_account($userid);
         if ($justconnected) {
             delete_user_meta($userid, '_vipps_just_connected');
-            $notice = sprintf(__('You are now connected to the %1$s profile <b>%2$s</b>!', 'login-with-vipps'), VippsLogin::CompanyName(), $vippsphone);
+            $notice = sprintf(__('You are now connected to the %1$s profile <b>%2$s</b>!', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), $vippsphone);
             ?>
                 <div class='vipps-notice vipps-info vipps-success'><?php echo $notice ?></div>
                 <?php
@@ -478,7 +478,7 @@ class VippsWooLogin{
     }
     // Add the 'Vipps' tab to the menu on the my account page. IOK 2019-10-14
     public function account_menu_items($items) {
-        $items['vipps'] = sprintf(__('%1$s', 'login-with-vipps'), VippsLogin::CompanyName());
+        $items['vipps'] = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
         return $items;
     }
     // And add content to the 'Vipps' tab. . IOK 2019-10-14
@@ -494,7 +494,7 @@ class VippsWooLogin{
 
         ?>
             <?php    if ($vippsphone && $vippsid): ?>
-            <h3><?php printf(__('You are connected to the %1$s profile with the phone number <b>%2$s</b>', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($vippsphone)); ?></h3>
+            <h3><?php printf(__('You are connected to the %1$s profile with the phone number <b>%2$s</b>', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), esc_html($vippsphone)); ?></h3>
             <p>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
             <?php wp_nonce_field('disconnect_vipps', 'disconnect_vipps_nonce'); ?>
@@ -507,7 +507,7 @@ class VippsWooLogin{
             <?php else: ?>
             <p><button type="button" onclick="connect_vipps_account('woocommerce');return false"; class="button vippsorange vipps-connect" value="1" name="vipps-connect"><?php _e('Press here to connect with your app','login-with-vipps'); ?></button></p>
             <?php endif; ?>
-            <p> <?php printf(__('The easiest way to sign in. Anyone with %1$s can use %1$s to sign in. No need to remember passwords ever again. %1$s, and you are logged in.','login-with-vipps'), VippsLogin::CompanyName()); ?> </p>
+            <p> <?php printf(__('The easiest way to log in. Anyone with %1$s can use %1$s to log in. No need to remember passwords ever again.','login-with-vipps'), VippsLogin::instance()->get_login_method()); ?> </p>
             <?php
     }
 
@@ -528,7 +528,7 @@ class VippsWooLogin{
         if (!$userid) wp_die(__('You must be logged in to disconnect', 'login-with-vipps'));
         list($vippsphone, $vippsid) =  VippsLogin::instance()->get_vipps_account($userid);
         VippsLogin::instance()->unmap_phone_to_user(get_user_by('id', $userid));
-        VippsLogin::instance()->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::CompanyName(), $userid));
+        VippsLogin::instance()->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), $userid));
 
         // Woocommerce hasn't loaded yet, so we'll just add the notices in a transient - we can't use the session
         // If they were critical, the users' metadata would have worked. IOK 2019-10-08
@@ -537,7 +537,7 @@ class VippsWooLogin{
         if ($cookie) {
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-            $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $vippsphone);
+            $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), $vippsphone);
             $notices[]=array('notice'=>$notice, 'type'=>'success');
             set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
         }        
@@ -552,7 +552,7 @@ class VippsWooLogin{
             global $wp_query;
             $is_endpoint = isset($wp_query->query_vars['vipps']);
             if ($is_endpoint) {
-                $title = sprintf(__('%1$s!', 'login-with-vipps'), VippsLogin::CompanyName()); 
+                $title = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()); 
                 remove_filter('the_title', array($this, 'account_vipps_title'), 10);
                 return $title;
             }
@@ -615,7 +615,7 @@ class VippsWooLogin{
             $phone =  $userinfo['phone_number'];
             $cookiehash =  hash('sha256',$cookie,false);
             $notices = get_transient('_vipps_woocommerce_stored_notices_' . $cookiehash);
-            $notice = sprintf(__('Your addresses are now synchronized with the %1$s-account %2$s.', 'login-with-vipps'), VippsLogin::CompanyName(), $phone);
+            $notice = sprintf(__('Your addresses are now synchronized with the %1$s-account %2$s.', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), $phone);
             $notices[]=array('notice'=>$notice, 'type'=>'success');
             set_transient('_vipps_woocommerce_stored_notices_' . $cookiehash, $notices, 60);
         }        
