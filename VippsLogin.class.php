@@ -325,9 +325,39 @@ class VippsLogin {
     public function get_login_method() {
         $settings = get_option('vipps_login_settings', array());
         if(!isset($settings['login_method'])) {
-            return 'Vipps';
+            return $this->detect_default_login_method();
         }
         return $settings['login_method'];
+    }
+
+    // Detect default payment method based on store location, user locale, currency NT 2023-11-30
+    // Modified for Login IOK 2024-04-22
+    public function detect_default_login_method() {
+        // IOK 2023-12-01 use the main locale instead of the user locale
+        $locale = get_locale();
+        $settings = get_option('vipps_login_settings', array());
+        if ($settings['migrated'] ?? false) {
+            // All pre-existing installs are known to use Vipps
+            return 'Vipps';
+        }
+        if ( class_exists( 'WooCommerce' ) ) {
+            // Countries object not yet available at this point IOK 2023-12-01
+            // $store_location = WC()->countries->get_base_country();
+            $store_location=  wc_get_base_location();
+            $store_country = $store_location['country'] ?? '';
+            $currency = get_woocommerce_currency();
+
+            // If store location, locale, or currency is Norwegian, use Vipps
+            if ($store_country== "NO" || preg_match("/.*_NO/", $locale) || $currency == "NOK") {
+                return 'Vipps';
+            }
+        }
+
+        if (preg_match("/.*_NO/", $locale)) {
+           return 'Vipps';
+        }
+
+        return 'MobilePay';
     }
 
     // Try to get the current language in the format Vipps wants, one of 'en' and 'no'

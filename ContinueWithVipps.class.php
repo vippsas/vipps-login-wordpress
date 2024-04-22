@@ -141,13 +141,14 @@ class ContinueWithVipps {
     // Extracted into separate function IOK 2024-04-22
     private function maybe_migrate_options () {
         $new_settings = get_option('vipps_login_settings');
-        if ($new_settings['migrated'] ?? false) return;
+        if (($new_settings['initialized'] ?? 0) > 0) return;
         $current_login_options = get_option('vipps_login_options', array());
         $current_login_options2 = get_option('vipps_login_options2', array());
         $current_woo_login_options = get_option('vipps_login_woo_options', array());
         $merged_settings = array_merge($current_login_options, $current_login_options2, $current_woo_login_options);
-        $merged_settings['migrated'] = true;
+        $merged_settings['initialized'] = 1;
         if (!empty($current_login_options)) {
+            $merged_settings['migrated'] = true;
             error_log("Migrating settings from old settings");
         }
         update_option('vipps_login_settings', $merged_settings);
@@ -475,7 +476,7 @@ class ContinueWithVipps {
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
     public function activate () {
         // Options
-        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time(), 'migrated'=>false);
+        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time(), 'migrated'=>false, 'initialized'=>0);
         add_option('vipps_login_settings',$default,false);
         $this->maybe_migrate_options();
         $this->dbtables();
