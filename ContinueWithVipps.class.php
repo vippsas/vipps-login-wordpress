@@ -140,22 +140,30 @@ class ContinueWithVipps {
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
 
-        // Migrate old settings to new settings, this was necessary so that the settings could be stored/modified in the same form on the settings page.
-        // This is a one-time operation, and will only run if there's no settings in the new format.
+    }
+
+
+    // Migrate old settings to new settings, this was necessary so that the settings could be stored/modified in the same form on the settings page.
+    // This is a one-time operation, and will only run if there's no settings in the new format. (NT 2024-04)
+    // Extracted into separate function IOK 2024-04-22
+    private function maybe_migrate_options () {
+        $new_settings = get_option('vipps_login_settings');
+        if ($new_settings['migrated'] ?? false) return;
         $current_login_options = get_option('vipps_login_options', array());
         $current_login_options2 = get_option('vipps_login_options2', array());
         $current_woo_login_options = get_option('vipps_login_woo_options', array());
-        $new_settings = get_option('vipps_login_settings');
         $merged_settings = array_merge($current_login_options, $current_login_options2, $current_woo_login_options);
-        // should migrate if there are more keys in the old settings than in the new settings
-        $should_migrate = count(array_diff_key($merged_settings, $new_settings)) > 0;
-        if ($should_migrate){
-            update_option('vipps_login_settings', $merged_settings);
+        $merged_settings['migrated'] = true;
+        if (!empty($current_login_options)) {
+            error_log("Migrating settings from old settings");
         }
+        update_option('vipps_login_settings', $merged_settings);
     }
+
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
     public function plugins_loaded () {
         $ok = load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
+        $this->maybe_migrate_options();
         $options =   get_option('vipps_login_settings'); 
         if (!@$options['installtime']) {
             $options['installtime'] = time();
@@ -438,11 +446,12 @@ class ContinueWithVipps {
     }
 
     // Validating user options, unsetting any options that are not in the form fields.
+    // Changed not to overwrite hidden settings, eg. database table versions etc IOK 2024-04-22
     public function validate ($input) {
         $current =  get_option('vipps_login_settings');
         if (empty($input)) return $current;
 
-        $valid = array();
+        $valid = $current;
         foreach($input as $k=>$v) {
             switch ($k) {
                 default:
@@ -455,9 +464,9 @@ class ContinueWithVipps {
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
     public function activate () {
         // Options
-        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time());
+        $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time(), 'migrated'=>false);
         add_option('vipps_login_settings',$default,false);
-        
+        $this->maybe_migrate_options();
         $this->dbtables();
     }
 

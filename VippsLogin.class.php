@@ -351,10 +351,11 @@ class VippsLogin {
      
      public function init_form_login_options2() {
         $options = get_option('vipps_login_settings');
+
         $continuepageoptions = array(
            ''=>__('Create a new page', 'login-with-vipps'),
         );
-        $continuepageid = $options['continuepageid'];
+        $continuepageid = $options['continuepageid'] ?? 0;
 
         $continuepage = $this->ensure_continue_with_vipps_page();
         if (is_wp_error($continuepage)) {
@@ -428,7 +429,7 @@ class VippsLogin {
     // Returns the page object of the 'continue with vipps' page, creating it if neccessary. 2019-10-14
     public function ensure_continue_with_vipps_page() {
         $options = get_option('vipps_login_settings');
-        $continuepageid = $options['continuepageid'];
+        $continuepageid = $options['continuepageid'] ?? false;
         if ($continuepageid) {
             $page = get_post($continuepageid);
             if ($page) return $page;
