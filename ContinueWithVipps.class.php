@@ -160,9 +160,27 @@ class ContinueWithVipps {
         update_option('vipps_login_settings', $merged_settings);
     }
 
+
+    // To simplify development, we load translations from the plugins' own .mos on development branches. IOK 2024-04-22
+    public static function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path = false ) {
+        $development = apply_filters('login_with_vipps_use_plugin_translations', true);
+        if (!$development) {
+           return load_plugin_textdomain($domain, $deprecated, $plugin_rel_path);
+        }
+        // Available since 6.1.0 only IOK 2023-01-25
+        global $wp_textdomain_registry;
+        if ($wp_textdomain_registry) {
+            $locale = apply_filters( 'plugin_locale', determine_locale(), $domain );
+            $mofile = $domain . '-' . $locale . '.mo';
+            $path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
+            $wp_textdomain_registry->set_custom_path( $domain, $path );
+            return load_textdomain( $domain, $path . '/' . $mofile, $locale );
+        }
+    }
+
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
     public function plugins_loaded () {
-        $ok = load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
+        $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
         $this->maybe_migrate_options();
         $options =   get_option('vipps_login_settings'); 
         if (!@$options['installtime']) {
