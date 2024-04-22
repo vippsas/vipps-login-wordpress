@@ -80,13 +80,6 @@ class ContinueWithVipps {
     // translating return values from the Vipps API 2019-10-14
     private function translation_dummy () {
         print __('User cancelled the login', 'login-with-vipps');
-        print __('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps');
-        // Future strings for translation IOK 2021-09-23
-        print __("You'll find more descriptions and illustrations about the setup of Log in with %1\$s in <a href='%1\$s'>%1\$s' documentation</a>", 'login-with-vipps');
-        print __("Your redirect-URI is:", 'login-with-vipps');
-        print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client id' and paste it into this field", 'login-with-vipps');
-        print __("Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Show keys'. Copy the value of 'client secret' and paste it into this field", 'login-with-vipps');
-        print __("Copy the URI above. Then go to  <a target='_blank' href='https://portal.vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of sale and press 'Setup login'. Press 'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. If you change your websites name or your permalink setup, you will need to register the new URI the same way.", 'login-with-vipps');
     }
 
     public function log ($what,$type='info') {

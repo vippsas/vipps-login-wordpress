@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Login with Vipps\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-22 14:19+0000\n"
-"PO-Revision-Date: 2024-04-22 14:55+0000\n"
+"PO-Revision-Date: 2024-04-22 14:59+0000\n"
 "Last-Translator: Iver Odin Kvello <iver@wp-hosting.no>\n"
 "Language-Team: Finnish\n"
 "Language: fi\n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "!"
 msgstr "!"
 
-#: ContinueWithVipps.class.php:443
+#: ContinueWithVipps.class.php:454
 #, php-format
 msgid "%1$s integration settings"
 msgstr ""
@@ -45,12 +45,12 @@ msgstr ""
 msgid "<a href='%s'>Return to your previous page</a> to try again</a>"
 msgstr ""
 
-#: ContinueWithVipps.class.php:651
+#: ContinueWithVipps.class.php:662
 #, php-format
 msgid "A problem occurred when getting user info from %1$s:"
 msgstr ""
 
-#: ContinueWithVipps.class.php:641
+#: ContinueWithVipps.class.php:652
 #, php-format
 msgid "A problem occurred when trying to use %1$s:"
 msgstr ""
@@ -110,7 +110,7 @@ msgstr ""
 msgid "Change \"Continue with %1$s\" banner text"
 msgstr ""
 
-#: ContinueWithVipps.class.php:423
+#: ContinueWithVipps.class.php:434
 msgid "Choose which login method you'd like to enable for your users."
 msgstr ""
 
@@ -123,11 +123,11 @@ msgstr ""
 msgid "Click to continue"
 msgstr ""
 
-#: ContinueWithVipps.class.php:427
+#: ContinueWithVipps.class.php:438
 msgid "Client ID"
 msgstr ""
 
-#: ContinueWithVipps.class.php:432
+#: ContinueWithVipps.class.php:443
 msgid "Client Secret"
 msgstr ""
 
@@ -146,17 +146,7 @@ msgstr ""
 msgid "Continue with %1$s page"
 msgstr ""
 
-#: ContinueWithVipps.class.php:89
-msgid ""
-"Copy the URI above. Then go to  <a target='_blank' href='https://portal."
-"vippsmobilepay.com'>https://portal.vippsmobilepay.com</a> and choose "
-"'Developer'. Find your point of sale and press 'Setup login'. Press "
-"'Activate Login' and paste the URI into the field 'URI'. Then press 'Save'. "
-"If you change your websites name or your permalink setup, you will need to "
-"register the new URI the same way."
-msgstr ""
-
-#: ContinueWithVipps.class.php:438
+#: ContinueWithVipps.class.php:449
 #, php-format
 msgid ""
 "Copy the URI above. Then go to <a target=\"_blank\" href=\"%s\">https:"
@@ -177,14 +167,14 @@ msgstr ""
 msgid "Could not create a new user - an error occured: %s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:536
+#: ContinueWithVipps.class.php:547
 #, php-format
 msgid ""
 "Could not create session table. The Login with %1$s plugin is not correctly "
 "installed."
 msgstr ""
 
-#: ContinueWithVipps.class.php:541
+#: ContinueWithVipps.class.php:552
 #, php-format
 msgid ""
 "Could not create user identity table. The Login with %1$s plugin is not "
@@ -205,7 +195,7 @@ msgstr ""
 msgid "Could not synchronize your %1$s profile: "
 msgstr ""
 
-#: ContinueWithVipps.class.php:634 ContinueWithVipps.class.php:636
+#: ContinueWithVipps.class.php:645 ContinueWithVipps.class.php:647
 #, php-format
 msgid "Could not verify your oAuth2 token: %s"
 msgstr ""
@@ -219,7 +209,7 @@ msgstr ""
 msgid "Create an account using %s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:262
+#: ContinueWithVipps.class.php:273
 msgid "Dismissed message "
 msgstr ""
 
@@ -255,7 +245,7 @@ msgstr ""
 msgid "Get addresses"
 msgstr ""
 
-#: ContinueWithVipps.class.php:428
+#: ContinueWithVipps.class.php:439
 #, php-format
 msgid ""
 "Go to <a target=\"_blank\" href=\"%s\">https://portal.vippsmobilepay.com</a> "
@@ -263,7 +253,7 @@ msgid ""
 "Copy the value of \"client id\" and paste it into this field"
 msgstr ""
 
-#: ContinueWithVipps.class.php:433
+#: ContinueWithVipps.class.php:444
 #, php-format
 msgid ""
 "Go to <a target=\"_blank\" href=\"%s\">https://portal.vippsmobilepay.com</a> "
@@ -271,23 +261,7 @@ msgid ""
 "Copy the value of \"client secret\" and paste it into this field"
 msgstr ""
 
-#: ContinueWithVipps.class.php:87
-msgid ""
-"Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https:"
-"//portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of "
-"sale and press 'Show keys'. Copy the value of 'client id' and paste it into "
-"this field"
-msgstr ""
-
-#: ContinueWithVipps.class.php:88
-msgid ""
-"Go to <a target='_blank' href='https://portal.vippsmobilepay.com'>https:"
-"//portal.vippsmobilepay.com</a> and choose 'Developer'. Find your point of "
-"sale and press 'Show keys'. Copy the value of 'client secret' and paste it "
-"into this field"
-msgstr ""
-
-#: ContinueWithVipps.class.php:83 ContinueWithVipps.class.php:229
+#: ContinueWithVipps.class.php:240
 #, php-format
 msgid ""
 "Having downloaded Log in with %1$s: It is quick and easy to get started! Get "
@@ -314,12 +288,12 @@ msgid ""
 "confirming this operation with their %1$s app - email addresses must match."
 msgstr ""
 
-#: ContinueWithVipps.class.php:561
+#: ContinueWithVipps.class.php:572
 #, php-format
 msgid "Installed database tables for Login With %1$s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:379
+#: ContinueWithVipps.class.php:390
 msgid "Insufficient privileges"
 msgstr ""
 
@@ -381,12 +355,12 @@ msgstr ""
 msgid "Log in without password using %1$s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:227
+#: ContinueWithVipps.class.php:238
 #, php-format
 msgid "Logg inn med %1$s-logo"
 msgstr ""
 
-#: ContinueWithVipps.class.php:417
+#: ContinueWithVipps.class.php:428
 msgid "Login method"
 msgstr ""
 
@@ -397,8 +371,8 @@ msgid ""
 "and does not have the same email account"
 msgstr ""
 
-#: VippsLogin.class.php:408 ContinueWithVipps.class.php:97
-#: ContinueWithVipps.class.php:250 VippsWooLogin.class.php:481
+#: VippsLogin.class.php:408 ContinueWithVipps.class.php:90
+#: ContinueWithVipps.class.php:261 VippsWooLogin.class.php:481
 #: VippsWooLogin.class.php:555
 #, php-format
 msgid "Login with %1$s"
@@ -422,7 +396,7 @@ msgstr ""
 msgid "Make the entire banner clickable"
 msgstr ""
 
-#: ContinueWithVipps.class.php:420
+#: ContinueWithVipps.class.php:431
 msgid "MobilePay"
 msgstr ""
 
@@ -463,11 +437,11 @@ msgstr ""
 msgid "Require users in these roles to log in with %1$s"
 msgstr ""
 
-#: ContinueWithVipps.class.php:405
+#: ContinueWithVipps.class.php:416
 msgid "Save Changes"
 msgstr ""
 
-#: ContinueWithVipps.class.php:669 ContinueWithVipps.class.php:670
+#: ContinueWithVipps.class.php:680 ContinueWithVipps.class.php:681
 msgid "Session expired - please retry."
 msgstr ""
 
@@ -525,7 +499,7 @@ msgstr ""
 msgid "The user is not connected to a %1$s profile."
 msgstr ""
 
-#: ContinueWithVipps.class.php:658
+#: ContinueWithVipps.class.php:669
 #, php-format
 msgid ""
 "There is a problem with verifying your ID token from %1$s. Unfortunately, "
@@ -568,7 +542,7 @@ msgid ""
 "are not the same."
 msgstr ""
 
-#: ContinueWithVipps.class.php:604
+#: ContinueWithVipps.class.php:615
 #, php-format
 msgid "Unhandled error when using Continue with %1$s for action %2$s: %3$s"
 msgstr ""
@@ -598,7 +572,7 @@ msgid ""
 "for a given user on the profile page"
 msgstr ""
 
-#: ContinueWithVipps.class.php:419
+#: ContinueWithVipps.class.php:430
 msgid "Vipps"
 msgstr ""
 
@@ -670,18 +644,11 @@ msgid ""
 "contact the site admin"
 msgstr ""
 
-#: ContinueWithVipps.class.php:678
+#: ContinueWithVipps.class.php:689
 #, php-format
 msgid ""
 "You successfully completed the action \"%2$s\" using %1$s - unfortunately, "
 "this website doesn't know how to handle that."
-msgstr ""
-
-#: ContinueWithVipps.class.php:85
-#, php-format
-msgid ""
-"You'll find more descriptions and illustrations about the setup of Log in "
-"with %1$s in <a href='%1$s'>%1$s' documentation</a>"
 msgstr ""
 
 #: VippsWooLogin.class.php:618
@@ -696,6 +663,6 @@ msgid ""
 "you will need those to log in."
 msgstr ""
 
-#: ContinueWithVipps.class.php:86 ContinueWithVipps.class.php:437
+#: ContinueWithVipps.class.php:448
 msgid "Your redirect-URI is:"
 msgstr ""
