@@ -394,10 +394,14 @@ class ContinueWithVipps {
         // Group the form fields into an array, so we can loop through them and render them in the same way.
         $main_options = $this->init_form_login_options();
         $main_options2 = VippsLogin::instance()->init_form_login_options2();
-        $woo_options = VippsWooLogin::instance()->init_form_login_woo_options(); // Only show if WooCommerce is present
         $form_fields = array($main_options, $main_options2);
-        if ($woo_options) {
-            $form_fields[] = $woo_options;
+
+        // Only show if WooCommerce is present NT 2024-04-24
+        if (class_exists('VippsWooLogin')) {
+            $woo_options = VippsWooLogin::instance()->init_form_login_woo_options();
+            if ($woo_options) {
+                $form_fields[] = $woo_options;
+            }
         }
         // Get the current values from the database
         $values = get_option('vipps_login_settings', array());
