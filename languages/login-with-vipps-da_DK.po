@@ -1,17 +1,18 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-22 15:37+0000\n"
-"PO-Revision-Date: 2024-04-22 15:41+0000\n"
-"Last-Translator: \n"
-"Language-Team: Danish\n"
+"PO-Revision-Date: 2024-04-29 08:03+0000\n"
+"Last-Translator: Iver Odin Kvello <iver@wp-hosting.no>\n"
+"Language-Team: Dansk\n"
 "Language: da_DK\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Loco https://localise.biz/"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.7; wp-6.5.2"
 
 #: blocks/login-with-vipps.php:72
 msgid "!"
@@ -438,7 +439,7 @@ msgstr "Gør hele bannen klikbar."
 
 #: ContinueWithVipps.class.php:431
 msgid "MobilePay"
-msgstr "MobilePay."
+msgstr "MobilePay"
 
 #. Description of the plugin
 msgid "No need to remember passwords ever again. Vipps, and you are logged in."
