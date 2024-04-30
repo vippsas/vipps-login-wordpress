@@ -1,6 +1,6 @@
 <!-- START_METADATA
 ---
-title: Vipps Login for WordPress and WooCommerce
+title: Vipps MobilePay Login for WordPress and WooCommerce
 sidebar_position: 1
 description: Allow customers to log in to WordPress and WooCommerce websites using the Vipps app.
 pagination_next: null
@@ -8,28 +8,29 @@ pagination_prev: null
 ---
 END_METADATA -->
 
-# Vipps Login for WordPress and WooCommerce
+# Vipps/MobilePay Login for WordPress and WooCommerce
 
 ![Support and development by WP Hosting ](./docs/images/wphosting.svg#gh-light-mode-only)![Support and development by WP Hosting](./docs/images/wphosting_dark.svg#gh-dark-mode-only)
 
-![Vipps](./docs/images/vipps.png) *Available for Vipps.*
+![Vipps](./docs/images/vipps.png) *Available for Vipps for Norway.*
 
-![MobilePay](./docs/images/mp.png) *Availability for MobilePay has not yet been determined.*
+![MobilePay](./docs/images/mp.png) *Availability for MobilePay in Denmark and Finland.*
 
 
-*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
+*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
 
 <!-- START_COMMENT -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/plugins/). 💥
 <!-- END_COMMENT -->
 
-*Login with Vipps* is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number. Vipps, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
+Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One platform gathering more than 11 million users and more than 400,000 merchants across the Nordics. 
 
-Vipps is the leading smart payment app in Norway, used by more than 75% of Norwegians and tops the list of most positive word of mouth for any brand.
+*Login with Vipps MobilePay* is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number, Vipps or MobilePay, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
 
-*Login with Vipps* suits all websites that need users to sign in and want to tailor content and dialogue with their customers.
 
-* Anyone with Vipps can create a profile on your website with just one click and can be directly signed in at the next visit.
+*Login with Vipps MobilePay* suits all websites that need users to sign in and want to tailor content and dialogue with their customers.
+
+* Anyone with Vipps or MobilePay can create a profile on your website with just one click and can be directly signed in at the next visit.
 * Your customers get what they want faster
 * You get more people signed in, leading to more insight and increased conversion.
 
@@ -46,7 +47,7 @@ Vipps is the leading smart payment app in Norway, used by more than 75% of Norwe
 
 ### Fully integrated with WooCommerce
 
-Allows login and registration on your account pages, cart, checkout and via shortcodes. Addresses automatically synchronized with Vipps on login.
+Allows login and registration on your account pages, cart, checkout and via shortcodes. Addresses automatically synchronized with Vipps or MobilePay on login.
 
 ### No need for usernames and passwords
 
@@ -54,19 +55,20 @@ Users don't need to worry about forgetting usernames and passwords. All they nee
 
 ### User can register with one click
 
-Login with Vipps is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birthdate. The identity of all Vipps users is verified using BankID, Norway's leading electronic ID, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
+Login with Vipps MobilePay is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birthdate. The identity of all Vipps MobilePay users is verified by each markets leading electronic IDs, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
 
 ### Link existing account
 
-Already registered users can link their current accounts when signing in with Vipps or from their account page. Users can choose to update their address information from Vipps.
+Already registered users can link their current accounts when signing in with Vipps MobilePay or from their account page. Users can choose to update their address information from Vipps MobilePay.
 
 ### Fully integrated with WooCommerce and available for all relevant areas of your store
 
-Login with Vipps can be added to all relevant pages in your web shop: login, registration, cart, and checkout pages.
+Login with Vipps MobilePay can be added to all relevant pages in your web shop: login, registration, cart, and checkout pages.
 
-### Vipps Login
+### Vipps MobilePay Login
 
-New site owners need to set up an agreement with Vipps to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
+New site owners need to set up an agreement with Vipps MobilePay to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
+Read more about pricing on [vippsmobilepay.com](https://vippsmobilepay.com/pricing/login).
 
 ### Customizable for your application
 
@@ -74,7 +76,7 @@ You can use the framework of this plugin to implement other signed actions, such
 
 ## Shortcodes
 
-* `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a *Login with Vipps* button that will log you into the given application, which by default can be either WordPress or WooCommerce.
+* `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a *Login with Vipps MobilePay* button that will log you into the given application, which by default can be either WordPress or WooCommerce.
 * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text.
 
 ## Customizing the Plugin
@@ -104,6 +106,6 @@ These are the main steps:
 * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)`. You can also provide an array of session data which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is a URL to which you should redirect your user.
 * Create your success handler.
 * Create your error handler. This should be hooked to `continue_with_vipps_error_*your action*`. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here and show your user the error. The redirect is important, you should not output content in this action.
-* Create your success handler. This should be hooked to `continue_with_vipps_*your action*`. It will receive an array of [userinfo from Vipps](https://developer.vippsmobilepay.com/api/userinfo/), and a live session. This handler too should end with a redirect to your success page.
+* Create your success handler. This should be hooked to `continue_with_vipps_*your action*`. It will receive an array of [userinfo from Vipps MobilePay](https://developer.vippsmobilepay.com/api/userinfo/), and a live session. This handler too should end with a redirect to your success page.
 
 The rest is a simple matter of programming.
