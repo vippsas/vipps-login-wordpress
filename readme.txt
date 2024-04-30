@@ -119,6 +119,9 @@ The rest is a simple matter of programming.
 
 == Changelog ==
 
+= 2024.05.02 Version 1.3.0 =
+Support Mobilepay, improve settings
+
 = 2024.03.21 Version 1.2.8 =
 Send debugging headers to Vipps MobilePay
 Updating blocks and css
