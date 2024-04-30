@@ -162,12 +162,19 @@ html body img.inline.vipps-logo {
     border-color: #FF5B24;
     border-color: #FF5B24;
 }
+.vipps-banner.vipps-info a {
+    color: #fff;
+}
 .mobilepay-banner.mobilepay-info {
     color: #fff;
     background-color: #5A78FF;
     border-color: #5A78FF;
     border-color: #5A78FF;
 }
+.mobilepay-banner.mobilepay-info a {
+    color: #fff;
+}
+
 .vipps-banner.vipps-info img.vipps-logo {
  margin:0px;
 }
