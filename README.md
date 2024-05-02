@@ -14,7 +14,7 @@ END_METADATA -->
 
 ![Vipps](./docs/images/vipps.png) *Available for Vipps for Norway.*
 
-![MobilePay](./docs/images/mp.png) *Availability for MobilePay in Denmark and Finland.*
+![MobilePay](./docs/images/mp.png) *Available for MobilePay in Denmark and Finland.*
 
 
 *This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
