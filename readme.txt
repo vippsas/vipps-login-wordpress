@@ -15,7 +15,7 @@ Login with Vipps and MobilePay offers super-easy registration and login from the
 
 The users need only remember their phone number. They are also able to provide information that websites often require, like e-mail, phone numbers and addresses, from their Vipps MobilePay profile with no tedious data entry.
 
-Logg in with Vipps and MobilePay is fully integrated into WordPress and WooCommerce and is free for both users and webshops. The plugin is easy to modify for your own applications.
+Login with Vipps and MobilePay is fully integrated into WordPress and WooCommerce and is free for both users and webshops. The plugin is easy to modify for your own applications.
 
 This solution is great for all websites that wants to:
 
