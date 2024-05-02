@@ -776,10 +776,12 @@ class ContinueWithVipps {
             $headers['Authorization'] = "Basic " . base64_encode("$clientid:$secret");
         }
 
+        $login_method = sanitize_title(VippsLogin::instance()->get_login_method());
+
         $headers['Vipps-System-Name'] = 'Wordpress';
         $headers['Vipps-System-Version'] = get_bloginfo('version');
         $headers['Vipps-System-Plugin-Name'] = 'login-with-vipps';
-        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION;
+        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION . ":$login_method";
 
         $response = $this->http_call($url,$args,'POST',$headers,'url');
         return $response;
@@ -792,10 +794,11 @@ class ContinueWithVipps {
         $url = $this->userinfo_endpoint();
         $args = array();
 
+        $login_method = sanitize_title(VippsLogin::instance()->get_login_method());
         $headers['Vipps-System-Name'] = 'Wordpress';
         $headers['Vipps-System-Version'] = get_bloginfo('version');
         $headers['Vipps-System-Plugin-Name'] = 'login-with-vipps';
-        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION;
+        $headers['Vipps-System-Plugin-Version'] = VIPPS_LOGIN_VERSION . ":$login_method";
 
         return $this->http_call($url,$args,'GET',$headers,'url');
     }
