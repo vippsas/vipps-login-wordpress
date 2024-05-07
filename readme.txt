@@ -11,7 +11,7 @@ License URI: https://choosealicense.com/licenses/mit/
 Login with Vipps and MobilePay is the easiest way to sign in and create an account. No need to worry about usernames and passwords.
 
 == Description ==
-Login with Vipps and MobilePay offers super-easy registration and login from the leading smart-payment app in Norway with more than 4.2 million users. MobilePay is used by more than 75 % of Denmark's population (4.4 million users), and more than 36 % of Finland's population (2 million users). There is no easier login. No more usernames or passwords.
+Login with Vipps and MobilePay offers super-easy registration and login from the leading smart-payment app in Norway with more than 4.2 million users. MobilePay is used by more than 75 % of Denmark's population (4.4 million users), and more than 36 % of Finland's population (2.6 million users). There is no easier login. No more usernames or passwords.
 
 The users need only remember their phone number. They are also able to provide information that websites often require, like e-mail, phone numbers and addresses, from their Vipps MobilePay profile with no tedious data entry.
 
