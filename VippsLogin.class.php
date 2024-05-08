@@ -915,7 +915,8 @@ class VippsLogin {
                 return $data;
                 }, 10, 2);
 
-        wp_set_auth_cookie($user->ID, false);
+        $remember = apply_filters('login_with_vipps_remember_user', false, $user, $data);
+        wp_set_auth_cookie($user->ID, $remember);
         wp_set_current_user($user->ID,$user->user_login); // 'secure'
         do_action('wp_login', $user->user_login, $user);
         $profile = get_edit_user_link($user->ID);
