@@ -51,7 +51,7 @@ SOFTWARE.
  display:inline-block;
 }
 .continue-with-vipps-wrapper a.button.continue-with-vipps img {
-    max-width: 100%;
+    max-width: 6rem;
     margin:0px 2px;
     display:inline;
     height: 2ex;
