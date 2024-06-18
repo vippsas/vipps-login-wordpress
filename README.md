@@ -16,17 +16,15 @@ END_METADATA -->
 
 ![MobilePay](./docs/images/mp.png) *Available for MobilePay in Denmark and Finland.*
 
-
 *This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
 
 <!-- START_COMMENT -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/plugins/). 💥
 <!-- END_COMMENT -->
 
-Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One platform gathering more than 11 million users and more than 400,000 merchants across the Nordics. 
+Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One platform gathering more than 11 million users and more than 400,000 merchants across the Nordics.
 
 *Login with Vipps MobilePay* is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number, Vipps or MobilePay, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
-
 
 *Login with Vipps MobilePay* suits all websites that need users to sign in and want to tailor content and dialogue with their customers.
 
@@ -55,7 +53,7 @@ Users don't need to worry about forgetting usernames and passwords. All they nee
 
 ### User can register with one click
 
-Login with Vipps MobilePay is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birthdate. The identity of all Vipps MobilePay users is verified by each markets leading electronic IDs, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
+Login with Vipps MobilePay is the easiest way to create a new account. Sharing high-quality data from the user's Vipps profile with the site owner. Available information includes name, email, address, phone number, and birthdate. The identity of all Vipps MobilePay users is verified by each market's leading electronic IDs, so rest assured that these are real people with correct name and information.  (Please note: Standard WordPress does not register information other than name and email, so apart from WooCommerce, you will need to write code to use this information for your particular application.)
 
 ### Link existing account
 
