@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev
 Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 4.9.6
-Tested up to: 6.5.3
+Tested up to: 6.6.1
 Requires PHP: 7.2
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,6 +40,7 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.3.2: Fix bug that stopped admins from disconnecting users' accounts
 Version 1.3.1: Add support for a filter to 'remember user'
 Version 1.3.0: Suport MobilePay and improve settings screen
 Version 1.2.8: Send version headers to Vipps MobilePay on login
@@ -119,6 +120,9 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2024.08.27 Version 1.3.2 =
+Fix bugs that stopped admins from disconnecting users' accounts
+
 = 2024.05.08 Version 1.3.1 =
 Add filter to allow for the 'remember user' extended cookie length
 
