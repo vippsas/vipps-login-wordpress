@@ -88,10 +88,12 @@ class VippsLogin {
         // Any errors from 'continue_with_vipps_error_login' will be handled here on the wp-login.php screen. IOK 2019-10-14
         add_filter('wp_login_errors', array($this, 'wp_login_errors'), 10, 2);
 
-        // Profile updates for customers. 2019-10-14. Used currently just to connect/disconnect from Vipps. IOK 2019-10-14
+        // Profile updates for customers. 2019-10-14. Used to connect/disconnect from Vipps. IOK 2019-10-14
+        // disconnect now handled separately, this handles other settings like if App usage is required for the user. IOK 2024-08-27
         add_action('personal_options_update',array($this,'profile_update'));
         add_action('edit_user_profile_update',array($this,'profile_update'));
         add_action('user_profile_update_errors', array($this,'user_profile_update_errors'), 10,3);
+        add_action('admin_post_profile_disconnect_vipps', array($this,'disconnect_vipps_post_handler'));
 
         // Action that handles the 'waiting' page - originally, this was the page that will be shown to the user while they confirm their email account.
         // It can however be used for other actions to be done before actually logging a user in, so the filters are kept.
@@ -504,6 +506,12 @@ class VippsLogin {
         list($vippsphone, $vippsid) = $this->get_vipps_account($user);
         $its_you = (get_current_user_id() == $user->ID);
         $is_admin = current_user_can('manage_options');
+
+        // Use an admin-post URL to disconnect users if we have the capability IOK 2024-08-27
+        $disconnect_url = 
+             add_query_arg( ['action'=>'profile_disconnect_vipps', 'userid'=>$user->ID],
+             wp_nonce_url(admin_url("/admin-post.php"), 'disconnect_vipps', 'disconnect_vipps_nonce'));
+
         ?>
             <h2 class='vipps-profile-section-header'><?php printf(__('Log in with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()); ?> </h2>
             <?php if ($allow_login): ?>
@@ -517,7 +525,7 @@ class VippsLogin {
             <?php else: ?>
             <p> <?php printf(__('The user is connected to the %1$s profile with the phone number <b>%2$s</b>', 'login-with-vipps'), VippsLogin::CompanyName(), esc_html($vippsphone)); ?></p>
             <?php endif; ?> 
-            <p><button class="button vipps-disconnect" value="1" name="vipps-disconnect"><?php _e('Unlink account','login-with-vipps'); ?></button></p>
+            <p><a href="<?php echo $disconnect_url; ?>" class="button vipps-disconnect" ><?php _e('Unlink account','login-with-vipps'); ?></a></p>
             <span class="description"><?php printf(__('As long as your profile is connected to %1$s, you can log in with %1$s.','login-with-vipps'), VippsLogin::CompanyName()); ?></span>
             <?php else: ?>
             <?php if ($its_you): ?>
@@ -569,6 +577,7 @@ class VippsLogin {
     }
 
     // This runs when the users saves the profile page, which here includes disconnecting from Vipps. IOK 2019-10-14
+    // Disconnect moved to disconnect_vipps_post_handler, called from admin-post. IOK 2024-09-27
     function profile_update( $userid ) {
         if (!current_user_can('edit_user',$userid)) return false;
 
@@ -576,22 +585,31 @@ class VippsLogin {
         if (current_user_can('manage_options') && isset($_POST['_require_vipps_confirm'])) {
            update_user_meta($userid, '_require_vipps_confirm', sanitize_key($_POST['_require_vipps_confirm']));
         }
-
-
-        if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
-            $user = get_user_by('id', $userid);
-            $this->unmap_phone_to_user($user);
-            $this->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::CompanyName(), $user->ID));
-            $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $phone);
-            $continue = ContinueWithVipps::instance();
-            $continue->add_admin_notice($notice);
-            $continue->store_admin_notices();
-            return true;
-        }
     }
+
     // If neccessary, add errors et to the profile update.
     public function user_profile_update_errors($errors,$update,$user) {
         // Not actually neccessary, yet.
+    }
+
+    // Disconnect handler. Done using admin-post, but check nonce first. IOK 2019-10-14
+    public function disconnect_vipps_post_handler () {
+        check_admin_referer('disconnect_vipps', 'disconnect_vipps_nonce');
+        $userid = intval($_REQUEST['userid']);
+        if (!$userid) wp_die(__('Cannot disconnect', 'login-with-vipps'));
+        if (!current_user_can('edit_user',$userid)) wp_die(__('Cannot disconnect', 'login-with-vipps'));
+
+        list($vippsphone, $vippsid) =  VippsLogin::instance()->get_vipps_account($userid);
+        VippsLogin::instance()->unmap_phone_to_user(get_user_by('id', $userid));
+        VippsLogin::instance()->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::instance()->get_login_method(), $userid));
+
+        $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $phone);
+        $continue = ContinueWithVipps::instance();
+        $continue->add_admin_notice($notice);
+        $continue->store_admin_notices();
+
+        wp_safe_redirect(wp_get_referer());
+        exit();
     }
 
     // At this point, this method does not do anything. However, it is intended to 
