@@ -577,8 +577,9 @@ class VippsLogin {
            update_user_meta($userid, '_require_vipps_confirm', sanitize_key($_POST['_require_vipps_confirm']));
         }
 
+
         if (isset($_POST['vipps-disconnect']) && $_POST['vipps-disconnect']) {
-            $user = wp_get_current_user();
+            $user = get_user_by('id', $userid);
             $this->unmap_phone_to_user($user);
             $this->log(sprintf(__('Unmapping user %2$d from %1$s', 'login-with-vipps'), VippsLogin::CompanyName(), $user->ID));
             $notice = sprintf(__('Connection to %1$s profile %2$s <b>removed</b>.', 'login-with-vipps'), VippsLogin::CompanyName(), $phone);
