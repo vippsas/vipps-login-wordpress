@@ -14,7 +14,8 @@ END_METADATA -->
 
 ![Vipps](./docs/images/vipps.png) ![MobilePay](./docs/images/mp.png) *Available for Vipps and MobilePay.*
 
-*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).*
+*This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).
+For support, contact [WordPress: *Login with Vipps and MobilePay Support*](https://wordpress.org/support/plugin/login-with-vipps/).*
 
 <!-- START_COMMENT -->
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/plugins/). 💥
@@ -105,3 +106,8 @@ These are the main steps:
 * Create your success handler. This should be hooked to `continue_with_vipps_*your action*`. It will receive an array of [userinfo from Vipps MobilePay](https://developer.vippsmobilepay.com/api/userinfo/), and a live session. This handler too should end with a redirect to your success page.
 
 The rest is a simple matter of programming.
+
+## Support
+
+For issues with the plugin,
+contact [WordPress: *Login with Vipps and MobilePay Support*](https://wordpress.org/support/plugin/login-with-vipps/).
