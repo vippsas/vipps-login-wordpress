@@ -15,8 +15,8 @@
 		"start": "wp-scripts start --webpack-copy-php"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.3.0"
-	},
-	"dependencies": {
+		"@wordpress/scripts": "^30.3.0",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.6.3"
 	}
 }
