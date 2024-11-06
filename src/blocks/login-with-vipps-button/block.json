@@ -5,8 +5,8 @@
 	"version": "2.0.0",
 	"title": "Login with Vipps/MobilePay-button",
 	"category": "widgets",
-	"icon": "smiley",
-	"description": "Login button block for Vipps/MobilePay",
+	"icon": "file:../../img/vmp-logo.png",
+	"description": "Login button block for Vipps and MobilePay",
 	"example": {},
 	"supports": {
 		"html": false

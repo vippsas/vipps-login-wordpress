@@ -1,0 +1,46 @@
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+const path = require('path');
+
+module.exports = {
+  ...defaultConfig,
+  entry: {
+    'login-with-vipps-button/index': './login-with-vipps-button/index.ts',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              configFile: 'tsconfig.json',
+              transpileOnly: true,
+            },
+          }          
+        ],
+      },
+      {
+        test: /\.json$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+
+  output: {
+    path: path.resolve(__dirname, '../../blocks/build'),
+  }
+};
