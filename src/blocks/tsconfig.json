@@ -1,11 +1,18 @@
 {
+  "extends": "@wp-blocks/tsconfig",
   "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es6",
-    "target": "es5",
-    "jsx": "react",
-    "allowJs": true,
-    "moduleResolution": "node"
-  }
+    "rootDir": ".",
+    "outDir": "../../blocks",
+    "strict": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "pretty": true,
+  },
+  "include": [
+    "./**/*",
+    "./**/block.json"
+  ],
+  "exclude": [
+    "webpack.*.js"
+  ]
 }
