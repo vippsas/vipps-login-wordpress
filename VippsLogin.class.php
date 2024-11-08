@@ -739,11 +739,11 @@ class VippsLogin {
         }
     }
 
-    // The svg logo icon for the login button, depending on the login method. LP 07.11.2024
-    public function get_icon_svg() {
+    // The mark logo (svg) for the login button, depending on the login method. LP 07.11.2024
+    public function get_mark_svg() {
         $method = $this->get_login_method();
         if ($method == 'MobilePay') {
-            return plugins_url('img/mobilepay-mark.svg.png',__FILE__);
+            return plugins_url('img/mobilepay-mark.svg',__FILE__);
         }
         if ($method == 'Vipps') {
             return plugins_url('img/vipps-mark.svg',__FILE__);

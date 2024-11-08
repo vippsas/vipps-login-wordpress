@@ -4,17 +4,41 @@
 	"name": "login-with-vipps/login-with-vipps-button",
 	"version": "2.0.0",
 	"category": "widgets",
-	"title": "", 
-	"icon": "",
-	"description": "Login button block for Vipps and MobilePay",
+	"title": "",
 	"example": {},
 	"supports": {
 		"html": true,
 		"customClassName": true
 	},
 	"attributes": {
+		"application": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "data-application"
+		},
+		"title": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "title"
+		},
+		"preLogo": {
+			"type": "string",
+			"source": "html",
+			"selector": ".prelogo"
+		},
+		"postLogo": {
+			"type": "string",
+			"source": "html",
+			"selector": ".postlogo"
+		},
+		"loginMethod": {
+			"type": "string",
+			"source": "attribute"
+		}
 	},
-	"textdomain": "login-with-vipps-button",
+	"textdomain": "login-with-vipps",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css"
