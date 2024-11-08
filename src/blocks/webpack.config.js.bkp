@@ -3,11 +3,10 @@ const path = require('path');
 
 module.exports = {
   ...defaultConfig,
-  entry: {
-    'login-with-vipps-button/index': './login-with-vipps-button/index.ts',
-  },
   module: {
+    ...defaultConfig.module,
     rules: [
+      ...defaultConfig.module.rules,
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
@@ -21,26 +20,16 @@ module.exports = {
           }          
         ],
       },
-      {
-        test: /\.json$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-            },
-          },
-        ],
-      },
     ],
   },
 
   resolve: {
+    ...defaultConfig.resolve,
     extensions: ['.tsx', '.ts', '.js'],
   },
 
   output: {
+    ...defaultConfig.output,
     path: path.resolve(__dirname, '../../blocks/build'),
   }
 };
