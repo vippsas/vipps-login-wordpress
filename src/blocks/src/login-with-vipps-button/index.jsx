@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { registerBlockType } from '@wordpress/blocks';
 
 import './style.css';

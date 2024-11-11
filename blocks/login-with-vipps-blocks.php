@@ -49,14 +49,15 @@ function login_with_vipps_button_block_hooks() {
 
         $block_config = [
             'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
-            'iconSrc' => $vipps_login->get_mark_svg(),
+            'iconSrc' => $vipps_login->get_vmp_logo(),
             'defaultApp' => $gotWoo ? 'woocommerce' : 'wordpress',
             'defaultTitle' => sprintf(__('Log in with %1$s!', 'login-with-vipps'), $login_method),
             'defaultTextPreLogo' => __('Log in with', 'login-with-vipps'),
             'defaultTextPostLogo' => __('!', 'login-with-vipps'),
             'loginMethod' => $login_method,
             'applications' => apply_filters('login_with_vipps_applications', $applications),
-            'loginMethodLogoSrc' => $vipps_login->get_transparent_logo()
+            'loginMethodLogoSrc' => $vipps_login->get_transparent_logo(),
+            'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
         ];
 
         wp_add_inline_script('login-with-vipps-login-with-vipps-button-editor-script',

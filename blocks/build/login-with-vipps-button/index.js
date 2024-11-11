@@ -13,11 +13,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   blockConfig: () => (/* binding */ blockConfig),
 /* harmony export */   "default": () => (/* binding */ Edit)
 /* harmony export */ });
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
-/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _editor_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./editor.css */ "./src/login-with-vipps-button/editor.css");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
+/* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
+/* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _editor_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.css */ "./src/login-with-vipps-button/editor.css");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
@@ -45,37 +51,61 @@ function Edit({
     value: current
   });
   let backgroundColorClass = attributes.loginMethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
-      ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)({
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+      ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)({
         className: 'continue-with-vipps-wrapper inline'
       }),
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("a", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("a", {
         className: 'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' + backgroundColorClass,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.RichText, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
           className: "prelogo",
-          tagName: "span"
-          // inline // inline is from the previous implementation by iok, I can't find inline anywhere in the RichText doc: https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md. LP 08.11.2024
-          ,
+          tagName: "span",
           allowedFormats: formats,
           value: attributes.preLogo,
-          onChange: v => setAttributes({
-            prelogo: v
+          onChange: val => setAttributes({
+            preLogo: val
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("img", {
           alt: attributes.title,
           src: blockConfig.loginMethodLogoSrc
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
+          className: "postlogo",
+          tagName: "span",
+          allowedFormats: formats,
+          value: attributes.postLogo,
+          onChange: newVal => setAttributes({
+            postLogo: newVal
+          })
         })]
       })
-    })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
+          onChange: newApp => setAttributes({
+            application: newApp
+          }),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Application', 'login-with-vipps'),
+          value: attributes.applicaiton,
+          options: appOptions,
+          help: blockConfig.applicationsText
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+          onChange: newTitle => setAttributes({
+            title: newTitle
+          }),
+          label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Title', 'login-with-vipps'),
+          value: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('This will be used as the title/popup of the button', 'login-with-vipps')
+        })]
+      })
+    })]
   });
 }
 
 /***/ }),
 
-/***/ "./src/login-with-vipps-button/index.tsx":
+/***/ "./src/login-with-vipps-button/index.jsx":
 /*!***********************************************!*\
-  !*** ./src/login-with-vipps-button/index.tsx ***!
+  !*** ./src/login-with-vipps-button/index.jsx ***!
   \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -88,8 +118,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./block.json */ "./src/login-with-vipps-button/block.json");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
-// @ts-nocheck
-
 
 
 
@@ -207,13 +235,33 @@ module.exports = window["wp"]["blocks"];
 
 /***/ }),
 
+/***/ "@wordpress/components":
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["components"];
+
+/***/ }),
+
+/***/ "@wordpress/i18n":
+/*!******************************!*\
+  !*** external ["wp","i18n"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["i18n"];
+
+/***/ }),
+
 /***/ "./src/login-with-vipps-button/block.json":
 /*!************************************************!*\
   !*** ./src/login-with-vipps-button/block.json ***!
   \************************************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"login-with-vipps/login-with-vipps-button","version":"2.0.0","category":"widgets","title":"","example":{},"supports":{"html":true,"customClassName":true},"attributes":{"application":{"type":"string","source":"attribute","selector":"a","attribute":"data-application"},"title":{"type":"string","source":"attribute","selector":"a","attribute":"title"},"preLogo":{"type":"string","source":"html","selector":".prelogo"},"postLogo":{"type":"string","source":"html","selector":".postlogo"},"loginMethod":{"type":"string","source":"attribute"}},"textdomain":"login-with-vipps","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"login-with-vipps/login-with-vipps-button","version":"2.0.0","category":"widgets","title":"{override at block registering}","icon":"{override at block registering}","example":{},"supports":{"html":true,"customClassName":true},"attributes":{"application":{"type":"string","source":"attribute","selector":"a","attribute":"data-application"},"title":{"type":"string","source":"attribute","selector":"a","attribute":"title"},"preLogo":{"type":"string","source":"html","selector":".prelogo"},"postLogo":{"type":"string","source":"html","selector":".postlogo"},"loginMethod":{"type":"string","source":"attribute"}},"textdomain":"login-with-vipps","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css"}');
 
 /***/ })
 
@@ -382,7 +430,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/tru
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["login-with-vipps-button/style-index"], () => (__webpack_require__("./src/login-with-vipps-button/index.tsx")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["login-with-vipps-button/style-index"], () => (__webpack_require__("./src/login-with-vipps-button/index.jsx")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()

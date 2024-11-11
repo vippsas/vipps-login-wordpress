@@ -4,7 +4,8 @@
   "name": "login-with-vipps/login-with-vipps-button",
   "version": "2.0.0",
   "category": "widgets",
-  "title": "",
+  "title": "{override at block registering}",
+  "icon": "{override at block registering}",
   "example": {},
   "supports": {
     "html": true,

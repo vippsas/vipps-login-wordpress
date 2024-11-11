@@ -1,7 +1,12 @@
 import { __ } from '@wordpress/i18n';
 
 import type { BlockAttributes, BlockEditProps } from '@wordpress/blocks';
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { SelectControl, TextControl, PanelBody } from '@wordpress/components';
+import {
+	useBlockProps,
+	RichText,
+	InspectorControls,
+} from '@wordpress/block-editor';
 
 import './editor.css';
 
@@ -28,6 +33,7 @@ interface LoginWithVippsBlockConfig {
 	loginMethod: string;
 	loginMethodLogoSrc: string;
 	applications: Application[];
+	applicationsText: string;
 }
 
 // const injectedBlockConfig gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
@@ -59,6 +65,7 @@ export default function Edit( {
 
 	return (
 		<>
+			{ /* The block itself. LP 11.11.2024 */ }
 			<span
 				{ ...useBlockProps( {
 					className: 'continue-with-vipps-wrapper inline',
@@ -73,17 +80,52 @@ export default function Edit( {
 					<RichText
 						className="prelogo"
 						tagName="span"
-						// inline // inline is from the previous implementation by iok, I can't find inline anywhere in the RichText doc: https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md. LP 08.11.2024
 						allowedFormats={ formats }
 						value={ attributes.preLogo }
-						onChange={ ( v ) => setAttributes( { prelogo: v } ) }
+						onChange={ ( val ) =>
+							setAttributes( { preLogo: val } )
+						}
 					/>
 					<img
 						alt={ attributes.title }
 						src={ blockConfig.loginMethodLogoSrc }
 					/>
+					<RichText
+						className="postlogo"
+						tagName="span"
+						allowedFormats={ formats }
+						value={ attributes.postLogo }
+						onChange={ ( newVal ) =>
+							setAttributes( { postLogo: newVal } )
+						}
+					/>
 				</a>
 			</span>
+
+			{ /* The block controls on the right side-panel. LP 11.11.2024 */ }
+			<InspectorControls>
+				<PanelBody>
+					<SelectControl
+						onChange={ ( newApp ) =>
+							setAttributes( { application: newApp } )
+						}
+						label={ __( 'Application', 'login-with-vipps' ) }
+						value={ attributes.applicaiton }
+						options={ appOptions }
+						help={ blockConfig.applicationsText }
+					/>
+					<TextControl
+						onChange={ ( newTitle ) =>
+							setAttributes( { title: newTitle } )
+						}
+						label={ __( 'Title', 'login-with-vipps' ) }
+						value={ __(
+							'This will be used as the title/popup of the button',
+							'login-with-vipps'
+						) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 		</>
 	);
 }
