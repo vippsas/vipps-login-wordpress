@@ -84,7 +84,7 @@ export default function Edit( {
 							setAttributes( { application: newApp } )
 						}
 						label={ __( 'Application', 'login-with-vipps' ) }
-						value={ attributes.applicaiton }
+						value={ attributes.application }
 						options={ appOptions }
 						help={ blockConfig.applicationsText }
 					/>
@@ -93,7 +93,8 @@ export default function Edit( {
 							setAttributes( { title: newTitle } )
 						}
 						label={ __( 'Title', 'login-with-vipps' ) }
-						value={ __(
+						value={ attributes.title }
+						help={ __(
 							'This will be used as the title/popup of the button',
 							'login-with-vipps'
 						) }

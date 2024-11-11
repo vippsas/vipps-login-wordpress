@@ -7,7 +7,7 @@ import save from './save';
 import metadata from './block.json';
 import { blockConfig } from './blockConfig';
 
-
+// @ts-ignore
 registerBlockType( metadata.name, {
 	// Override dynamic metadata. LP 08.11.2024
 	title: blockConfig.title,
