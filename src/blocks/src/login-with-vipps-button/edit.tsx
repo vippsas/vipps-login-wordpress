@@ -22,12 +22,14 @@ export default function Edit( {
 	const current = attributes.application;
 	let found = false;
 	for ( let i = 0; i < appOptions.length; i++ ) {
-		if ( current == appOptions[ i ].value ) {
+		if ( current === appOptions[ i ].value ) {
 			found = true;
 			break;
 		}
 	}
-	if ( ! found ) appOptions.push( { label: current, value: current } );
+	if ( ! found ) {
+		appOptions.push( { label: current, value: current } );
+	}
 
 	const backgroundColorClass =
 		attributes.loginMethod === 'Vipps'
