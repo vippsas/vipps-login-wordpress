@@ -2,6 +2,22 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/login-with-vipps-button/blockConfig.ts":
+/*!****************************************************!*\
+  !*** ./src/login-with-vipps-button/blockConfig.ts ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   blockConfig: () => (/* binding */ blockConfig)
+/* harmony export */ });
+// const injectedBlockConfig gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
+// @ts-ignore
+const blockConfig = injectedBlockConfig;
+
+/***/ }),
+
 /***/ "./src/login-with-vipps-button/edit.tsx":
 /*!**********************************************!*\
   !*** ./src/login-with-vipps-button/edit.tsx ***!
@@ -10,7 +26,6 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   blockConfig: () => (/* binding */ blockConfig),
 /* harmony export */   "default": () => (/* binding */ Edit)
 /* harmony export */ });
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
@@ -19,26 +34,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _editor_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.css */ "./src/login-with-vipps-button/editor.css");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _blockConfig__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./blockConfig */ "./src/login-with-vipps-button/blockConfig.ts");
+/* harmony import */ var _editor_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./editor.css */ "./src/login-with-vipps-button/editor.css");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
 
 
 
 
 
-// const injectedBlockConfig gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
-// @ts-ignore
-const blockConfig = injectedBlockConfig;
+
 function Edit({
   attributes,
   setAttributes
 }) {
-  let formats = ['core/bold', 'core/italic'];
+  const formats = ['core/bold', 'core/italic'];
 
   // Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
-  let appOptions = blockConfig.applications;
-  let current = attributes.application;
+  const appOptions = _blockConfig__WEBPACK_IMPORTED_MODULE_3__.blockConfig.applications;
+  const current = attributes.application;
   let found = false;
   for (let i = 0; i < appOptions.length; i++) {
     if (current == appOptions[i].value) {
@@ -50,15 +64,17 @@ function Edit({
     label: current,
     value: current
   });
-  let backgroundColorClass = attributes.loginMethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+  const backgroundColorClass = attributes.loginMethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("span", {
       ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)({
         className: 'continue-with-vipps-wrapper inline'
       }),
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("a", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("a", {
         className: 'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' + backgroundColorClass,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
+        title: attributes.title,
+        "data-application": attributes,
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
           className: "prelogo",
           tagName: "span",
           allowedFormats: formats,
@@ -66,10 +82,11 @@ function Edit({
           onChange: val => setAttributes({
             preLogo: val
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("img", {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("img", {
+          className: "vipps-block-logo-img",
           alt: attributes.title,
-          src: blockConfig.loginMethodLogoSrc
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
+          src: _blockConfig__WEBPACK_IMPORTED_MODULE_3__.blockConfig.loginMethodLogoSrc
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.RichText, {
           className: "postlogo",
           tagName: "span",
           allowedFormats: formats,
@@ -79,17 +96,17 @@ function Edit({
           })
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, {
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
           onChange: newApp => setAttributes({
             application: newApp
           }),
           label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Application', 'login-with-vipps'),
           value: attributes.applicaiton,
           options: appOptions,
-          help: blockConfig.applicationsText
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+          help: _blockConfig__WEBPACK_IMPORTED_MODULE_3__.blockConfig.applicationsText
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
           onChange: newTitle => setAttributes({
             title: newTitle
           }),
@@ -116,8 +133,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _edit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./edit */ "./src/login-with-vipps-button/edit.tsx");
 /* harmony import */ var _save__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./save */ "./src/login-with-vipps-button/save.tsx");
 /* harmony import */ var _block_json__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./block.json */ "./src/login-with-vipps-button/block.json");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _blockConfig__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./blockConfig */ "./src/login-with-vipps-button/blockConfig.ts");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+
 
 
 
@@ -126,28 +145,28 @@ __webpack_require__.r(__webpack_exports__);
 
 (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_0__.registerBlockType)(_block_json__WEBPACK_IMPORTED_MODULE_4__.name, {
   // Override dynamic metadata. LP 08.11.2024
-  title: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.title,
-  icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("img", {
-    className: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.title.includes('Vipps') ? 'vipps-component-icon vipps-smile' : 'vipps-component-icon mobilepay-mark',
-    src: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.iconSrc,
-    alt: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.title + ' icon'
+  title: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.title,
+  icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("img", {
+    className: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.title.includes('Vipps') ? 'vipps-component-icon vipps-smile' : 'vipps-component-icon mobilepay-mark',
+    src: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.iconSrc,
+    alt: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.title + ' icon'
   }),
   // Set attribute defaults. LP 08.11.2024
   attributes: {
     application: {
-      default: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.defaultApp
+      default: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.defaultApp
     },
     title: {
-      default: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.defaultTitle
+      default: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.defaultTitle
     },
     preLogo: {
-      default: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.defaultTextPreLogo
+      default: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.defaultTextPreLogo
     },
     postLogo: {
-      default: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.defaultTextPostLogo
+      default: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.defaultTextPostLogo
     },
     loginMethod: {
-      default: _edit__WEBPACK_IMPORTED_MODULE_2__.blockConfig.loginMethod
+      default: _blockConfig__WEBPACK_IMPORTED_MODULE_5__.blockConfig.loginMethod
     }
   },
   edit: _edit__WEBPACK_IMPORTED_MODULE_2__["default"],
@@ -168,14 +187,41 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _blockConfig__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./blockConfig */ "./src/login-with-vipps-button/blockConfig.ts");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
 
 
-function save() {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("p", {
-    ..._wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps.save(),
-    children: 'Login with Vipps/MobilePay-button – hello from the saved content!'
+
+function save({
+  attributes
+}) {
+  const backgroundColorClass = attributes.loginMethod === 'Vipps' ? 'vipps-background' : 'mobilepay-background';
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+      ..._wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps.save({
+        className: 'continue-with-vipps-wrapper inline'
+      }),
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("a", {
+        className: 'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' + backgroundColorClass,
+        title: attributes.title,
+        "data-application": attributes,
+        href: "javascript: void(0);",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.RichText.Content, {
+          className: "prelogo",
+          tagName: "span",
+          value: attributes.preLogo
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+          className: "vipps-block-logo-img",
+          alt: attributes.title,
+          src: _blockConfig__WEBPACK_IMPORTED_MODULE_1__.blockConfig.loginMethodLogoSrc
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.RichText.Content, {
+          className: "postlogo",
+          tagName: "span",
+          value: attributes.postLogo
+        })]
+      })
+    })
   });
 }
 

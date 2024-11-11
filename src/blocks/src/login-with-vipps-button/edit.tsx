@@ -1,6 +1,5 @@
+import type { BlockEditProps } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-import type { BlockAttributes, BlockEditProps } from '@wordpress/blocks';
 import { SelectControl, TextControl, PanelBody } from '@wordpress/components';
 import {
 	useBlockProps,
@@ -8,47 +7,19 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 
+import type { LoginWithVippsBlockAttributes } from './types';
+import { blockConfig } from './blockConfig';
 import './editor.css';
-
-interface LoginWithVippsBlockAttributes extends BlockAttributes {
-	application: string;
-	title: string;
-	preLogo: string;
-	postLogo: string;
-	loginMethod: string;
-}
-
-interface Application {
-	label: string;
-	value: string;
-}
-
-interface LoginWithVippsBlockConfig {
-	title: string;
-	iconSrc: string;
-	defaultApp: string;
-	defaultTitle: string;
-	defaultTextPreLogo: string;
-	defaultTextPostLogo: string;
-	loginMethod: string;
-	loginMethodLogoSrc: string;
-	applications: Application[];
-	applicationsText: string;
-}
-
-// const injectedBlockConfig gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
-// @ts-ignore
-export const blockConfig: LoginWithVippsBlockConfig = injectedBlockConfig;
 
 export default function Edit( {
 	attributes,
 	setAttributes,
 }: BlockEditProps< LoginWithVippsBlockAttributes > ) {
-	let formats = [ 'core/bold', 'core/italic' ];
+	const formats = [ 'core/bold', 'core/italic' ];
 
 	// Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
-	let appOptions = blockConfig.applications;
-	let current = attributes.application;
+	const appOptions = blockConfig.applications;
+	const current = attributes.application;
 	let found = false;
 	for ( let i = 0; i < appOptions.length; i++ ) {
 		if ( current == appOptions[ i ].value ) {
@@ -58,7 +29,7 @@ export default function Edit( {
 	}
 	if ( ! found ) appOptions.push( { label: current, value: current } );
 
-	let backgroundColorClass =
+	const backgroundColorClass =
 		attributes.loginMethod === 'Vipps'
 			? 'vipps-background'
 			: 'mobilepay-background';
@@ -76,6 +47,8 @@ export default function Edit( {
 						'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' +
 						backgroundColorClass
 					}
+					title={ attributes.title }
+					data-application={ attributes }
 				>
 					<RichText
 						className="prelogo"
@@ -87,6 +60,7 @@ export default function Edit( {
 						}
 					/>
 					<img
+						className="vipps-block-logo-img"
 						alt={ attributes.title }
 						src={ blockConfig.loginMethodLogoSrc }
 					/>

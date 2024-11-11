@@ -2,9 +2,11 @@ import { registerBlockType } from '@wordpress/blocks';
 
 import './style.css';
 
-import Edit, { blockConfig } from './edit';
+import Edit from './edit';
 import save from './save';
 import metadata from './block.json';
+import { blockConfig } from './blockConfig';
+
 
 registerBlockType( metadata.name, {
 	// Override dynamic metadata. LP 08.11.2024
@@ -31,5 +33,5 @@ registerBlockType( metadata.name, {
 	},
 
 	edit: Edit,
-	save,
+	save: save,
 } );
