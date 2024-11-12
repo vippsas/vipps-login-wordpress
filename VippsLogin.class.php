@@ -44,7 +44,7 @@ class VippsLogin {
 
 
     public static function CompanyName() { 
-        return __("Vipps MobilePay", 'woo-vipps');
+        return __("Vipps MobilePay", 'login-with-vipps');
     }
 
     function __construct() {

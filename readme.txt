@@ -1,5 +1,5 @@
 === Login with Vipps and MobilePay ===
-Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev
+Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev,lassepladsen
 Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 4.9.6
 Tested up to: 6.6.1
