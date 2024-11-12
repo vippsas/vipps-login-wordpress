@@ -132,6 +132,8 @@ class ContinueWithVipps {
 
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
+        $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
+
 
     }
 
@@ -174,7 +176,6 @@ class ContinueWithVipps {
 
     // And this runs on plugins-loaded. The call to dbtables will only do things when the database definition changes. IOK 2019-10-14
     public function plugins_loaded () {
-        $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
         $this->maybe_migrate_options();
         $options =   get_option('vipps_login_settings'); 
         if (!@$options['installtime']) {
