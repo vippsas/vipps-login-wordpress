@@ -35,8 +35,7 @@
 			"selector": ".postlogo"
 		},
 		"loginMethod": {
-			"type": "string",
-			"source": "attribute"
+			"type": "string"
 		}
 	},
 	"textdomain": "login-with-vipps",
