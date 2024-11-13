@@ -4,9 +4,7 @@
   "name": "login-with-vipps/login-with-vipps-button",
   "version": "2.0.0",
   "category": "widgets",
-  "title": "{override at block registering}",
-  "icon": "{override at block registering}",
-  "example": {},
+  "title": "Login with Vipps/MobilePay-button",
   "supports": {
     "html": true,
     "customClassName": true
@@ -35,8 +33,7 @@
       "selector": ".postlogo"
     },
     "loginMethod": {
-      "type": "string",
-      "source": "attribute"
+      "type": "string"
     }
   },
   "textdomain": "login-with-vipps",

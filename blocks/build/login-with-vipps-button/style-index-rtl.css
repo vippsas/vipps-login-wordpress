@@ -1,1 +1,81 @@
-.vipps-button .block-editor-rich-text__editable{padding:0 3px}.continue-with-vipps-wrapper.center-block .button.continue-with-vipps{margin:0 auto;width:100%}.continue-with-vipps-wrapper{display:inline-block}.continue-with-vipps-wrapper a.button.continue-with-vipps img{display:inline;height:2ex;margin:0 2px;max-width:100%;vertical-align:text-bottom}.continue-with-vipps-wrapper a.button.continue-with-vipps:hover img{opacity:.9}.continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img{opacity:.7}.continue-with-vipps-wrapper a.button.continue-with-vipps{background-color:#ff5b24;border:0;border-radius:5px;box-sizing:border-box;color:#fff;cursor:pointer;display:inline-block;font-size:22px;font-weight:400;height:48px;line-height:48px;padding:0;text-align:center}.continue-with-vipps-wrapper.inline a.button.continue-with-vipps{font-size:1em;font-weight:500;height:auto;line-height:2em;padding:5px 10px 4px}.continue-with-vipps-wrapper a.button.continue-with-vipps:focus{outline:0}#continue-with-vipps-wrapper a.button.continue-with-vipps:active,.continue-with-vipps-wrapper a.button.continue-with-vipps:active{border:0}.mobilepay-background{background-color:#5a78ff!important}.vipps-background{background-color:#ff5b24!important}
+/*!*******************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/login-with-vipps-button/style.css ***!
+  \*******************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied both on the front of your site and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+
+.vipps-button .block-editor-rich-text__editable {
+    /* Allow a bit of extra padding for clicking the rich text to edit the button text. LP 11.11.2024*/
+    padding: 0 3px 0 3px;
+}
+
+.continue-with-vipps-wrapper.center-block .button.continue-with-vipps {
+    margin: 0 auto;
+    width: 100%;
+}
+
+.continue-with-vipps-wrapper {
+    display: inline-block;
+}
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps img {
+    max-width: 100%;
+    margin: 0px 2px;
+    display: inline;
+    height: 2ex;
+    vertical-align: text-bottom;
+}
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps:hover img {
+    opacity: 0.9;
+}
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img {
+    opacity: 0.7;
+}
+
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps {
+    display: inline-block;
+    color: #fff;
+    background-color: #FF5B24;
+    border: 0;
+    padding: 0;
+    font-size: 22px;
+    height: 48px;
+    line-height: 48px;
+    font-weight: 400;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.continue-with-vipps-wrapper.inline a.button.continue-with-vipps {
+    font-size: 1em;
+    line-height: 2em;
+    font-weight: 500;
+    height: auto;
+    padding: 5px 10px 4px 10px;
+}
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps:focus {
+    outline: 0;
+}
+
+.continue-with-vipps-wrapper a.button.continue-with-vipps:active,
+#continue-with-vipps-wrapper a.button.continue-with-vipps:active {
+    border: 0;
+}
+
+.mobilepay-background {
+    background-color: #5A78FF !important;
+}
+
+.vipps-background {
+    background-color: #FF5B24 !important;
+}
