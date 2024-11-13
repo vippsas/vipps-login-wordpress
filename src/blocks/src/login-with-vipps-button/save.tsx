@@ -7,8 +7,6 @@ import { blockConfig } from './blockConfig';
 export default function save( {
 	attributes,
 }: BlockSaveProps< LoginWithVippsBlockAttributes > ) {
-	console.log(attributes);
-	
 	const backgroundColorClass =
 		attributes.loginMethod === 'Vipps'
 			? 'vipps-background'

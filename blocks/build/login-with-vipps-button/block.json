@@ -11,26 +11,16 @@
   },
   "attributes": {
     "application": {
-      "type": "string",
-      "source": "attribute",
-      "selector": "a",
-      "attribute": "data-application"
+      "type": "string"
     },
     "title": {
-      "type": "string",
-      "source": "attribute",
-      "selector": "a",
-      "attribute": "title"
+      "type": "string"
     },
     "preLogo": {
-      "type": "string",
-      "source": "html",
-      "selector": ".prelogo"
+      "type": "string"
     },
     "postLogo": {
-      "type": "string",
-      "source": "html",
-      "selector": ".postlogo"
+      "type": "string"
     },
     "loginMethod": {
       "type": "string"
