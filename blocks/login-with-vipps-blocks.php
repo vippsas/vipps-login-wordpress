@@ -34,7 +34,7 @@
  */
 function login_with_vipps_button_block_hooks() {
     add_action('init', function () {
-        register_block_type(__DIR__ . '/build/login-with-vipps-button');
+        register_block_type(__DIR__ . '/dist/login-with-vipps-button');
     });
 
 
