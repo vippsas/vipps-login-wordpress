@@ -38,7 +38,8 @@ function login_with_vipps_button_block_hooks() {
     });
 
 
-    add_action('admin_enqueue_scripts', function () {
+    // Inject block config variables to the login-with-vipps-button editor script. LP 14.11.2024
+    add_action('enqueue_block_editor_assets', function () {
         $vipps_login = VippsLogin::instance();
         $login_method = $vipps_login->get_login_method();
 
@@ -52,7 +53,6 @@ function login_with_vipps_button_block_hooks() {
         }
 
         
-        // Inject block config variables to the login-with-vipps-button editor script. LP 14.11.2024
         $block_config = [
             'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
             'iconSrc' => $vipps_login->get_vmp_logo(),
@@ -65,6 +65,7 @@ function login_with_vipps_button_block_hooks() {
             'loginMethodLogoSrc' => $vipps_login->get_transparent_logo(),
             'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
         ];
+        
         wp_add_inline_script('login-with-vipps-login-with-vipps-button-editor-script',
             'const injectedBlockConfig = ' . json_encode($block_config),
             'before');
