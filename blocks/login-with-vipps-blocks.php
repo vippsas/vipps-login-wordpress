@@ -27,6 +27,11 @@
  * SOFTWARE.
  */
 
+
+/**
+ * Init hooks and inline script for the block login-with-vipps-button. LP 14.11.2024
+ * @return void
+ */
 function login_with_vipps_button_block_hooks() {
     add_action('init', function () {
         register_block_type(__DIR__ . '/build/login-with-vipps-button');
@@ -46,7 +51,8 @@ function login_with_vipps_button_block_hooks() {
             $applications[] = ['label' => __("Log in to WooCommerce", 'login-with-vipps'), 'value' => 'woocommerce'];
         }
 
-
+        
+        // Inject block config variables to the login-with-vipps-button editor script. LP 14.11.2024
         $block_config = [
             'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
             'iconSrc' => $vipps_login->get_vmp_logo(),
@@ -59,7 +65,6 @@ function login_with_vipps_button_block_hooks() {
             'loginMethodLogoSrc' => $vipps_login->get_transparent_logo(),
             'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
         ];
-
         wp_add_inline_script('login-with-vipps-login-with-vipps-button-editor-script',
             'const injectedBlockConfig = ' . json_encode($block_config),
             'before');
