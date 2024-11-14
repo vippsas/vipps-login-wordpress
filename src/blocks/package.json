@@ -14,12 +14,6 @@
 		"@wordpress/prettier-config": "^4.11.0",
 		"@wordpress/scripts": "^30.3.0",
 		"@wp-blocks/tsconfig": "^0.1.0",
-		"file-loader": "^6.2.0",
-		"ts-loader": "^9.5.1",
 		"typescript": "^5.6.3"
-	},
-	"dependencies": {
-		"@wordpress/block-editor": "^14.6.0",
-		"@wordpress/blocks": "^14.0.0"
 	}
 }
