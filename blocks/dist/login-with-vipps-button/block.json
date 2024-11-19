@@ -5,6 +5,7 @@
   "version": "2.0.0",
   "category": "widgets",
   "title": "Login with Vipps/MobilePay-button",
+  "icon": "smiley",
   "supports": {
     "html": true,
     "customClassName": true

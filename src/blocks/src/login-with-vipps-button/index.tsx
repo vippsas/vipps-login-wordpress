@@ -12,11 +12,7 @@ registerBlockType( metadata.name, {
 	title: blockConfig.title,
 	icon: (
 		<img
-			className={
-				blockConfig.title.includes( 'Vipps' )
-					? 'vipps-component-icon vipps-smile'
-					: 'vipps-component-icon mobilepay-mark'
-			}
+			className={ 'block-editor-block-icon has-colors vipps-smile vipps-component-icon' }
 			src={ blockConfig.iconSrc }
 			alt={ blockConfig.title + ' icon' }
 		/>
