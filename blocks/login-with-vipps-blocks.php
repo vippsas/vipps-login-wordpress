@@ -67,7 +67,7 @@ function login_with_vipps_button_block_hooks() {
         ];
         
         wp_add_inline_script('login-with-vipps-login-with-vipps-button-editor-script',
-            'const injectedBlockConfig = ' . json_encode($block_config),
+            'const injectedLoginWithVippsBlockConfig = ' . json_encode($block_config),
             'before');
     });
 }
