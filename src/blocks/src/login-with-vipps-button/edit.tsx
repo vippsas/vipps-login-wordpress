@@ -50,7 +50,7 @@ export default function Edit( {
 						backgroundColorClass
 					}
 					title={ attributes.title }
-					data-application={ attributes }
+					data-application={ attributes.application }
 				>
 					<RichText
 						className="prelogo"

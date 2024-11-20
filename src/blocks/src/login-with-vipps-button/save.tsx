@@ -25,7 +25,7 @@ export default function save( {
 						backgroundColorClass
 					}
 					title={ attributes.title }
-					data-application={ attributes }
+					data-application={ attributes.application }
 					href="javascript: void(0);"
 				>
 					<RichText.Content
