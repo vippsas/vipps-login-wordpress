@@ -739,6 +739,11 @@ class VippsLogin {
         }
     }
 
+    // The combined VippsMobilePay logo png. LP 08.11.2024
+    public function get_vmp_logo() {
+        return plugins_url('img/vmp-logo.png', __FILE__);
+    }
+
     // The background for the login button, depending on the login method.
     public function get_background_class() {
         $method = $this->get_login_method();
