@@ -719,10 +719,12 @@ class VippsLogin {
         $login_method = $this->get_login_method();
         $logo = $this->get_transparent_logo();
         $bg = $this->get_background_class();
+        // The "application" should only contain letters, numbers and hyphens. IOK 2024-11-26
+        $application = preg_replace("![^a-zA-Z0-9-_]!", "", $application);
         ob_start();
         ?>
-            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo $bg;?>" title="<?php echo sprintf("%s %s", $text, $login_method); ?>"><?php echo $text;?> <img
-            alt="<?php printf(__('Log in without password using %1$s', 'login-with-vipps'), $login_method); ?>" src="<?php echo $logo; ?>">!</a>
+            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo esc_attr($bg);?>" title="<?php echo esc_attr(sprintf("%s %s", $text, $login_method)); ?>"><?php echo esc_html($text);?> <img
+            alt="<?php echo esc_attr(sprintf(__('Log in without password using %1$s', 'login-with-vipps'), $login_method)); ?>" src="<?php echo esc_attr($logo); ?>">!</a>
             <?php
         echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
     }
