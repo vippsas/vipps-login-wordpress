@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 4.9.6
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,20 +40,12 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.3.4: Login-block updated to newest block API. You may need to recreate your blocks if using.
+Version 1.3.5: Login-block updated to newest block API. You may need to recreate your blocks if using.
+Version 1.3.4: Fix for possible stored XSS vulnerability (Thanks to Peter Thaleikis for reporting)
 Version 1.3.3: Text domain fix for 6.7 compatibility
 Version 1.3.2: Fix bug that stopped admins from disconnecting users' accounts
 Version 1.3.1: Add support for a filter to 'remember user'
 Version 1.3.0: Suport MobilePay and improve settings screen
-Version 1.2.8: Send version headers to Vipps MobilePay on login
-Version 1.2.7: Minor fixes
-Version 1.2.0: Adds support for using the phone number as "login key" and changing email addresses; cleanup
-Version 1.2.1: Minor fix for Gutenberg block
-Version 1.2.2: Testing on 6.1
-Version 1.2.3: Fix compatibility with php 7.4
-Version 1.2.4: Fix compatibility with php 8.1
-Version 1.2.5: Add filter for "invalid user" message
-Version 1.2.6: Removed restrictions on filtering application and action in javascript; simplifying reuse of the Login block
 
 == Feature Highlights ==
 
@@ -122,8 +114,11 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2024.xx.xx Version 1.3.4 =
+= 2024.xx.xx Version 1.3.5 =
 The login-block is updated to the latest Block API.
+
+= 2024.11.26 Version 1.3.4 =
+This version fixes a vulnerability in the shortcodes where it would be possible for an editor to add stored javascript that would run when the button was pressed. Thanks to Peter Thaleikis for reporting.
 
 = 2024.05.02 Version 1.3.3 =
 Text domain fix for 6.7 compatibility
