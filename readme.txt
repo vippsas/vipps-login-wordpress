@@ -114,7 +114,7 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2024.xx.xx Version 1.3.5 =
+= 2024.12.02 Version 1.3.5 =
 The login-block is updated to the latest Block API.
 
 = 2024.11.26 Version 1.3.4 =
