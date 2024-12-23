@@ -1,0 +1,668 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Login with Vipps\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-22 14:59+0000\n"
+"PO-Revision-Date: 2024-12-03 08:09+0000\n"
+"Last-Translator: Iver Odin Kvello <iver@wp-hosting.no>\n"
+"Language-Team: Swedish\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.14; wp-6.7.1"
+
+#: blocks/login-with-vipps.php:72
+msgid "!"
+msgstr ""
+
+#: ContinueWithVipps.class.php:454
+#, php-format
+msgid "%1$s integration settings"
+msgstr ""
+
+#: VippsLogin.class.php:1234
+#, php-format
+msgid "%1$s user with phone %2$s just connected to account %1$d"
+msgstr ""
+
+#: VippsLogin.class.php:1104
+#, php-format
+msgid ""
+"%1$s user with phone %2$s just connected to account %3$d during account "
+"creation"
+msgstr ""
+
+#: VippsLogin.class.php:1146
+#, php-format
+msgid "%1$s user with phone %2$s just connected to account %3$d during login"
+msgstr ""
+
+#: VippsLogin.class.php:1309
+#, php-format
+msgid "<a href='%s'>Return to your previous page</a> to try again</a>"
+msgstr ""
+
+#: ContinueWithVipps.class.php:662
+#, php-format
+msgid "A problem occurred when getting user info from %1$s:"
+msgstr ""
+
+#: ContinueWithVipps.class.php:652
+#, php-format
+msgid "A problem occurred when trying to use %1$s:"
+msgstr ""
+
+#: VippsLogin.class.php:387
+#, php-format
+msgid "Add %1$s to login page"
+msgstr ""
+
+#: VippsWooLogin.class.php:162
+#, php-format
+msgid ""
+"Allow users to register as customers in WooCommerce using Login with %1$s"
+msgstr ""
+
+#: blocks/login-with-vipps.php:66
+msgid "Application"
+msgstr ""
+
+#: VippsWooLogin.class.php:343
+#, php-format
+msgid ""
+"Are you registered as a customer? Log in with %s to continue your checkout."
+msgstr ""
+
+#: VippsWooLogin.class.php:376
+#, php-format
+msgid "Are you registered as a customer? Log in with %s."
+msgstr ""
+
+#: VippsLogin.class.php:491
+#, php-format
+msgid "As long as your profile is connected to %1$s, you can log in with %1$s."
+msgstr ""
+
+#: VippsLogin.class.php:1307
+#, php-format
+msgid ""
+"Cannot log in: It is required for this account to verify login with the %1$s "
+"app"
+msgstr ""
+
+#: VippsLogin.class.php:749
+#, php-format
+msgid ""
+"Cannot redirect to %1$s waiting page as it doesn't exist. If you just tried "
+"to log in, check your email."
+msgstr ""
+
+#: VippsWooLogin.class.php:187
+#, php-format
+msgid "Change \"Continue with %1$s\" banner link text"
+msgstr ""
+
+#: VippsWooLogin.class.php:180
+#, php-format
+msgid "Change \"Continue with %1$s\" banner text"
+msgstr ""
+
+#: ContinueWithVipps.class.php:434
+msgid "Choose which login method you'd like to enable for your users."
+msgstr ""
+
+#: VippsWooLogin.class.php:189 VippsWooLogin.class.php:379
+#: VippsWooLogin.class.php:404
+msgid "Click here to continue"
+msgstr ""
+
+#: VippsWooLogin.class.php:346
+msgid "Click to continue"
+msgstr ""
+
+#: ContinueWithVipps.class.php:438
+msgid "Client ID"
+msgstr ""
+
+#: ContinueWithVipps.class.php:443
+msgid "Client Secret"
+msgstr ""
+
+#: VippsLogin.class.php:554 VippsWooLogin.class.php:540
+#, php-format
+msgid "Connection to %1$s profile %2$s <b>removed</b>."
+msgstr ""
+
+#: VippsLogin.class.php:635 VippsLogin.class.php:657
+#: VippsWooLogin.class.php:285
+msgid "Continue with"
+msgstr ""
+
+#: VippsLogin.class.php:400 VippsLogin.class.php:457
+#, php-format
+msgid "Continue with %1$s page"
+msgstr ""
+
+#: ContinueWithVipps.class.php:449
+#, php-format
+msgid ""
+"Copy the URI above. Then go to <a target=\"_blank\" href=\"%s\">https:"
+"//portal.vippsmobilepay.com</a> and choose \"Developer\". Find your point of "
+"sale and press \"Setup login\". Press \"Activate Login\" and paste the URI "
+"into the field \"URI\". Then press \"Save\". If you change your websites "
+"name or your permalink setup, you will need to register the new URI the same "
+"way."
+msgstr ""
+
+#: VippsLogin.class.php:1187
+#, php-format
+msgid "Could not connect to your %1$s profile: "
+msgstr ""
+
+#: VippsLogin.class.php:1086
+#, php-format
+msgid "Could not create a new user - an error occured: %s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:547
+#, php-format
+msgid ""
+"Could not create session table. The Login with %1$s plugin is not correctly "
+"installed."
+msgstr ""
+
+#: ContinueWithVipps.class.php:552
+#, php-format
+msgid ""
+"Could not create user identity table. The Login with %1$s plugin is not "
+"correctly installed."
+msgstr ""
+
+#: VippsLogin.class.php:1068
+msgid "Could not find any user with your registered email. Cannot log in."
+msgstr ""
+
+#: VippsLogin.class.php:462
+#, php-format
+msgid "Could not find or create the \"Continue with %1$s\" page."
+msgstr ""
+
+#: VippsLogin.class.php:1334
+#, php-format
+msgid "Could not synchronize your %1$s profile: "
+msgstr ""
+
+#: ContinueWithVipps.class.php:645 ContinueWithVipps.class.php:647
+#, php-format
+msgid "Could not verify your oAuth2 token: %s"
+msgstr ""
+
+#: VippsLogin.class.php:356
+msgid "Create a new page"
+msgstr ""
+
+#: VippsWooLogin.class.php:405
+#, php-format
+msgid "Create an account using %s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:273
+msgid "Dismissed message "
+msgstr ""
+
+#: VippsLogin.class.php:381
+#, php-format
+msgid "Enable Login with %1$s"
+msgstr ""
+
+#: VippsWooLogin.class.php:156
+#, php-format
+msgid "Enable Login with %1$s for WooCommerce"
+msgstr ""
+
+#: VippsWooLogin.class.php:158
+#, php-format
+msgid "Enable Login with %1$s on your customer's pages in WooCommerce"
+msgstr ""
+
+#: VippsWooLogin.class.php:164
+#, php-format
+msgid ""
+"Enable new users to be created as customers if using Login with %1$s with "
+"WooCommerce. If you are using the payment gateway, this will have been "
+"configured to create new users when using Express Checkout - checkout the "
+"payment gateway settings to modify this."
+msgstr ""
+
+#: VippsLogin.class.php:372
+msgid "Everybody"
+msgstr ""
+
+#: VippsWooLogin.class.php:519
+msgid "Get addresses"
+msgstr ""
+
+#: ContinueWithVipps.class.php:439
+#, php-format
+msgid ""
+"Go to <a target=\"_blank\" href=\"%s\">https://portal.vippsmobilepay.com</a> "
+"and choose \"Developer\". Find your point of sale and press \"Show keys\". "
+"Copy the value of \"client id\" and paste it into this field"
+msgstr ""
+
+#: ContinueWithVipps.class.php:444
+#, php-format
+msgid ""
+"Go to <a target=\"_blank\" href=\"%s\">https://portal.vippsmobilepay.com</a> "
+"and choose \"Developer\". Find your point of sale and press \"Show keys\". "
+"Copy the value of \"client secret\" and paste it into this field"
+msgstr ""
+
+#: ContinueWithVipps.class.php:240
+#, php-format
+msgid ""
+"Having downloaded Log in with %1$s: It is quick and easy to get started! Get "
+"your API keys in the %1$s Portal and add them to the plugin to activate Log "
+"in with %1$s."
+msgstr ""
+
+#. URI of the plugin
+msgid "https://wordpress.org/plugins/login-with-vipps/"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.wp-hosting.no/"
+msgstr ""
+
+#: VippsWooLogin.class.php:170
+msgid "If you are using Express Checkout, that will be shown instead."
+msgstr ""
+
+#: VippsLogin.class.php:518
+#, php-format
+msgid ""
+"If you check this, this user will not be allowed to log in without "
+"confirming this operation with their %1$s app - email addresses must match."
+msgstr ""
+
+#: ContinueWithVipps.class.php:572
+#, php-format
+msgid "Installed database tables for Login With %1$s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:390
+msgid "Insufficient privileges"
+msgstr ""
+
+#: VippsLogin.class.php:1126
+#, php-format
+msgid "It is unfortunately not allowed for your account to log-in using %1$s"
+msgstr ""
+
+#: VippsWooLogin.class.php:182
+#, php-format
+msgid "Log in or register an account using %1$s."
+msgstr ""
+
+#: VippsWooLogin.class.php:374
+#, php-format
+msgid "Log in or register an account using %s."
+msgstr ""
+
+#: VippsWooLogin.class.php:341
+#, php-format
+msgid "Log in or register an account with %s to continue your checkout."
+msgstr ""
+
+#: blocks/login-with-vipps.php:54
+msgid "Log in to WooCommerce"
+msgstr ""
+
+#: blocks/login-with-vipps.php:49
+msgid "Log in to WordPress"
+msgstr ""
+
+#: VippsLogin.class.php:631 VippsLogin.class.php:651
+#: blocks/login-with-vipps.php:71
+msgid "Log in with"
+msgstr ""
+
+#: VippsLogin.class.php:478
+#, php-format
+msgid "Log in with %1$s"
+msgstr ""
+
+#: VippsLogin.class.php:388
+#, php-format
+msgid "Log in with %1$s on the Wordpress login page"
+msgstr ""
+
+#: blocks/login-with-vipps.php:73
+#, php-format
+msgid "Log in with %1$s!"
+msgstr ""
+
+#: blocks/login-with-vipps.php:61
+#, php-format
+msgid "Log in with %1$s-button"
+msgstr ""
+
+#: VippsLogin.class.php:676
+#, php-format
+msgid "Log in without password using %1$s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:238
+#, php-format
+msgid "Logg inn med %1$s-logo"
+msgstr ""
+
+#: ContinueWithVipps.class.php:428
+msgid "Login method"
+msgstr ""
+
+#: VippsLogin.class.php:1292
+#, php-format
+msgid ""
+"Login not confirmed: This user is not the user mapped to the %1$s account, "
+"and does not have the same email account"
+msgstr ""
+
+#: VippsLogin.class.php:408 ContinueWithVipps.class.php:90
+#: ContinueWithVipps.class.php:261 VippsWooLogin.class.php:481
+#: VippsWooLogin.class.php:555
+#, php-format
+msgid "Login with %1$s"
+msgstr ""
+
+#: VippsWooLogin.class.php:201
+#, php-format
+msgid "Login with %1$s for WooCommerce"
+msgstr ""
+
+#: VippsLogin.class.php:530
+#, php-format
+msgid "Login with %1$s is disabled"
+msgstr ""
+
+#. Name of the plugin
+msgid "Login with Vipps"
+msgstr ""
+
+#: VippsWooLogin.class.php:194
+msgid "Make the entire banner clickable"
+msgstr ""
+
+#: ContinueWithVipps.class.php:431
+msgid "MobilePay"
+msgstr ""
+
+#. Description of the plugin
+msgid "No need to remember passwords ever again. Vipps, and you are logged in."
+msgstr ""
+
+#: VippsLogin.class.php:514
+msgid "No, allow login without the app"
+msgstr ""
+
+#: VippsWooLogin.class.php:196
+msgid ""
+"Normally, WooCommerce-banners like this will use a \"click here\"-text. If "
+"you don't, check here to make the entire banner clickable like a button"
+msgstr ""
+
+#: VippsLogin.class.php:1256 VippsLogin.class.php:1263
+msgid "Not a valid user"
+msgstr ""
+
+#: VippsLogin.class.php:517
+msgid "Only if member of restricted groups"
+msgstr ""
+
+#: VippsLogin.class.php:495 VippsWooLogin.class.php:508
+msgid "Press here to connect with your app"
+msgstr ""
+
+#: VippsLogin.class.php:505
+#, php-format
+msgid ""
+"Require this user to confirm their login with %1$s if logging in normally"
+msgstr ""
+
+#: VippsLogin.class.php:393
+#, php-format
+msgid "Require users in these roles to log in with %1$s"
+msgstr ""
+
+#: ContinueWithVipps.class.php:416
+msgid "Save Changes"
+msgstr ""
+
+#: ContinueWithVipps.class.php:680 ContinueWithVipps.class.php:681
+msgid "Session expired - please retry."
+msgstr ""
+
+#: VippsWooLogin.class.php:168
+#, php-format
+msgid "Show \"Continue with %1$s\" in Cart page and widgets"
+msgstr ""
+
+#: VippsWooLogin.class.php:174
+#, php-format
+msgid "Show \"Continue with %1$s\" on the Checkout page"
+msgstr ""
+
+#: VippsLogin.class.php:401
+msgid ""
+"Sometimes, the user may need to confirm their email or answer follow up "
+"questions to complete sign in. This page, which you may leave blank, will be "
+"used for this purpose. A blank page will have been installed for you when "
+"activating the plugin, this is the default page which will be used. Do *not* "
+"use any system pages or anything that is being used for other things."
+msgstr ""
+
+#: VippsWooLogin.class.php:183 VippsWooLogin.class.php:190
+#, php-format
+msgid ""
+"The \"Continue with %1$s\" banner will have slightly different text "
+"depending on context, and some of these are rather long. You can change "
+"these dynamically if using hooks and filters, or you can use this override "
+"to change the standard text."
+msgstr ""
+
+#: blocks/login-with-vipps.php:67
+#, php-format
+msgid ""
+"The continue with %1$s-button can perform different actions depending on "
+"what is defined in your system. Per default it will log you in to WordPress "
+"or WooCommerce if installed, but plugins and themes can define more"
+msgstr ""
+
+#: VippsWooLogin.class.php:510
+#, php-format
+msgid ""
+"The easiest way to log in. Anyone with %1$s can use %1$s to log in. No need "
+"to remember passwords ever again."
+msgstr ""
+
+#: VippsLogin.class.php:488
+#, php-format
+msgid ""
+"The user is connected to the %1$s profile with the phone number <b>%2$s</b>"
+msgstr ""
+
+#: VippsLogin.class.php:497
+#, php-format
+msgid "The user is not connected to a %1$s profile."
+msgstr ""
+
+#: ContinueWithVipps.class.php:669
+#, php-format
+msgid ""
+"There is a problem with verifying your ID token from %1$s. Unfortunately, "
+"you cannot continue with %1$s at this time."
+msgstr ""
+
+#: VippsLogin.class.php:1196 VippsLogin.class.php:1343
+msgid "This can only be called when logged in"
+msgstr ""
+
+#: VippsLogin.class.php:766
+#, php-format
+msgid ""
+"This page is used to handle your requests when continuing from %1$s and "
+"further action is required to complete your task. But in this case, it "
+"doesn't seem to be an open session"
+msgstr ""
+
+#: blocks/login-with-vipps.php:69
+msgid "This will be used as the title/popup of the button"
+msgstr ""
+
+#: VippsWooLogin.class.php:176
+msgid "This will replace Express Checkout on the checkout page."
+msgstr ""
+
+#: blocks/login-with-vipps.php:68
+msgid "Title"
+msgstr ""
+
+#: VippsLogin.class.php:382
+#, php-format
+msgid "Turn Login with %1$s on and off"
+msgstr ""
+
+#: VippsLogin.class.php:1227
+#, php-format
+msgid ""
+"Unfortunately, you cannot connect to this %1$s-profile: The email addresses "
+"are not the same."
+msgstr ""
+
+#: ContinueWithVipps.class.php:615
+#, php-format
+msgid "Unhandled error when using Continue with %1$s for action %2$s: %3$s"
+msgstr ""
+
+#: VippsLogin.class.php:490 VippsWooLogin.class.php:503
+msgid "Unlink account"
+msgstr ""
+
+#: VippsLogin.class.php:553 VippsWooLogin.class.php:531
+#, php-format
+msgid "Unmapping user %2$d from %1$s"
+msgstr ""
+
+#: VippsLogin.class.php:482
+#, php-format
+msgid "Use %1$s to login to your account"
+msgstr ""
+
+#: ContinueWithVipps.class.php:82
+msgid "User cancelled the login"
+msgstr ""
+
+#: VippsLogin.class.php:394
+#, php-format
+msgid ""
+"Users in these roles *must* use login with %1$s. You can also require this "
+"for a given user on the profile page"
+msgstr ""
+
+#: ContinueWithVipps.class.php:430
+msgid "Vipps"
+msgstr ""
+
+#: VippsLogin.class.php:802
+#, php-format
+msgid ""
+"Welcome! If you see this page, an really unexpected error has occur. "
+"Unfortunately, we can't do better than to send you to the <a href='%s'>login "
+"page</a>"
+msgstr ""
+
+#. Author of the plugin
+msgid "WP-Hosting AS"
+msgstr ""
+
+#: VippsLogin.class.php:511
+msgid "Yes, require confirmation"
+msgstr ""
+
+#: VippsLogin.class.php:486 VippsWooLogin.class.php:497
+#, php-format
+msgid "You are connected to the %1$s profile with the phone number <b>%2$s</b>"
+msgstr ""
+
+#: VippsLogin.class.php:494
+#, php-format
+msgid "You are not connected to any %1$s profile"
+msgstr ""
+
+#: VippsWooLogin.class.php:473
+#, php-format
+msgid "You are now connected to the %1$s profile <b>%2$s</b>!"
+msgstr ""
+
+#: VippsLogin.class.php:306
+#, php-format
+msgid "You are now connected to the %1$s profile <b>%2$s</b>."
+msgstr ""
+
+#: VippsLogin.class.php:311
+#, php-format
+msgid "You are now synchronized with the %1$s profile <b>%2$s</b>."
+msgstr ""
+
+#: VippsLogin.class.php:499
+#, php-format
+msgid ""
+"You can connect to your %1$s profile if you use the same email address in "
+"the %1$s app and on this site."
+msgstr ""
+
+#: VippsLogin.class.php:1166
+msgid "You must be logged in to confirm your account"
+msgstr ""
+
+#: VippsWooLogin.class.php:528
+msgid "You must be logged in to disconnect"
+msgstr ""
+
+#: VippsLogin.class.php:1316
+msgid "You must be logged in to synchronise your account"
+msgstr ""
+
+#: VippsLogin.class.php:1158
+#, php-format
+msgid ""
+"You need to confirm your email account before Login with %1$s can be used. "
+"Login to your account normally and connect with %1$s on your user page, or "
+"contact the site admin"
+msgstr ""
+
+#: ContinueWithVipps.class.php:689
+#, php-format
+msgid ""
+"You successfully completed the action \"%2$s\" using %1$s - unfortunately, "
+"this website doesn't know how to handle that."
+msgstr ""
+
+#: VippsWooLogin.class.php:618
+#, php-format
+msgid "Your addresses are now synchronized with the %1$s-account %2$s."
+msgstr ""
+
+#: VippsLogin.class.php:1055
+msgid ""
+"Your login session is missing. Ensure that you are accessing this site on a "
+"secure link (using HTTPS). Also, ensure that you are not blocking cookies – "
+"you will need those to log in."
+msgstr ""
+
+#: ContinueWithVipps.class.php:448
+msgid "Your redirect-URI is:"
+msgstr ""

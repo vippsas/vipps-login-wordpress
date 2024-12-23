@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 4.9.6
 Tested up to: 6.7.1
 Requires PHP: 7.2
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,6 +40,7 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.3.6: Filter fixed which could cause issues if WP_DEBUG was true
 Version 1.3.5: Login-block updated to newest block API. You may need to recreate your blocks if using.
 Version 1.3.4: Fix for possible stored XSS vulnerability (Thanks to Peter Thaleikis for reporting)
 Version 1.3.3: Text domain fix for 6.7 compatibility
@@ -114,6 +115,9 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2024.12.23 Version 1.3.5 =
+Fix wrong variable name in login filter
+
 = 2024.12.02 Version 1.3.5 =
 The login-block is updated to the latest Block API.
 
