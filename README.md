@@ -12,7 +12,7 @@ END_METADATA -->
 
 ![Support and development by WP Hosting ](./docs/images/wphosting.svg#gh-light-mode-only)![Support and development by WP Hosting](./docs/images/wphosting_dark.svg#gh-dark-mode-only)
 
-![null](./docs/images/vipps.png) ![null](./docs/images/mp.png) *Available for Vipps and MobilePay.*
+![Vipps](./docs/images/vipps.png) ![MobilePay](./docs/images/mp.png) *Available for Vipps and MobilePay.*
 
 *This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).
 For support, contact [WordPress: *Login with Vipps and MobilePay Support*](https://wordpress.org/support/plugin/login-with-vipps/).*
