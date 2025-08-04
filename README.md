@@ -39,7 +39,7 @@ Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One
 * For WooCommerce, the version requirement is 3.3.4 or above
 * The port 443 must be open for outward traffic on your servers firewall
 
-## Feature Highlights
+## Feature highlights
 
 ### Fully integrated with WooCommerce
 
@@ -75,7 +75,7 @@ You can use the framework of this plugin to implement other signed actions, such
 * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a *Login with Vipps MobilePay* button that will log you into the given application, which by default can be either WordPress or WooCommerce.
 * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text.
 
-## Customizing the Plugin
+## Customizing the plugin
 
 To use 'Continue with Vipps' in your application, there are two levels of customizations available, except for a mass of filters and hooks.
 
