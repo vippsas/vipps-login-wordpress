@@ -1,5 +1,5 @@
-import type { LoginWithVippsBlockConfig } from './types';
+import type { BlockConfig } from './types';
 
-// const injectedLoginWithVippsBlockConfig gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
+// gets injected from <pluginRoot>/blocks/login-with-vipps-blocks.php. It should follow the interface LoginWithVippsBlockConfig. LP 08.11.2024
 // @ts-ignore
-export const blockConfig: LoginWithVippsBlockConfig = injectedLoginWithVippsBlockConfig;
+export const blockConfig: BlockConfig = injectedLoginWithVippsBlockConfig;

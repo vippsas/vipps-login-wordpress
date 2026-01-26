@@ -1,11 +1,11 @@
 import type { BlockAttributes } from '@wordpress/blocks';
 
-interface Application {
+export interface Option {
 	label: string;
 	value: string;
 }
 
-export interface LoginWithVippsBlockAttributes extends BlockAttributes {
+export interface EditAttributes extends BlockAttributes {
 	application: string;
 	title: string;
 	preLogo: string;
@@ -13,7 +13,7 @@ export interface LoginWithVippsBlockAttributes extends BlockAttributes {
 	loginMethod: string;
 }
 
-export interface LoginWithVippsBlockConfig {
+export interface BlockConfig {
 	title: string;
 	iconSrc: string;
 	defaultApp: string;
@@ -22,6 +22,6 @@ export interface LoginWithVippsBlockConfig {
 	defaultTextPostLogo: string;
 	loginMethod: string;
 	loginMethodLogoSrc: string;
-	applications: Application[];
+	applications: Option[];
 	applicationsText: string;
 }

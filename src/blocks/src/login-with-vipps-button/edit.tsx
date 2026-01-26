@@ -7,14 +7,14 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 
-import type { LoginWithVippsBlockAttributes } from './types';
+import type { EditAttributes } from './types';
 import { blockConfig } from './blockConfig';
 import './editor.css';
 
 export default function Edit( {
 	attributes,
 	setAttributes,
-}: BlockEditProps< LoginWithVippsBlockAttributes > ) {
+}: BlockEditProps< EditAttributes > ) {
 	const formats = [ 'core/bold', 'core/italic' ];
 
 	// Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
@@ -39,7 +39,7 @@ export default function Edit( {
 	return (
 		<>
 			{ /* The block itself. LP 11.11.2024 */ }
-			<span
+			<div
 				{ ...useBlockProps( {
 					className: 'continue-with-vipps-wrapper inline',
 				} ) }
@@ -76,13 +76,13 @@ export default function Edit( {
 						}
 					/>
 				</a>
-			</span>
+			</div>
 
 			{ /* The block controls on the right side-panel. LP 11.11.2024 */ }
 			<InspectorControls>
 				<PanelBody>
 					<SelectControl
-						onChange={ ( newApp ) =>
+						onChange={ ( newApp: string ) =>
 							setAttributes( { application: newApp } )
 						}
 						label={ __( 'Application', 'login-with-vipps' ) }
@@ -91,7 +91,7 @@ export default function Edit( {
 						help={ blockConfig.applicationsText }
 					/>
 					<TextControl
-						onChange={ ( newTitle ) =>
+						onChange={ ( newTitle: string ) =>
 							setAttributes( { title: newTitle } )
 						}
 						label={ __( 'Title', 'login-with-vipps' ) }

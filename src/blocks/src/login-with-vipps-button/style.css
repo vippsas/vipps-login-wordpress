@@ -1,10 +1,3 @@
-/**
- * The following styles get applied both on the front of your site and in the editor.
- *
- * Replace them with your own styles or remove the file completely.
- */
-
-
 .vipps-button .block-editor-rich-text__editable {
     /* Allow a bit of extra padding for clicking the rich text to edit the button text. LP 11.11.2024*/
     padding: 0 3px 0 3px;
