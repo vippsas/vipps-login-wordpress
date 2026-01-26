@@ -134,7 +134,7 @@ class ContinueWithVipps {
     public function init () {
         $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
 
-
+        wp_register_script("vipps-button-webcomponent", "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js");
     }
 
 
@@ -257,6 +257,8 @@ class ContinueWithVipps {
         if ($suffix == 'settings_page_vipps_login_settings') {
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
+
+        wp_register_script("vipps-button-webcomponent", "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js");
     }
 
     public function admin_menu () {

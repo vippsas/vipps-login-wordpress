@@ -21,10 +21,6 @@ registerBlockType( metadata.name, {
 	// Set attribute defaults. LP 08.11.2024
 	attributes: {
 		application: { default: blockConfig.defaultApp },
-		title: { default: blockConfig.defaultTitle },
-		preLogo: { default: blockConfig.defaultTextPreLogo },
-		postLogo: { default: blockConfig.defaultTextPostLogo },
-		loginMethod: { default: blockConfig.loginMethod },
 	},
 
 	edit: Edit,

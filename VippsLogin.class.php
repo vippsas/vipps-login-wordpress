@@ -369,7 +369,8 @@ class VippsLogin {
         $user_locale = get_user_meta($user->ID, 'locale', true);
         $language = substr($user_locale, 0, 2); 
         if (function_exists('pll_current_language')) {
-           $language = pll_current_language('slug');
+            $pll_language = pll_current_language('slug');
+            if ($pll_language) $language = $pll_language;
         } elseif (has_filter('wpml_current_language')){
             $language=apply_filters('wpml_current_language',null);
         } 
@@ -379,8 +380,30 @@ class VippsLogin {
         if (! in_array($language, ['en', 'no', 'dk', 'fi'])) $language = 'en';
         return $language;
      }
-     
-     
+
+    public function get_store_language() {
+        global $TRP_LANGUAGE; // TranslatePress IOK 2025-11-06
+
+        $language = substr(get_bloginfo('language'),0,2);
+        if (function_exists('pll_current_language')) {
+            $pll_language = pll_current_language('slug');
+            if ($pll_language) $language = $pll_language;
+        } elseif (has_filter('wpml_current_language')){
+            $language=apply_filters('wpml_current_language',null);
+        }  elseif (!empty($TRP_LANGUAGE)) {
+            $language = sanitize_title($TRP_LANGUAGE);
+        }
+        // Just to be sure.
+        $language = strtolower($language);
+
+        if ($language == 'nb' || $language == 'nn') $language = 'no';
+        if ($language == 'da') $language = 'dk';
+        if ($language == 'sv') $language = 'se';
+        if (! in_array($language, ['en', 'no', 'dk', 'fi', 'se'])) $language = 'en';
+        return $language;
+    }
+
+
      public function init_form_login_options2() {
         $options = get_option('vipps_login_settings');
 

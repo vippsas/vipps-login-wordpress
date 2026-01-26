@@ -1,21 +1,20 @@
 import type { BlockEditProps } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { SelectControl, TextControl, PanelBody } from '@wordpress/components';
 import {
-	useBlockProps,
-	RichText,
-	InspectorControls,
-} from '@wordpress/block-editor';
+	SelectControl,
+	PanelBody,
+	CheckboxControl,
+} from '@wordpress/components';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
-import type { EditAttributes } from './types';
 import { blockConfig } from './blockConfig';
 import './editor.css';
+import { Attributes } from './types';
 
-export default function Edit( {
-	attributes,
-	setAttributes,
-}: BlockEditProps< EditAttributes > ) {
-	const formats = [ 'core/bold', 'core/italic' ];
+export type EditProps = BlockEditProps< Attributes >;
+
+export default function Edit( { attributes, setAttributes }: EditProps ) {
+	console.log( 'LP attributes: ', attributes );
 
 	// Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
 	const appOptions = blockConfig.applications;
@@ -36,6 +35,11 @@ export default function Edit( {
 			? 'vipps-background'
 			: 'mobilepay-background';
 
+	const language =
+		attributes.language === 'store'
+			? blockConfig.storeLanguage
+			: attributes.language;
+
 	return (
 		<>
 			{ /* The block itself. LP 11.11.2024 */ }
@@ -52,29 +56,20 @@ export default function Edit( {
 					title={ attributes.title }
 					data-application={ attributes.application }
 				>
-					<RichText
-						className="prelogo"
-						tagName="span"
-						allowedFormats={ formats }
-						value={ attributes.preLogo }
-						onChange={ ( val ) =>
-							setAttributes( { preLogo: val } )
-						}
-					/>
-					<img
-						className="vipps-block-logo-img"
-						alt={ attributes.title }
-						src={ blockConfig.loginMethodLogoSrc }
-					/>
-					<RichText
-						className="postlogo"
-						tagName="span"
-						allowedFormats={ formats }
-						value={ attributes.postLogo }
-						onChange={ ( newVal ) =>
-							setAttributes( { postLogo: newVal } )
-						}
-					/>
+					{ /* Web component https://developer.vippsmobilepay.com/docs/knowledge-base/design-guidelines/buttons/#javascript-button-library. :LPLP 2026-01-26 */ }
+					{ /* @ts-ignore */ }
+					<vipps-mobilepay-button
+						type="button"
+						loading="false"
+						brand={ blockConfig.loginMethod }
+						language={ language }
+						variant={ attributes.variant }
+						rounded={ attributes.rounded }
+						verb={ attributes.verb }
+						stretched="true"
+						branded={ attributes.branded }
+						// @ts-ignore
+					></vipps-mobilepay-button>
 				</a>
 			</div>
 
@@ -90,16 +85,43 @@ export default function Edit( {
 						options={ appOptions }
 						help={ blockConfig.applicationsText }
 					/>
-					<TextControl
-						onChange={ ( newTitle: string ) =>
-							setAttributes( { title: newTitle } )
+					<SelectControl
+						onChange={ ( language: string ) =>
+							setAttributes( { language } )
 						}
-						label={ __( 'Title', 'login-with-vipps' ) }
-						value={ attributes.title }
-						help={ __(
-							'This will be used as the title/popup of the button',
-							'login-with-vipps'
-						) }
+						label={ __( 'Language', 'login-with-vipps' ) }
+						value={ attributes.language }
+						options={ blockConfig.languages }
+					/>
+					<SelectControl
+						onChange={ ( variant: string ) =>
+							setAttributes( { variant } )
+						}
+						label={ __( 'Variant', 'login-with-vipps' ) }
+						value={ attributes.variant }
+						options={ blockConfig.variants }
+					/>
+					<SelectControl
+						onChange={ ( verb: string ) =>
+							setAttributes( { verb } )
+						}
+						label={ __( 'Verb', 'login-with-vipps' ) }
+						value={ attributes.verb }
+						options={ blockConfig.verbs }
+					/>
+					<CheckboxControl
+						onChange={ ( rounded: boolean ) =>
+							setAttributes( { rounded } )
+						}
+						label={ __( 'Rounded', 'login-with-vipps' ) }
+						value={ attributes.rounded }
+					/>
+					<CheckboxControl
+						onChange={ ( branded: boolean ) =>
+							setAttributes( { branded } )
+						}
+						label={ __( 'Branded', 'login-with-vipps' ) }
+						value={ attributes.branded }
 					/>
 				</PanelBody>
 			</InspectorControls>

@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "login-with-vipps/login-with-vipps-button",
-	"version": "2.0.0",
+	"version": "3.0.0",
 	"category": "widgets",
 	"title": "Login with Vipps/MobilePay-button",
 	"icon": "smiley",
@@ -14,21 +14,33 @@
 		"application": {
 			"type": "string"
 		},
-		"title": {
-			"type": "string"
+		"brand": {
+			"type": "string",
+			"default": "store"
 		},
-		"preLogo": {
-			"type": "string"
+		"variant": {
+			"type": "string",
+			"default": "primary"
 		},
-		"postLogo": {
-			"type": "string"
+		"verb": {
+			"type": "string",
+			"default": "login"
 		},
-		"loginMethod": {
-			"type": "string"
+		"rounded": {
+			"type": "boolean",
+			"default": false
+		},
+		"branded": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"textdomain": "login-with-vipps",
-	"editorScript": "file:./index.js",
+	"editorScript": [
+		"file:./index.js",
+		"vipps-button-webcomponent"
+	],
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+	"style": "file:./style-index.css",
+	"viewScript": "vipps-button-webcomponent"
 }

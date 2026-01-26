@@ -1,12 +1,12 @@
 import type { BlockSaveProps } from '@wordpress/blocks';
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
-import type { LoginWithVippsBlockAttributes } from './types';
-import { blockConfig } from './blockConfig';
+import type { Attributes } from './edit';
+import VMPLoginButton from './VippsMobilePayButton';
 
-export default function save( {
-	attributes,
-}: BlockSaveProps< LoginWithVippsBlockAttributes > ) {
+export type SaveProps = BlockSaveProps< Attributes >;
+
+export default function save( { attributes }: SaveProps ) {
 	const backgroundColorClass =
 		attributes.loginMethod === 'Vipps'
 			? 'vipps-background'
@@ -14,7 +14,7 @@ export default function save( {
 
 	return (
 		<>
-			<span
+			<div
 				{ ...useBlockProps.save( {
 					className: 'continue-with-vipps-wrapper inline',
 				} ) }
@@ -28,23 +28,19 @@ export default function save( {
 					data-application={ attributes.application }
 					href="javascript: void(0);"
 				>
-					<RichText.Content
-						className="prelogo"
-						tagName="span"
-						value={ attributes.preLogo }
-					/>
-					<img
-						className="vipps-block-logo-img"
-						alt={ attributes.title }
-						src={ blockConfig.loginMethodLogoSrc }
-					/>
-					<RichText.Content
-						className="postlogo"
-						tagName="span"
-						value={ attributes.postLogo }
-					/>
+					<vipps-mobilepay-button
+						type="button"
+						brand="vipps"
+						language="en"
+						variant="primary"
+						rounded="true"
+						verb="buy"
+						stretched="false"
+						branded="true"
+						loading="false"
+					></vipps-mobilepay-button>
 				</a>
-			</span>
+			</div>
 		</>
 	);
 }
