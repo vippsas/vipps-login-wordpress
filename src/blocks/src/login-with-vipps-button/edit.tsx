@@ -74,8 +74,6 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 					{ /* Web component https://developer.vippsmobilepay.com/docs/knowledge-base/design-guidelines/buttons/#javascript-button-library. :LP 2026-01-26 */ }
 					{ /* @ts-ignore */ }
 					<vipps-mobilepay-button
-						type="button"
-						loading="false"
 						brand={ blockConfig.loginMethod }
 						language={ language }
 						variant={ getAttribute( 'variant' ) }
@@ -96,7 +94,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { application } )
 						}
 						label={ __( 'Application', 'login-with-vipps' ) }
-						value={ getAttribute('application') }
+						value={ getAttribute( 'application' ) }
 						options={ appOptions }
 						help={ blockConfig.applicationsText }
 					/>
@@ -105,7 +103,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { language } )
 						}
 						label={ __( 'Language', 'login-with-vipps' ) }
-						value={ getAttribute('language') }
+						value={ getAttribute( 'language' ) }
 						options={ blockConfig.languages }
 					/>
 					<SelectControl
@@ -113,7 +111,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { variant } )
 						}
 						label={ __( 'Variant', 'login-with-vipps' ) }
-						value={ getAttribute('variant') }
+						value={ getAttribute( 'variant' ) }
 						options={ blockConfig.variants }
 					/>
 					<SelectControl
@@ -121,7 +119,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { verb } )
 						}
 						label={ __( 'Verb', 'login-with-vipps' ) }
-						value={ getAttribute('verb') }
+						value={ getAttribute( 'verb' ) }
 						options={ blockConfig.verbs }
 					/>
 					<CheckboxControl
@@ -129,14 +127,14 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { rounded } )
 						}
 						label={ __( 'Rounded', 'login-with-vipps' ) }
-						checked={ getAttribute('rounded') }
+						checked={ getAttribute( 'rounded' ) }
 					/>
 					<CheckboxControl
 						onChange={ ( branded: boolean ) =>
 							setAttributes( { branded } )
 						}
 						label={ __( 'Branded', 'login-with-vipps' ) }
-						checked={ getAttribute('branded') }
+						checked={ getAttribute( 'branded' ) }
 					/>
 				</PanelBody>
 			</InspectorControls>

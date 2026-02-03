@@ -7,7 +7,7 @@
 	"title": "Login with Vipps/MobilePay-button",
 	"icon": "smiley",
 	"supports": {
-		"html": true,
+		"html": false,
 		"customClassName": true
 	},
 	"attributes": {
@@ -33,7 +33,17 @@
 		"branded": {
 			"type": "boolean",
 			"default": true
-		}
+		},
+		"loginMethod": {
+			"type": "string"
+		},
+		"language": {
+			"type": "string",
+			"default": "store"
+		},
+		"storeLanguage": {
+			"type": "string"
+		}	
 	},
 	"textdomain": "login-with-vipps",
 	"editorScript": [
@@ -42,5 +52,6 @@
 	],
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
-	"viewScript": "vipps-button-webcomponent"
+	"viewScript": "vipps-button-webcomponent",
+	"render": "file:./render.php"
 }
