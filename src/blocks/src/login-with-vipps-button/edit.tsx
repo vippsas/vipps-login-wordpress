@@ -8,12 +8,27 @@ import {
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 import { blockConfig } from './blockConfig';
+import metadata from './block.json';
 import './editor.css';
 import { Attributes } from './types';
 
 export type EditProps = BlockEditProps< Attributes >;
 
+console.log( metadata.attributes );
+console.log( metadata.attributes[ 'variant' ].default );
 export default function Edit( { attributes, setAttributes }: EditProps ) {
+	/** Returns attribute with default provided by metadata in block.json.
+	 * Annoying wrapper, but this is used because if an attribute is equal to its default value, then its not set in the attributes object at all... LP 2026-02-03 */
+	function getAttribute(
+		attributeName: string,
+		defaultValue: any = null
+	): any {
+		if ( null === defaultValue ) {
+			// @ts-ignore
+			defaultValue = metadata.attributes[ attributeName ]?.default;
+		}
+		return attributes[ attributeName ] ?? defaultValue;
+	}
 	console.log( 'LP attributes: ', attributes );
 
 	// Let the user choose the application. If the current one isn't in the list, add it (though we don't know the label then. IOK 2020-12-18
@@ -31,12 +46,12 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 	}
 
 	const backgroundColorClass =
-		attributes.loginMethod === 'Vipps'
+		'Vipps' === blockConfig.loginMethod
 			? 'vipps-background'
 			: 'mobilepay-background';
 
 	const language =
-		attributes.language === 'store'
+		'store' === getAttribute( 'language' )
 			? blockConfig.storeLanguage
 			: attributes.language;
 
@@ -53,21 +68,21 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 						'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' +
 						backgroundColorClass
 					}
-					title={ attributes.title }
-					data-application={ attributes.application }
+					title={ getAttribute( 'title' ) }
+					data-application={ getAttribute( 'application' ) }
 				>
-					{ /* Web component https://developer.vippsmobilepay.com/docs/knowledge-base/design-guidelines/buttons/#javascript-button-library. :LPLP 2026-01-26 */ }
+					{ /* Web component https://developer.vippsmobilepay.com/docs/knowledge-base/design-guidelines/buttons/#javascript-button-library. :LP 2026-01-26 */ }
 					{ /* @ts-ignore */ }
 					<vipps-mobilepay-button
 						type="button"
 						loading="false"
 						brand={ blockConfig.loginMethod }
 						language={ language }
-						variant={ attributes.variant }
-						rounded={ attributes.rounded }
-						verb={ attributes.verb }
+						variant={ getAttribute( 'variant' ) }
+						rounded={ getAttribute( 'rounded' ) }
+						verb={ getAttribute( 'verb' ) }
 						stretched="true"
-						branded={ attributes.branded }
+						branded={ getAttribute( 'branded' ) }
 						// @ts-ignore
 					></vipps-mobilepay-button>
 				</a>
@@ -77,11 +92,11 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 			<InspectorControls>
 				<PanelBody>
 					<SelectControl
-						onChange={ ( newApp: string ) =>
-							setAttributes( { application: newApp } )
+						onChange={ ( application: string ) =>
+							setAttributes( { application } )
 						}
 						label={ __( 'Application', 'login-with-vipps' ) }
-						value={ attributes.application }
+						value={ getAttribute('application') }
 						options={ appOptions }
 						help={ blockConfig.applicationsText }
 					/>
@@ -90,7 +105,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { language } )
 						}
 						label={ __( 'Language', 'login-with-vipps' ) }
-						value={ attributes.language }
+						value={ getAttribute('language') }
 						options={ blockConfig.languages }
 					/>
 					<SelectControl
@@ -98,7 +113,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { variant } )
 						}
 						label={ __( 'Variant', 'login-with-vipps' ) }
-						value={ attributes.variant }
+						value={ getAttribute('variant') }
 						options={ blockConfig.variants }
 					/>
 					<SelectControl
@@ -106,7 +121,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { verb } )
 						}
 						label={ __( 'Verb', 'login-with-vipps' ) }
-						value={ attributes.verb }
+						value={ getAttribute('verb') }
 						options={ blockConfig.verbs }
 					/>
 					<CheckboxControl
@@ -114,14 +129,14 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 							setAttributes( { rounded } )
 						}
 						label={ __( 'Rounded', 'login-with-vipps' ) }
-						value={ attributes.rounded }
+						checked={ getAttribute('rounded') }
 					/>
 					<CheckboxControl
 						onChange={ ( branded: boolean ) =>
 							setAttributes( { branded } )
 						}
 						label={ __( 'Branded', 'login-with-vipps' ) }
-						value={ attributes.branded }
+						checked={ getAttribute('branded') }
 					/>
 				</PanelBody>
 			</InspectorControls>
