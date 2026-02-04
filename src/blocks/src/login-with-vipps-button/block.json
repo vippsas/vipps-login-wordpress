@@ -14,10 +14,6 @@
 		"application": {
 			"type": "string"
 		},
-		"brand": {
-			"type": "string",
-			"default": "store"
-		},
 		"variant": {
 			"type": "string",
 			"default": "primary"
@@ -34,16 +30,10 @@
 			"type": "boolean",
 			"default": true
 		},
-		"loginMethod": {
-			"type": "string"
-		},
 		"language": {
 			"type": "string",
 			"default": "store"
-		},
-		"storeLanguage": {
-			"type": "string"
-		}	
+		}
 	},
 	"textdomain": "login-with-vipps",
 	"editorScript": [

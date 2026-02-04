@@ -11,18 +11,14 @@ registerBlockType( metadata.name, {
 	title: blockConfig.title,
 	icon: (
 		<img
-			className={ 'block-editor-block-icon has-colors vipps-smile vipps-component-icon' }
+			className={
+				'block-editor-block-icon has-colors vipps-smile vipps-component-icon'
+			}
 			src={ blockConfig.iconSrc }
 			alt={ blockConfig.title + ' icon' }
 		/>
 	),
 
-	// Set attribute defaults. LP 08.11.2024
-	attributes: {
-		application: { default: blockConfig.defaultApp },
-		loginMethod: { default: blockConfig.loginMethod },
-		storeLanguage: { default: blockConfig.storeLanguage },
-	},
 
 	edit: Edit,
 } );

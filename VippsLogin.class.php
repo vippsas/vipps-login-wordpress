@@ -481,6 +481,64 @@ class VippsLogin {
         // We don't delete anything however, just in case.
     }
 
+    /** This is the config data for the login-with-vipps guten block. LP 2026-02-04
+    * Store in the class because we need it in render.php to handle block attribute 
+    * defaults correctly, and to reuse some data that is not stored in attributes. LP 2026-02-04 */
+    public function login_with_vipps_block_config() {
+        $login_method = strtolower($this->get_login_method());
+        $store_language = $this->get_store_language();
+        if ($store_language === 'se') {
+            $store_language = 'sv';
+        }
+
+        $applications = [
+            ['label' => __("Log in to WordPress", 'login-with-vipps'), 'value' => 'wordpress']
+        ];
+        $gotWoo = false;
+        if (class_exists('VippsWooLogin') && VippsWooLogin::instance()->is_active()) {
+            $gotWoo = true;
+            $applications[] = ['label' => __("Log in to WooCommerce", 'login-with-vipps'), 'value' => 'woocommerce'];
+        }
+
+        $languages = [
+            ['label' => __('Store language', 'login-with-vipps'), 'value' => 'store'],
+            ['label' => __('English', 'login-with-vipps'), 'value' => 'en'],
+        ];
+        switch ($login_method) {
+            case 'vipps':
+                $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
+                $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
+                break;
+            case 'mobilepay':
+                $languages[] = ['label' => __('Finnish', 'login-with-vipps'), 'value' => 'fi'];
+                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'dk'];
+                break;
+        }
+
+
+        $variants = [
+            [ 'label' => __('Primary', 'login-with-vipps'), 'value' => 'primary' ],
+            [ 'label' => __('Dark', 'login-with-vipps'), 'value' => 'dark' ],
+            [ 'label' => __('Light', 'login-with-vipps'), 'value' => 'light' ],
+        ];
+        $verbs = [
+            [ 'label' => __('Login', 'login-with-vipps'), 'value' => 'login' ],
+            [ 'label' => __('Continue', 'login-with-vipps'), 'value' => 'continue' ],
+        ];
+        return [
+            'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
+            'iconSrc' => $this->get_vmp_logo(),
+            'defaultApp' => $gotWoo ? 'woocommerce' : 'wordpress',
+            'loginMethod' => $login_method,
+            'applications' => apply_filters('login_with_vipps_applications', $applications),
+            'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
+            'languages' => $languages,
+            'storeLanguage' => $store_language,
+            'variants' => $variants,
+            'verbs' => $verbs,
+        ];
+    }
+
     // Returns the page object of the 'continue with vipps' page, creating it if neccessary. 2019-10-14
     public function ensure_continue_with_vipps_page() {
         $options = get_option('vipps_login_settings');
