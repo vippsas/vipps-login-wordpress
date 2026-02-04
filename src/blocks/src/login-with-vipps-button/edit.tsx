@@ -11,8 +11,6 @@ import { useEffect } from 'react';
 export type EditProps = BlockEditProps< Attributes >;
 
 export default function Edit( { attributes, setAttributes }: EditProps ) {
-	console.log( 'LP attributes: ', attributes );
-
 	// Dynamic default from php, so make sure to set the default from blockConfig here. Setting it in index.ts by overriding the default does not work with dynamic blocks (it does not show up in the attributes in render.php). LP 2026-02-04
 	useEffect( () => {
 		if ( undefined === attributes.application ) {

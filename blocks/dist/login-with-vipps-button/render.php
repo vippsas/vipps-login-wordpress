@@ -1,13 +1,10 @@
 <?php
 $block_config = VippsLogin::instance()->login_with_vipps_block_config();
-error_log('LP block attributes: ' . print_r($block->attributes, true));
 $language = 'store' === $block->attributes['language']
             ? $block_config['storeLanguage']
             : $block->attributes['language'];
 
-error_log('LP language: ' . print_r($language, true));
 $wrapper_attributes = get_block_wrapper_attributes(['class' => 'continue-with-vipps-wrapper inline']);
-error_log('LP wrapper attrs: ' . $wrapper_attributes);
 ?>
 <div <?php echo $wrapper_attributes; ?>">
     <a class="button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action"
