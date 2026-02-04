@@ -34,11 +34,6 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 		appOptions.push( { label: current, value: current } );
 	}
 
-	const backgroundColorClass =
-		'Vipps' === blockConfig.loginMethod
-			? 'vipps-background'
-			: 'mobilepay-background';
-
 	const language =
 		'store' === attributes.language
 			? blockConfig.storeLanguage
@@ -53,10 +48,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 				} ) }
 			>
 				<a
-					className={
-						'button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action ' +
-						backgroundColorClass
-					}
+					className="button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action"
 					title={ attributes.title }
 					data-application={ attributes.application }
 				>

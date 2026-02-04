@@ -10,13 +10,19 @@ $wrapper_attributes = get_block_wrapper_attributes(['class' => 'continue-with-vi
 error_log('LP wrapper attrs: ' . $wrapper_attributes);
 ?>
 <div <?php echo $wrapper_attributes; ?>">
-    <vipps-mobilepay-button
-        brand="<?php echo $block_config['loginMethod']; ?>"
-        language="<?php echo $language; ?>"
-        variant="<?php echo $block->attributes['variant']; ?>"
-        rounded="<?php echo $block->attributes['rounded'] ? 'true' : 'false'; ?>"
-        verb="<?php echo $block->attributes['verb']; ?>"
-        stretched="true"
-        branded="<?php echo $block->attributes['branded'] ? 'true' : 'false'; ?>"
-    ></vipps-mobilepay-button>
+    <a class="button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action"
+        title="<?php echo $block_config['title'];?>"
+        data-application="<?php echo $block->attributes['application'];?>"
+        href="javascript: void(0);"
+    >
+        <vipps-mobilepay-button
+            brand="<?php echo $block_config['loginMethod']; ?>"
+            language="<?php echo $language; ?>"
+            variant="<?php echo $block->attributes['variant']; ?>"
+            rounded="<?php echo $block->attributes['rounded'] ? 'true' : 'false'; ?>"
+            verb="<?php echo $block->attributes['verb']; ?>"
+            stretched="true"
+            branded="<?php echo $block->attributes['branded'] ? 'true' : 'false'; ?>"
+        ></vipps-mobilepay-button>
+    </a>
 </div>
