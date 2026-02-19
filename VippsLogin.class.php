@@ -482,8 +482,7 @@ class VippsLogin {
     }
 
     /** This is the config data for the login-with-vipps guten block. LP 2026-02-04
-    * Store in the class because we need it in render.php to handle block attribute 
-    * defaults correctly, and to reuse some data that is not stored in attributes. LP 2026-02-04 */
+    * Store in the class because we need it in render.php for some data we don't store in the block attributes. LP 2026-02-04 */
     public function login_with_vipps_block_config() {
         $login_method = strtolower($this->get_login_method());
         $store_language = $this->get_store_language();
