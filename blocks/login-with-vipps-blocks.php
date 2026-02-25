@@ -28,24 +28,44 @@
  */
 
 
-/**
- * Init hooks and inline script for the block login-with-vipps-button. LP 14.11.2024
- * @return void
- */
-function login_with_vipps_button_block_hooks() {
-    add_action('init', function () {
-        register_block_type(__DIR__ . '/dist/login-with-vipps-button');
-    });
+add_action('init', function () {
+    register_block_type(__DIR__ . '/dist/login-with-vipps-button');
+});
 
 
-    // Inject block config variables to the login-with-vipps-button editor script. LP 14.11.2024
-    add_action('enqueue_block_editor_assets', function () {
-        wp_add_inline_script(
-            'login-with-vipps-login-with-vipps-button-editor-script',
-            'const injectedLoginWithVippsBlockConfig = ' . json_encode(VippsLogin::instance()->login_with_vipps_block_config()),
-            'before'
-        );
-    });
-}
+// Inject block config variables to the login-with-vipps-button editor script. LP 14.11.2024
+add_action('enqueue_block_editor_assets', function () {
+    wp_add_inline_script(
+        'login-with-vipps-login-with-vipps-button-editor-script',
+        'const injectedLoginWithVippsBlockConfig = ' . json_encode(VippsLogin::instance()->login_with_vipps_block_config()),
+        'before'
+    );
+});
 
-login_with_vipps_button_block_hooks();
+// Add scripts for web components to the block editor. You would expect this to work with block.json
+// or enqueue_block_editor_assets, but no, that doesn't work at all. THIS works though.  IOK 2026-02-25
+// https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/
+add_action('enqueue_block_assets', function () {
+    // But only for admin backend... LP 2026-02-25
+    if (!is_admin()) {
+        return;
+    }
+
+    wp_enqueue_script(
+        "vipps-button-webcomponent",
+        "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+        [],
+        VIPPS_LOGIN_VERSION,
+        ['in_footer' => true, 'strategy'  => 'async'],
+    );
+});
+// web component for frontend. LP 2026-02-25
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_script(
+        "vipps-button-webcomponent",
+        "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+        [],
+        VIPPS_LOGIN_VERSION,
+        ['in_footer' => true, 'strategy'  => 'async'],
+    );
+});
