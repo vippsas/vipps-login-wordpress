@@ -133,6 +133,8 @@ class ContinueWithVipps {
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
         $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
+
+        add_action('wp_enqueue_scripts', array($this,'wp_enqueue_scripts'));
     }
 
 
@@ -193,10 +195,11 @@ class ContinueWithVipps {
 
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
-        add_action('wp_enqueue_scripts', array($this,'wp_enqueue_scripts'));
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
         register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
         VippsSession::clean();
+
+        add_action('enqueue_block_assets', array($this,'enqueue_block_assets'));
     }
 
 
@@ -247,7 +250,17 @@ class ContinueWithVipps {
     }
 
     public function wp_enqueue_scripts() {
-        wp_register_script("vipps-button-webcomponent",
+        wp_enqueue_script("vipps-button-webcomponent",
+            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+            [],
+            VIPPS_LOGIN_VERSION,
+            ['in_footer' => true, 'strategy'  => 'async'],
+        );
+    }
+
+    // FIXME: enqueue_block_assets supposedly does not enqueue assets in the content of the iframed Editor prior to 6.3, so backward compatiblity may an issue here? https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/. LP 2026-02-25
+    public function enqueue_block_assets() {
+        wp_enqueue_script("vipps-button-webcomponent",
             "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
             [],
             VIPPS_LOGIN_VERSION,
@@ -266,13 +279,6 @@ class ContinueWithVipps {
         if ($suffix == 'settings_page_vipps_login_settings') {
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
-
-        wp_register_script("vipps-button-webcomponent",
-            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
-            [],
-            VIPPS_LOGIN_VERSION,
-            ['in_footer' => true, 'strategy'  => 'async'],
-        );
     }
 
     public function admin_menu () {
