@@ -4,7 +4,7 @@ $language = 'store' === $block->attributes['language']
             ? $block_config['storeLanguage']
             : $block->attributes['language'];
 
-$wrapper_attributes = get_block_wrapper_attributes(['class' => 'continue-with-vipps-wrapper inline']);
+$wrapper_attributes = get_block_wrapper_attributes();
 ?>
 <div <?php echo $wrapper_attributes; ?>">
     <a class="button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action"

@@ -42,14 +42,6 @@ SOFTWARE.
  line-height: 48px;
 } 
 
-
-/* Gutenberg login block. LP 2026-02-04 */
-.wp-block-login-with-vipps-login-with-vipps-button.continue-with-vipps-wrapper a.button.continue-with-vipps.disabled vipps-mobilepay-button {
-    opacity: 0.7;
-}
-.wp-block-login-with-vipps-login-with-vipps-button.continue-with-vipps-wrapper a.button.continue-with-vipps {
-    padding: 0;
-
 /* And the rest */
 .continue-with-vipps-wrapper.center-block .button.continue-with-vipps {
  margin: 0 auto;
