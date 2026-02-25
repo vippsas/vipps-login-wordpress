@@ -4,7 +4,6 @@ import { SelectControl, PanelBody, ToggleControl } from '@wordpress/components';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 import { blockConfig } from './blockConfig';
-import './editor.css';
 import { Attributes } from './types';
 import { useEffect } from 'react';
 
@@ -45,10 +44,8 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 					className: 'continue-with-vipps-wrapper inline',
 				} ) }
 			>
-				<a
-					className="button vipps-orange vipps-button continue-with-vipps continue-with-vipps-action"
-					title={ attributes.title }
-					data-application={ attributes.application }
+				<div
+					className="button vipps-orange vipps-button continue-with-vipps"
 				>
 					{ /* Web component https://developer.vippsmobilepay.com/docs/knowledge-base/design-guidelines/buttons/#javascript-button-library. :LP 2026-01-26 */ }
 					{ /* @ts-ignore */ }
@@ -58,11 +55,11 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 						variant={ attributes.variant }
 						rounded={ attributes.rounded }
 						verb={ attributes.verb }
-						stretched="true"
+						stretched="false"
 						branded={ attributes.branded }
 						// @ts-ignore
 					></vipps-mobilepay-button>
-				</a>
+				</div>
 			</div>
 
 			{ /* The block controls on the right side-panel. LP 11.11.2024 */ }

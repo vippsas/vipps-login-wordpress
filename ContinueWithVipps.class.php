@@ -199,6 +199,7 @@ class ContinueWithVipps {
         register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
         VippsSession::clean();
 
+        // FIXME: enqueue_block_assets supposedly does not enqueue assets in the content of the iframed Editor prior to 6.3, so backward compatiblity may an issue here? https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/. LP 2026-02-25
         add_action('enqueue_block_assets', array($this,'enqueue_block_assets'));
     }
 
@@ -258,7 +259,6 @@ class ContinueWithVipps {
         );
     }
 
-    // FIXME: enqueue_block_assets supposedly does not enqueue assets in the content of the iframed Editor prior to 6.3, so backward compatiblity may an issue here? https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/. LP 2026-02-25
     public function enqueue_block_assets() {
         wp_enqueue_script("vipps-button-webcomponent",
             "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",

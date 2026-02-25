@@ -26,8 +26,3 @@
 .notice.notice-vipps-login.notice-info.notice-vipps-neg button.notice-dismiss::before {
    color: white;
 }
-
-/* Gutenberg login block. LP 2026-02-04 */
-.wp-block-login-with-vipps-login-with-vipps-button.continue-with-vipps-wrapper a.button.continue-with-vipps {
-    border: 0 !important;
-}

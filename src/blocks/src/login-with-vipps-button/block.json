@@ -40,8 +40,6 @@
 		"file:./index.js",
 		"vipps-button-webcomponent"
 	],
-	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
 	"viewScript": "vipps-button-webcomponent",
 	"render": "file:./render.php"
 }

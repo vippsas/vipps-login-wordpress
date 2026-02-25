@@ -18,7 +18,7 @@ $wrapper_attributes = get_block_wrapper_attributes(['class' => 'continue-with-vi
             variant="<?php echo $block->attributes['variant']; ?>"
             rounded="<?php echo $block->attributes['rounded'] ? 'true' : 'false'; ?>"
             verb="<?php echo $block->attributes['verb']; ?>"
-            stretched="true"
+            stretched="false"
             branded="<?php echo $block->attributes['branded'] ? 'true' : 'false'; ?>"
         ></vipps-mobilepay-button>
     </a>
