@@ -199,8 +199,20 @@ class ContinueWithVipps {
         register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
         VippsSession::clean();
 
+        // Add scripts for web components to the block editor. You would expect this to work with block.json
+        // or enqueue_block_editor_assets, but no, that doesn't work at all. THIS works though.  IOK 2026-02-25
         // FIXME: enqueue_block_assets supposedly does not enqueue assets in the content of the iframed Editor prior to 6.3, so backward compatiblity may an issue here? https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/. LP 2026-02-25
-        add_action('enqueue_block_assets', array($this,'enqueue_block_assets'));
+        add_action('enqueue_block_assets', function() {
+            // But only for admin backend... LP 2026-02-25
+            if (!is_admin()) return;
+
+            wp_enqueue_script("vipps-button-webcomponent",
+                "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+                [],
+                VIPPS_LOGIN_VERSION,
+                ['in_footer' => true, 'strategy'  => 'async'],
+            );
+        });
     }
 
 
@@ -251,15 +263,6 @@ class ContinueWithVipps {
     }
 
     public function wp_enqueue_scripts() {
-        wp_enqueue_script("vipps-button-webcomponent",
-            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
-            [],
-            VIPPS_LOGIN_VERSION,
-            ['in_footer' => true, 'strategy'  => 'async'],
-        );
-    }
-
-    public function enqueue_block_assets() {
         wp_enqueue_script("vipps-button-webcomponent",
             "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
             [],
