@@ -133,8 +133,6 @@ class ContinueWithVipps {
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
         $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
-
-        wp_register_script("vipps-button-webcomponent", "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js");
     }
 
 
@@ -195,6 +193,7 @@ class ContinueWithVipps {
 
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
+        add_action('wp_enqueue_scripts', array($this,'wp_enqueue_scripts'));
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
         register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
         VippsSession::clean();
@@ -246,6 +245,16 @@ class ContinueWithVipps {
             <?php
             });
     }
+
+    public function wp_enqueue_scripts() {
+        wp_register_script("vipps-button-webcomponent",
+            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+            [],
+            VIPPS_LOGIN_VERSION,
+            ['in_footer' => true, 'strategy'  => 'async'],
+        );
+    }
+
     public function admin_enqueue_scripts ($suffix) {
         $jsconfig = array();
         $jsconfig['vippssecnonce'] = wp_create_nonce('loginvippssecnonce');
@@ -258,7 +267,12 @@ class ContinueWithVipps {
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
 
-        wp_register_script("vipps-button-webcomponent", "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js");
+        wp_register_script("vipps-button-webcomponent",
+            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+            [],
+            VIPPS_LOGIN_VERSION,
+            ['in_footer' => true, 'strategy'  => 'async'],
+        );
     }
 
     public function admin_menu () {
