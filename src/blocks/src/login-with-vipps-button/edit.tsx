@@ -4,6 +4,7 @@ import { SelectControl, PanelBody, ToggleControl } from '@wordpress/components';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 
 import { blockConfig } from './blockConfig';
+import './editor.css';
 import { Attributes } from './types';
 import { useEffect } from 'react';
 
