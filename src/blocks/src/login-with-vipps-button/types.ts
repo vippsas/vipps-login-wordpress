@@ -1,27 +1,15 @@
-import type { BlockAttributes } from '@wordpress/blocks';
+import { BlockAttributes } from '@wordpress/blocks';
 
-interface Application {
+export interface Option {
 	label: string;
 	value: string;
 }
 
-export interface LoginWithVippsBlockAttributes extends BlockAttributes {
+export interface Attributes extends BlockAttributes {
 	application: string;
-	title: string;
-	preLogo: string;
-	postLogo: string;
-	loginMethod: string;
-}
-
-export interface LoginWithVippsBlockConfig {
-	title: string;
-	iconSrc: string;
-	defaultApp: string;
-	defaultTitle: string;
-	defaultTextPreLogo: string;
-	defaultTextPostLogo: string;
-	loginMethod: string;
-	loginMethodLogoSrc: string;
-	applications: Application[];
-	applicationsText: string;
+	language: string;
+	variant: string;
+	verb: string;
+	rounded: boolean;
+	branded: boolean;
 }

@@ -1,19 +1,5 @@
-/**
- * The following styles get applied inside the editor only.
- *
- * Replace them with your own styles or remove the file completely.
- */
-
-.create-link-section {
-	display: flex;
-	justify-content: end;
-	align-items: end;
-}
-
-.vipps-sharelink-variant {
-	width: 200px;
-}
-
-.table-actions-col {
-	width: 200px;
+.wp-block-login-with-vipps-login-with-vipps-button.continue-with-vipps-wrapper .button.continue-with-vipps {
+    border: 0 !important;
+    background-color: transparent;
+    border-color: transparent;
 }

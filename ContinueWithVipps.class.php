@@ -133,8 +133,6 @@ class ContinueWithVipps {
     // This runs on the main init hook. Not much here yet. IOK 2019-10-14
     public function init () {
         $ok = $this->load_plugin_textdomain('login-with-vipps', false, basename( dirname( __FILE__ ) ) . "/languages");
-
-
     }
 
 
@@ -246,6 +244,7 @@ class ContinueWithVipps {
             <?php
             });
     }
+
     public function admin_enqueue_scripts ($suffix) {
         $jsconfig = array();
         $jsconfig['vippssecnonce'] = wp_create_nonce('loginvippssecnonce');
