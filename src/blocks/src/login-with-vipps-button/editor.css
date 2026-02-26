@@ -1,3 +1,5 @@
 .wp-block-login-with-vipps-login-with-vipps-button.continue-with-vipps-wrapper .button.continue-with-vipps {
     border: 0 !important;
+    background-color: transparent;
+    border-color: transparent;
 }

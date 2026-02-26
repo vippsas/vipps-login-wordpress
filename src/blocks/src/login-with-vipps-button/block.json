@@ -1,48 +1,57 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 3,
-	"name": "login-with-vipps/login-with-vipps-button",
-	"version": "3.0.0",
-	"category": "widgets",
-	"title": "Login with Vipps/MobilePay-button",
-	"icon": "smiley",
-	"supports": {
-		"html": false,
-		"customClassName": true,
-		"align": true
-	},
-	"attributes": {
-		"application": {
-			"type": "string"
-		},
-		"variant": {
-			"type": "string",
-			"default": "primary"
-		},
-		"verb": {
-			"type": "string",
-			"default": "login"
-		},
-		"rounded": {
-			"type": "boolean",
-			"default": false
-		},
-		"branded": {
-			"type": "boolean",
-			"default": true
-		},
-		"language": {
-			"type": "string",
-			"default": "store"
-		}
-	},
-	"textdomain": "login-with-vipps",
-	"editorScript": [
-		"file:./index.js",
-		"vipps-button-webcomponent"
-	],
-	"editorStyle": "file:./index.css",
-	"viewStyle": "file:./style-index.css",
-	"viewScript": "vipps-button-webcomponent",
-	"render": "file:./render.php"
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+        "apiVersion": 3,
+        "name": "login-with-vipps/login-with-vipps-button",
+        "version": "3.0.0",
+        "category": "widgets",
+        "title": "Login with Vipps/MobilePay-button",
+        "icon": "smiley",
+        "supports": {
+            "html": false,
+            "customClassName": true,
+            "anchor": true,
+            "ariaLabel": true,
+            "align": true,
+            "position": {
+                "sticky": true
+            },
+            "spacing": {
+                "margin": true,
+                "padding": true
+            }
+        },
+        "attributes": {
+            "application": {
+                "type": "string"
+            },
+            "variant": {
+                "type": "string",
+                "default": "primary"
+            },
+            "verb": {
+                "type": "string",
+                "default": "login"
+            },
+            "rounded": {
+                "type": "boolean",
+                "default": false
+            },
+            "branded": {
+                "type": "boolean",
+                "default": true
+            },
+            "language": {
+                "type": "string",
+                "default": "store"
+            }
+        },
+        "textdomain": "login-with-vipps",
+        "editorScript": [
+            "file:./index.js",
+        "vipps-button-webcomponent"
+        ],
+        "editorStyle": "file:./index.css",
+        "viewStyle": "file:./style-index.css",
+        "viewScript": "vipps-button-webcomponent",
+        "render": "file:./render.php"
 }
