@@ -1,4 +1,10 @@
 <?php
+// Render legacy content from the old static block until the block is restored and updated in backend editor. LP 2026-02-26
+if ($content) {
+    echo $content;
+    return;
+}
+
 $block_config = VippsLogin::instance()->login_with_vipps_block_config();
 $language = 'store' === $block->attributes['language']
             ? $block_config['storeLanguage']
