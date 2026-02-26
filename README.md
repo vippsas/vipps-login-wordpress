@@ -5,6 +5,7 @@ sidebar_position: 1
 description: Allow customers to log in to WordPress and WooCommerce websites using the Vipps app.
 pagination_next: null
 pagination_prev: null
+section: Plugins
 ---
 END_METADATA -->
 
@@ -12,7 +13,6 @@ END_METADATA -->
 
 ![Support and development by WP Hosting ](./docs/images/wphosting.svg#gh-light-mode-only)![Support and development by WP Hosting](./docs/images/wphosting_dark.svg#gh-dark-mode-only)
 
-![Vipps](./docs/images/vipps.png) ![MobilePay](./docs/images/mp.png) *Available for Vipps and MobilePay.*
 
 *This plugin is built and maintained by [WP Hosting](https://www.wp-hosting.no/) and is hosted on [GitHub](https://github.com/vippsas/vipps-login-wordpress) and at [Login with Vipps MobilePay on WordPress](https://wordpress.org/support/plugin/login-with-vipps/).
 For support, contact [WordPress: *Login with Vipps and MobilePay Support*](https://wordpress.org/support/plugin/login-with-vipps/).*
@@ -40,7 +40,7 @@ Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One
 * For WooCommerce, the version requirement is 3.3.4 or above
 * The port 443 must be open for outward traffic on your servers firewall
 
-## Feature Highlights
+## Feature highlights
 
 ### Fully integrated with WooCommerce
 
@@ -64,7 +64,7 @@ Login with Vipps MobilePay can be added to all relevant pages in your web shop: 
 
 ### Vipps MobilePay Login
 
-New site owners need to set up an agreement with Vipps MobilePay to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
+New site owners need to set up an agreement with Vipps MobilePay to use the service. This can be ordered on the [business portal](https://portal.vippsmobilepay.com).
 Read more about pricing on [vippsmobilepay.com](https://vippsmobilepay.com/pricing/login).
 
 ### Customizable for your application
@@ -76,7 +76,7 @@ You can use the framework of this plugin to implement other signed actions, such
 * `[login-with-vipps text="Log in with Vipps" application="wordpress"]` - This will print out a *Login with Vipps MobilePay* button that will log you into the given application, which by default can be either WordPress or WooCommerce.
 * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text.
 
-## Customizing the Plugin
+## Customizing the plugin
 
 To use 'Continue with Vipps' in your application, there are two levels of customizations available, except for a mass of filters and hooks.
 
