@@ -253,14 +253,21 @@ class ContinueWithVipps {
         wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
 
         wp_enqueue_script('login-vipps-admin');
-        if ($suffix == 'settings_page_vipps_login_settings') {
+        // Code for the settings screen(s) handling password show/hide etc IOK 2026-02-26
+        error_log("suffix $suffix");
+        if ($suffix == 'settings_page_vipps_login_settings' || $suffix == 'vipps-mobilepay_page_vipps_login_options') {
+        error_log("suffix $suffix loading script");
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
-        // add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'toolpage'));
+        // If we have the Payment plugin, add the settings page there
+        if (class_exists('WC_Gateway_Vipps')) {
+            add_submenu_page( 'vipps_admin_menu', $option_name,  $option_name,   'manage_woocommerce', 'vipps_login_options', array($this, 'init_form_elements'), 90);
+        } 
+        // But leave old page in place
         add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'init_form_elements'));
     }
 
