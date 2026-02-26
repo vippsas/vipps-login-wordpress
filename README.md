@@ -5,6 +5,7 @@ sidebar_position: 1
 description: Allow customers to log in to WordPress and WooCommerce websites using the Vipps app.
 pagination_next: null
 pagination_prev: null
+section: Plugins
 ---
 END_METADATA -->
 
@@ -63,7 +64,7 @@ Login with Vipps MobilePay can be added to all relevant pages in your web shop: 
 
 ### Vipps MobilePay Login
 
-New site owners need to set up an agreement with Vipps MobilePay to use the service. This can be ordered on [portal.vippsmobilepay.com](https://portal.vippsmobilepay.com).
+New site owners need to set up an agreement with Vipps MobilePay to use the service. This can be ordered on the [business portal](https://portal.vippsmobilepay.com).
 Read more about pricing on [vippsmobilepay.com](https://vippsmobilepay.com/pricing/login).
 
 ### Customizable for your application
