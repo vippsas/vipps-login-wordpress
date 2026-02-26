@@ -72,7 +72,7 @@ add_action('init',array($ContinueWithVipps,'init'));
 add_action('plugins_loaded', array($ContinueWithVipps,'plugins_loaded'));
 if (is_admin()) {
     add_action('admin_init',array($ContinueWithVipps,'admin_init'));
-    add_action('admin_menu',array($ContinueWithVipps,'admin_menu'));
+    add_action('admin_menu',array($ContinueWithVipps,'admin_menu'), 90);
 } else {
     // IOK 2019-12-06 The below is required only because certain plugins in this
     // hook assumes they own every return with 'state' and 'code' args.
