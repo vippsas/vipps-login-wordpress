@@ -254,9 +254,7 @@ class ContinueWithVipps {
 
         wp_enqueue_script('login-vipps-admin');
         // Code for the settings screen(s) handling password show/hide etc IOK 2026-02-26
-        error_log("suffix $suffix");
         if ($suffix == 'settings_page_vipps_login_settings' || $suffix == 'vipps-mobilepay_page_vipps_login_options') {
-        error_log("suffix $suffix loading script");
             wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
         }
     }
