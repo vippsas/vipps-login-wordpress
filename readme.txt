@@ -112,7 +112,7 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2026.xx.xx Version 1.4.0 =
+= 2026.03.02 Version 1.4.0 =
 Blocks updated to version 3.0 to be compatible with the new iframe-based editor
 Implementation of block changed to use standard Vipps MobilePay web component buttons
 Settings-menu moved to the main Vipps MobilePay menu if available (legacy page still present)
