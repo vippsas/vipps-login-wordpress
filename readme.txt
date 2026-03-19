@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev,lassepladsen
 Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.1.0
-Tested up to: 6.9.1
+Tested up to: 6.9.4
 Requires PHP: 7.2
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -112,6 +112,9 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026.03.19 Version 1.4.1 =
+Fix typo that would lead to a crash in certain error conditions. Thanks to Øystein Østre @ maksimer for reporting
+
 = 2026.03.02 Version 1.4.0 =
 Blocks updated to version 3.0 to be compatible with the new iframe-based editor
 Implementation of block changed to use standard Vipps MobilePay web component buttons

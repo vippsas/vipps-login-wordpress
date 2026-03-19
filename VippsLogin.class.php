@@ -1441,7 +1441,7 @@ class VippsLogin {
     public function continue_with_vipps_error_confirm_login ($error,$errordesc,$error_hint='',$sessiondata=array()) {
        $origin = $sessiondata['referer'];
        if (!$origin) $origin = wp_login_url();
-       $message .= "<h2>" . sprint(__('Cannot log in: It is required for this account to verify login with the %1$s app', 'login-with-vipps'), VippsLogin::CompanyName()) . "</h2>";
+       $message .= "<h2>" . sprintf(__('Cannot log in: It is required for this account to verify login with the %1$s app', 'login-with-vipps'), VippsLogin::CompanyName()) . "</h2>";
        $message .= "<p>" . "<b>" . esc_html($error) . "<b>: " .  esc_html($errordesc) . "</p>";
        $message .= "<p>" . sprintf(__("<a href='%s'>Return to your previous page</a> to try again</a>", 'login-with-vipps'), esc_attr($origin)) . "</p>";
        wp_die($message);
