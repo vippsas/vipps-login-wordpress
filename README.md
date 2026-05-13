@@ -38,7 +38,7 @@ Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One
 * Your website must have an SSL certificate and be available through HTTPS
 * OpenSSL must be configured for your PHP installation
 * For WooCommerce, the version requirement is 3.3.4 or above
-* The port 443 must be open for outward traffic on your servers firewall
+* The port 443 must be open for outward traffic on your server's firewall
 
 ## Feature highlights
 
