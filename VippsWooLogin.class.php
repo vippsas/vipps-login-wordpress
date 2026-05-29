@@ -355,9 +355,11 @@ class VippsWooLogin{
             $class = 'mobilepay-banner mobilepay-info';
         }
 
+        $notice_logo = '<img class="notice-logo" src="' . VippsLogin::instance()->get_notice_logo() . '"/>';
+
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-checkout"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-checkout"><?php echo "$notice_logo $message";?></div>
             <?php
         echo apply_filters('continue_with_vipps_checkout_banner_html', ob_get_clean());
     }

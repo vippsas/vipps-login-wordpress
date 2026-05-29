@@ -181,15 +181,23 @@ html body img.inline.vipps-logo {
 .vipps-banner.vipps-info::before {
     color: #fff;
 }
-.vipps-banner.vipps-info::before, .mobilepay-banner.mobilepay-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before {
-    font-family: "Font Awesome 5 Free";
-    content: "";
+.notice-logo {
+    width: 1em;
     display: inline-block;
     position: absolute;
-    top: 1.05em;
+    top: 1.35em;
     left: 1.5em;
-    color: #fff;
 }
+/* LP FIXME: delete this below. LP 2026-05-29 */
+/* .vipps-banner.vipps-info::before, .mobilepay-banner.mobilepay-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before { */
+/*     font-family: "Font Awesome 5 Free"; */
+/*     content: ""; */
+/*     display: inline-block; */
+/*     position: absolute; */
+/*     top: 1.05em; */
+/*     left: 1.5em; */
+/*     color: #fff; */
+/* } */
 .vipps-banner.vipps-info::after {
     clear: both;
 }

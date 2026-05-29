@@ -821,6 +821,11 @@ class VippsLogin {
         }
     }
 
+    // logo at the start of banners, at this time an exclamation point. LP 2026-05-29
+    public function get_notice_logo() {
+        return plugins_url('img/circle-exclamation-solid.svg', __FILE__);
+    }
+
     // The combined VippsMobilePay logo png. LP 08.11.2024
     public function get_vmp_logo() {
         return plugins_url('img/vmp-logo.png', __FILE__);
