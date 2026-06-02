@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.1.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -112,6 +112,10 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026.06.02 Version 1.4.2 =
+Bump WP version tested up to 7.0
+Fix: missing logo in certain banners for themes without Font Awesome
+
 = 2026.03.19 Version 1.4.1 =
 Fix typo that would lead to a crash in certain error conditions. Thanks to Øystein Østre @ maksimer for reporting
 
