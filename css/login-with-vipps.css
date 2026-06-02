@@ -188,17 +188,6 @@ html body img.inline.vipps-logo {
     top: 1.35em;
     left: 1.5em;
 }
-/* LP FIXME: delete this below. LP 2026-05-29 */
-/* LP FIXME: replace all these classes below with the icon and class .notice-logo. see VippsWooLogin->continue_with_vipps_banner().
-/* .vipps-banner.vipps-info::before, .mobilepay-banner.mobilepay-info::before, .woocommerce-error::before, .woocommerce-noreviews::before, p.no-comments::before { */
-/*     font-family: "Font Awesome 5 Free"; */
-/*     content: ""; */
-/*     display: inline-block; */
-/*     position: absolute; */
-/*     top: 1.05em; */
-/*     left: 1.5em; */
-/*     color: #fff; */
-/* } */
 .vipps-banner.vipps-info::after {
     clear: both;
 }
