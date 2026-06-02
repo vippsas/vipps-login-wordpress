@@ -387,9 +387,10 @@ class VippsWooLogin{
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_login_banner', $message);
+        $notice_logo = '<img class="notice-logo" src="' . VippsLogin::instance()->get_notice_logo() . '"/>';
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-login"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-login"><?php echo "$notice_logo $message";?></div>
             <?php
         echo apply_filters('continue_with_vipps_login_banner_html', ob_get_clean());
     }
@@ -413,10 +414,11 @@ class VippsWooLogin{
         if ($login_method == 'MobilePay') {
             $class = 'mobilepay-banner mobilepay-info';
         }
+        $notice_logo = '<img class="notice-logo" src="' . VippsLogin::instance()->get_notice_logo() . '"/>';
 
         ob_start();
         ?>
-            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-register"><?php echo $message;?></div>
+            <div <?php echo $this->clickable_banner(); ?> class="<?php echo $class; ?> vipps-register"><?php echo "$notice_logo $message";?></div>
             <?php
         echo apply_filters('continue_with_vipps_register_banner_html', ob_get_clean());
     }
