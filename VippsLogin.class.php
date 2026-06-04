@@ -767,7 +767,7 @@ class VippsLogin {
         ob_start();
         ?> 
             <span class='continue-with-vipps-wrapper inline'>
-            <?php $this->login_button_html($text, $application); ?>
+            <?php $this->login_button($application); ?>
             </span>
             <?php
         return ob_get_clean();
@@ -777,38 +777,69 @@ class VippsLogin {
     public function login_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->wp_login_button(__('Log in with', 'login-with-vipps'));
+        $this->login_button();
         $this->move_continue_button_over_login_form();
     }
+
     public function register_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->wp_login_button(__('Continue with', 'login-with-vipps'));
+        $this->login_button();
         $this->move_continue_button_over_login_form();
     }
-    public function wp_login_button($text, $application='wordpress') {
-        ?>
-            <div id='continue-with-vipps-wrapper' class='continue-with-vipps-wrapper'>
-            <?php $this->login_button_html($text, $application); ?>
-            </div>
-            <?php 
-    }
 
-    // The HTML for this button. IOK 2019-10-14
-    public function login_button_html($text, $application) {
-        $login_method = $this->get_login_method();
-        $logo = $this->get_transparent_logo();
-        $bg = $this->get_background_class();
+    public function login_button($application='wordpress', $button_args=[]) {
         // The "application" should only contain letters, numbers and hyphens. IOK 2024-11-26
         $application = preg_replace("![^a-zA-Z0-9-_]!", "", $application);
+
+
         ob_start();
         ?>
-            <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps <?php echo esc_attr($bg);?>" title="<?php echo esc_attr(sprintf("%s %s", $text, $login_method)); ?>"><?php echo esc_html($text);?> <img
-            alt="<?php echo esc_attr(sprintf(__('Log in without password using %1$s', 'login-with-vipps'), $login_method)); ?>" src="<?php echo esc_attr($logo); ?>">!</a>
-            <?php
-        echo apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, $text);
+            <div id='continue-with-vipps-wrapper' class='continue-with-vipps-wrapper'>
+                <a href='javascript:login_with_vipps("<?php echo $application; ?>");' class="button vipps-orange vipps-button continue-with-vipps">
+                    <?php echo $this->web_component_button($button_args); ?>
+                </a>
+            </div>
+            <?php 
+        // legacy filter. Use continue_with_vipps_login_button instead. LP 2026-06-04
+        $button = apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, '');
+        error_log('LP button: ' . print_r($button, true));
+
+        // The new filter when changing from custom button html to web component. LP 2026-06-04
+        echo apply_filters('continue_with_vipps_login_button', $button, $application, $button_args);
     }
 
+    public function web_component_button($args = []) {
+        $login_method = $this->get_login_method();
+        $default_args = [
+            'language' => $this->get_store_language(),
+            'variant' => 'primary',
+            'rounded' => 'false',
+            'verb' => 'continue',
+            'stretched' => 'false',
+            'branded' => 'true',
+        ];
+        $args = wp_parse_args($args, $default_args);
+        // these are static for now. LP 2026-06-04
+        $args['type'] = 'button';
+        $args['brand'] = strtolower($login_method);
+        $args['compact'] = 'false';
+        error_log('LP args: ' . print_r($args, true));
+        $html = <<<EOF
+<vipps-mobilepay-button
+    type="{$args['type']}"
+    brand="{$args['brand']}"
+    language="{$args['language']}"
+    variant="{$args['variant']}"
+    rounded="{$args['rounded']}"
+    verb="{$args['verb']}"
+    stretched="{$args['stretched']}"
+    compact="{$args['compact']}"
+    branded="{$args['branded']}"
+></vipps-mobilepay-button>
+EOF;
+        return apply_filters('continue_with_vipps_web_component_html', $html, $args);
+    }
 
     // The logo for the login button, depending on the login method.
     public function get_transparent_logo() {
@@ -831,16 +862,6 @@ class VippsLogin {
         return plugins_url('img/vmp-logo.png', __FILE__);
     }
 
-    // The background for the login button, depending on the login method.
-    public function get_background_class() {
-        $method = $this->get_login_method();
-        if ($method == 'MobilePay') {
-            return 'mobilepay-background';
-        }
-        if ($method == 'Vipps') {
-            return 'vipps-background';
-        }
-    }
 
     // The login form does not have any action that runs right before the form, where we want to be. So we cheat, rewriting the page using javascript. IOK 2019-10-14
     public function move_continue_button_over_login_form() {
