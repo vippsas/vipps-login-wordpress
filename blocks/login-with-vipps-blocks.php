@@ -51,21 +51,5 @@ add_action('enqueue_block_assets', function () {
         return;
     }
 
-    wp_enqueue_script(
-        "vipps-button-webcomponent",
-        "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
-        [],
-        VIPPS_LOGIN_VERSION,
-        ['in_footer' => true, 'strategy'  => 'async'],
-    );
-});
-// web component for frontend. LP 2026-02-25
-add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_script(
-        "vipps-button-webcomponent",
-        "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
-        [],
-        VIPPS_LOGIN_VERSION,
-        ['in_footer' => true, 'strategy'  => 'async'],
-    );
+    wp_enqueue_script("vipps-button-webcomponent");
 });

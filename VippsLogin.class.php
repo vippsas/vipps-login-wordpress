@@ -136,6 +136,15 @@ class VippsLogin {
         // This is for confirming - with Vipps - an already existing user.
         add_action('continue_with_vipps_confirm_login', array($this, 'continue_with_vipps_confirm_login'), 10, 2);
         add_action('continue_with_vipps_error_confirm_login', array($this, 'continue_with_vipps_error_confirm_login'), 10, 4);
+
+        // Register web component button, enqueued frontend and backend. LP 2026-06-04
+        wp_register_script(
+            "vipps-button-webcomponent",
+            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+            [],
+            VIPPS_LOGIN_VERSION,
+            ['in_footer' => true, 'strategy'  => 'async'],
+        );
     }
 
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
@@ -151,9 +160,11 @@ class VippsLogin {
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
         $logo = plugins_url("img/vmp-logo.png", __FILE__);
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
+        wp_enqueue_script("vipps-button-webcomponent");
     }
 
 
+    // for all login and registration related forms. LP 2026-06-04
     public function login_enqueue_scripts() {
         if (!static::is_active()) return;
         $options = get_option('vipps_login_settings');
@@ -162,6 +173,7 @@ class VippsLogin {
         wp_enqueue_script('login-with-vipps',plugins_url('js/login-with-vipps.js',__FILE__),array('jquery'),filemtime(dirname(__FILE__) . "/js/login-with-vipps.js"), 'true');
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
+        wp_enqueue_script("vipps-button-webcomponent");
     }
 
 
@@ -790,7 +802,7 @@ class VippsLogin {
     public function login_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->login_button();
+        $this->login_button('wordpress', ['verb' => 'login']);
         $this->move_continue_button_over_login_form();
     }
 
@@ -804,7 +816,6 @@ class VippsLogin {
     public function login_button($application='wordpress', $button_args=[]) {
         // The "application" should only contain letters, numbers and hyphens. IOK 2024-11-26
         $application = preg_replace("![^a-zA-Z0-9-_]!", "", $application);
-
 
         ob_start();
         ?>
@@ -837,6 +848,9 @@ class VippsLogin {
         $args['type'] = 'button';
         $args['brand'] = strtolower($login_method);
         $args['compact'] = 'false';
+
+        // Only support verbs 'login' and 'continue'. LP 2026-06-04
+        if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
 
         if ('store' === $args['language']) $args['language'] = $this->get_store_language();
 
