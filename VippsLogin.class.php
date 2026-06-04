@@ -757,17 +757,30 @@ class VippsLogin {
     }
     public function log_in_with_vipps_shortcode($atts, $content, $tag) {
         if (!is_array($atts)) $atts = array();
-        if (!isset($atts['text'])) $atts['text'] = __('Log in with', 'login-with-vipps');
+        if (!isset($atts['verb'])) $atts['verb'] = 'login';
         return $this->continue_with_vipps_shortcode($atts,$content,$tag);
     }
-    public function continue_with_vipps_shortcode($atts,$content,$tag) {
-        $args = shortcode_atts(array('application'=>'wordpress', 'text'=>__('Continue with', 'login-with-vipps')), $atts);
-        $text = esc_html($args['text']);
-        $application = $args['application'];
+    public function continue_with_vipps_shortcode($atts, $content, $tag) {
+        $args = shortcode_atts([
+            'application' => 'wordpress',
+            'language' => 'store',
+            'variant' => 'primary',
+            'rounded' => 'false',
+            'verb' => 'continue',
+            'stretched' => 'false',
+            'branded' => 'true',
+        ], $atts);
+
+        // Separate web component button args from attributes. LP 2026-06-04
+        $button_args = [];
+        foreach(['language', 'variant', 'rounded', 'verb', 'stretched', 'branded'] as $key) {
+            if (isset($args[$key])) $button_args[$key] = $args[$key];
+        }
+
         ob_start();
         ?> 
             <span class='continue-with-vipps-wrapper inline'>
-            <?php $this->login_button($application); ?>
+            <?php $this->login_button($args['application'], $button_args); ?>
             </span>
             <?php
         return ob_get_clean();
@@ -824,6 +837,9 @@ class VippsLogin {
         $args['type'] = 'button';
         $args['brand'] = strtolower($login_method);
         $args['compact'] = 'false';
+
+        if ('store' === $args['language']) $args['language'] = $this->get_store_language();
+
         error_log('LP args: ' . print_r($args, true));
         $html = <<<EOF
 <vipps-mobilepay-button
