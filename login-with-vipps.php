@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define('VIPPS_LOGIN_VERSION', '1.3.6');
+define('VIPPS_LOGIN_VERSION', '1.4.2');
 
 // Utility classes used to verify JWT tokens and manage login sessions. IOK 2019-10-14
 require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
