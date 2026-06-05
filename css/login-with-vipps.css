@@ -25,30 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/* Styles for wp-login.php */
-#continue-with-vipps-wrapper, .continue-with-vipps-wrapper.center-block {
- text-align:center;
- display: block;
- padding: 0.5rem 0;
-}
-#continue-with-vipps-wrapper {
- margin: 20px;
-}
-
-#continue-with-vipps-wrapper .button.continue-with-vipps {
- margin: 0 auto;
- width: 100%;
- height: 48px; 
- line-height: 48px;
-} 
-
 /* And the rest */
-.continue-with-vipps-wrapper.center-block .button.continue-with-vipps {
- margin: 0 auto;
- width: 100%;
+.continue-with-vipps-wrapper.center-block {
+    display: flex;
+    justify-content: center;
 }
 .continue-with-vipps-wrapper {
- display:inline-block;
+    display: block;
+}
+.continue-with-vipps-wrapper.login-form {
+    display: flex;
+    justify-content: center;
 }
 .continue-with-vipps-wrapper a.button.continue-with-vipps img {
     max-width: 6rem;
