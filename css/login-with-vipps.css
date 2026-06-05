@@ -37,29 +37,11 @@ SOFTWARE.
     display: flex;
     justify-content: center;
 }
-.continue-with-vipps-wrapper a.button.continue-with-vipps img {
-    max-width: 6rem;
-    margin:0px 2px;
-    display:inline;
-    height: 2ex;
-    vertical-align: text-bottom;
-}
-.continue-with-vipps-wrapper a.button.continue-with-vipps:hover img {
-    opacity: 0.9;
-}
-.continue-with-vipps-wrapper a.button.continue-with-vipps.disabled img {
-    opacity: 0.7;
-}
 .continue-with-vipps-wrapper a.button.continue-with-vipps {
- display: inline-block;
- color: #fff;
+ display: inline;
  border: 0;
  padding:0;
- font-size: 22px;
- height: 48px;
  line-height: 48px;
- font-weight: 400;
- text-align:center;
  cursor: pointer;
  box-sizing: border-box;
 }
