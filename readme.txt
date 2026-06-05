@@ -60,8 +60,8 @@ Already registered users can link their current accounts when signing in with Vi
 You can use the framework of this plugin to implement other solutions that require verified users, without actually requiring login. For example, you might create a system for having users sign their comments with Vipps MobilePay so as to avoid spam issues.
 
 == Shortcodes ==
- * `[login-with-vipps text="Log in with Vipps (or MobilePay)" application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either Wordpress or WooCommerce.
- * `[continue-with-vipps text="Continue with Vipps" application="wordpress"]` - This is the same, except for a different default text
+ * `[login-with-vipps application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either Wordpress or WooCommerce. Uses this web component and supports the parameters: https://developer.vippsmobilepay.com/docs/knowledge-base/buttons/.
+ * `[continue-with-vipps application="wordpress"]` - This is the same, except for a different default text verb.
 
 == Installation ==
 **If you are an existing Vipps MobilePay customer**, log onto the Vipps MobilePay portal https://portal.vippsmobilepay.com and retreive your API keys that you will need to install Login with Vipps MobilePay
