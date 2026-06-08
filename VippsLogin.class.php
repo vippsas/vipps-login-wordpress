@@ -802,7 +802,7 @@ class VippsLogin {
     public function login_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->login_button_html('wordpress');
+        $this->login_button_html("ignored", 'wordpress');
         $this->move_continue_button_over_login_form();
     }
 
@@ -813,8 +813,9 @@ class VippsLogin {
         $this->move_continue_button_over_login_form();
     }
 
-    // Return a "login" button
-    public function login_button_html($application='wordpress', $button_args=['verb'=>'login']) {
+    // Return a "login" button. The first argument is currently ignored - it used to be a possibly non-standard text, which 
+    // Vipps MobilePay no longer supports. IOK 2026-06-08
+    public function login_button_html($text="", $application='wordpress', $button_args=['verb'=>'login']) {
        $button_args['verb'] = 'login';
        return $this->continue_button_html($application, $button_args);
     }
