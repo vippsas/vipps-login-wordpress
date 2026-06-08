@@ -282,7 +282,7 @@ class VippsWooLogin{
         ob_start();
         ?>
             <div class='continue-with-vipps-wrapper center-block <?php echo $type; ?>'>
-            <?php VippsLogin::instance()->login_button_html(__('Continue with', 'login-with-vipps'), 'woocommerce'); ?>
+            <?php VippsLogin::instance()->continue_button_html('woocommerce'); ?>
             </div>
             <?php
         echo apply_filters('continue_with_vipps_cart_button', ob_get_clean(), $type);

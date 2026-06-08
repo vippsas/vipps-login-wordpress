@@ -792,7 +792,7 @@ class VippsLogin {
         ob_start();
         ?> 
             <span class='continue-with-vipps-wrapper inline'>
-            <?php $this->login_button_html($args['application'], $button_args); ?>
+            <?php $this->continue_button_html($args['application'], $button_args); ?>
             </span>
             <?php
         return ob_get_clean();
@@ -802,18 +802,24 @@ class VippsLogin {
     public function login_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->login_button_html('wordpress', ['verb' => 'login']);
+        $this->login_button_html('wordpress');
         $this->move_continue_button_over_login_form();
     }
 
     public function register_form_continue_with_vipps () {
         $options = get_option('vipps_login_settings');
         if (!$options['login_page']) return;
-        $this->login_button_html();
+        $this->continue_button_html('wordpress');
         $this->move_continue_button_over_login_form();
     }
 
-    public function login_button_html($application='wordpress', $button_args=[]) {
+    // Return a "login" button
+    public function login_button_html($application='wordpress', $button_args=['verb'=>'login']) {
+       $button_args['verb'] = 'login';
+       return $this->continue_button_html($application, $button_args);
+    }
+    // Main helper for the "Continue with ..." button.
+    public function continue_button_html($application='wordpress', $button_args=[]) {
         // The "application" should only contain letters, numbers and hyphens. IOK 2024-11-26
         $application = preg_replace("![^a-zA-Z0-9-_]!", "", $application);
 
@@ -829,7 +835,7 @@ class VippsLogin {
         $button_html = apply_filters('continue_with_vipps_login_button_html', ob_get_clean(), $application, '');
 
         // The new filter when changing from custom button html to web component. LP 2026-06-04
-        echo apply_filters('continue_with_vipps_login_button', $button_html, $application, $button_args);
+        echo apply_filters('continue_with_vipps_button_html', $button_html, $application, $button_args);
     }
 
     public function web_component_button($args = []) {
