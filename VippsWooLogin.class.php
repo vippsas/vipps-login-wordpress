@@ -269,7 +269,7 @@ class VippsWooLogin{
         $gw = $this->is_gateway_active();
 
         $options =  get_option('vipps_login_settings');
-        $show_continue_with_vipps = intval($options['woo-checkout-login']);
+        $show_continue_with_vipps = intval($options['woo-cart-login']);
         $express_checkout = $gw && $gw->show_express_checkout();
 
         $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', ($show_continue_with_vipps && !$express_checkout));
