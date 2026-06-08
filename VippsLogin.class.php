@@ -393,7 +393,7 @@ class VippsLogin {
         return $language;
      }
 
-    public function get_store_language() {
+    public function get_site_language() {
         global $TRP_LANGUAGE; // TranslatePress IOK 2025-11-06
 
         $language = substr(get_bloginfo('language'),0,2);
@@ -497,7 +497,7 @@ class VippsLogin {
     * Store in the class because we need it in render.php for some data we don't store in the block attributes. LP 2026-02-04 */
     public function login_with_vipps_block_config() {
         $login_method = strtolower($this->get_login_method());
-        $store_language = $this->get_store_language();
+        $store_language = $this->get_site_language();
         if ($store_language === 'se') {
             $store_language = 'sv';
         }
@@ -835,7 +835,7 @@ class VippsLogin {
     public function web_component_button($args = []) {
         $login_method = $this->get_login_method();
         $default_args = [
-            'language' => $this->get_store_language(),
+            'language' => $this->get_site_language(),
             'variant' => 'primary',
             'rounded' => 'false',
             'verb' => 'continue',
@@ -851,7 +851,7 @@ class VippsLogin {
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
         if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
 
-        if ('store' === $args['language']) $args['language'] = $this->get_store_language();
+        if ('store' === $args['language']) $args['language'] = $this->get_site_language();
 
         $html = <<<EOF
 <vipps-mobilepay-button
