@@ -618,6 +618,7 @@ class ContinueWithVipps {
         $forwhat = $action;
         $userinfo = null;
 
+
         if ($error) {
             // When errors happen, we always destroy the current session. You may need to create a new one if you need to pass  info. IOK 2019-10-19
             if($session) $session->destroy();
@@ -687,9 +688,16 @@ class ContinueWithVipps {
                 if ($session) {
                     $session->set( 'userinfo', $userinfo);
                 } else {
-                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry.', 'login-with-vipps'),'', $session);
+                    if ($forwhat) {
+                        do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Session expired - please retry.', 'login-with-vipps'),'', $session);
+                    }
                     wp_die(__('Session expired - please retry.', 'login-with-vipps'));
                 }
+            } else {
+                if ($forwhat) {
+                    do_action('continue_with_vipps_error_' .  $forwhat, 'vipps_protocol_error',__('Invalid code parameters passed.', 'login-with-vipps'),'', $session);
+                }
+                wp_die(__('The code passed is invalid.', 'login-with-vipps'));
             }
         } 
 
