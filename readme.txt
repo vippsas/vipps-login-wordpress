@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.1.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.4.2
+Stable tag: 1.5.0
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,10 +40,9 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.4.0:
-Blocks updated to version 3.0 to be compatible with the new iframe-based editor
-Implementation of block changed to use standard Vipps MobilePay web component buttons
-Settings-menu moved to the main Vipps MobilePay menu if available (legacy page still present)
+Version 1.5.0
+All login-with-vipps buttons will now use the standard Vipps MobilePay web component buttons
+Fix for the login button in WooCommerce carts.
 
 == Feature Highlights ==
 
@@ -112,6 +111,10 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026.06.12 Version 1.5.0 =
+All login-with-vipps buttons will now use the standard Vipps MobilePay web component buttons
+Fix for the login button in WooCommerce carts.
+
 = 2026.06.02 Version 1.4.2 =
 Bump WP version tested up to 7.0
 Fix: missing logo in certain banners for themes without Font Awesome
