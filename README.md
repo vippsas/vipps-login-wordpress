@@ -73,7 +73,7 @@ You can use the framework of this plugin to implement other signed actions, such
 
 ## Shortcodes
 
-* `[login-with-vipps application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WordPress or WooCommerce. Uses this web component and supports the parameters: https://developer.vippsmobilepay.com/docs/knowledge-base/buttons/.
+* `[login-with-vipps application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WordPress or WooCommerce. Uses this web component and supports the parameters: [Button generator](https://developer.vippsmobilepay.com/docs/knowledge-base/buttons/).
 * `[continue-with-vipps application="wordpress"]` - This is the same, except for a different default text verb.
 
 ## Customizing the plugin
