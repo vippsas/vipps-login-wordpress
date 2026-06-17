@@ -860,17 +860,22 @@ class VippsLogin {
 
         if ('store' === $args['language']) $args['language'] = $this->get_site_language();
 
+        $escaped_args = [];
+        foreach($args as $k=>$v) {
+           $escaped_args[$k] = esc_attr($v);
+        }
+
         $html = <<<EOF
 <vipps-mobilepay-button
-    type="{$args['type']}"
-    brand="{$args['brand']}"
-    language="{$args['language']}"
-    variant="{$args['variant']}"
-    rounded="{$args['rounded']}"
-    verb="{$args['verb']}"
-    stretched="{$args['stretched']}"
-    compact="{$args['compact']}"
-    branded="{$args['branded']}"
+    type="{$escaped_args['type']}"
+    brand="{$escaped_args['brand']}"
+    language="{$escaped_args['language']}"
+    variant="{$escaped_args['variant']}"
+    rounded="{$escaped_args['rounded']}"
+    verb="{$escaped_args['verb']}"
+    stretched="{$escaped_args['stretched']}"
+    compact="{$escaped_args['compact']}"
+    branded="{$escaped_args['branded']}"
 ></vipps-mobilepay-button>
 EOF;
         return apply_filters('continue_with_vipps_web_component_html', $html, $args);
