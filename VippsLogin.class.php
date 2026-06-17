@@ -138,11 +138,13 @@ class VippsLogin {
         add_action('continue_with_vipps_error_confirm_login', array($this, 'continue_with_vipps_error_confirm_login'), 10, 4);
 
         // Register web component button, enqueued frontend and backend. LP 2026-06-04
+        // The original is at https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js - we host it locally to avoid running
+        // code from other domains. IOK 2026-06-17
         wp_register_script(
             "vipps-button-webcomponent",
-            "https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js",
+            plugins_url('js/vipps-checkout-button.js',__FILE__),
             [],
-            VIPPS_LOGIN_VERSION,
+            filemtime(dirname(__FILE__) . "/js/vipps-checkout-button.js"),
             ['in_footer' => true, 'strategy'  => 'async'],
         );
     }
