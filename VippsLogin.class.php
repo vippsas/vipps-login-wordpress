@@ -1469,31 +1469,51 @@ EOF;
         $phone =  $userinfo['phone_number'];
         $sub =  $userinfo['sub'];
 
+        // We'll now compare our user, whose login we are confirming, with the user corresponding to the Vipps account,
+        // if any, which we will call the $verifieduser. By default we'll check if we have a registered Vipps user from before.
+        // If not, we'll retrieve the user by email, using the the Vipps verified email address .
+        // We do also allow custom applications to retrieve the verifieduser by other means; such as using the phone number
+        // of the user as a username. To do this, you need to ensure that users can't manipulate this filter or the keys it uses 
+        // to retrieve the verifieduser. A popular example is to use the phone number as a username; if so you will need to verify 
+        // this phone number on registration - you should never use a user-modifiable field of any sort.
+     
         // First, see if we have this user already mapped
         $mapped = false;
         $verifieduser = $this->get_user_by_vipps_creds($phone, $sub);
         if ($verifieduser) {
             $mapped = true;
         } else  {
-            // Else, use  the verified email address to retrieve the user
+            // Else, use  the verified email address to retrieve the user by email, 
+            // mirroring the standard login process to find our user IOK 2026-06-17
             $mapped = false;
             if (intval($userinfo['email_verified'])) {
                 $verifieduser = get_user_by('email',$email); 
             }
         }
-        // Allow a filter to find the user for special applications (phone number as username etc etc)
+        // Allow a filter to find the user for special applications (phone number as username etc etc). NB: If you are using this filter,
+        // be careful! Do not allow user input to set the fields used to retreive the object. IOK 2026-06-17
         $verifieduser = apply_filters( 'login_with_vipps_authenticate_user', $verifieduser, $userinfo, $session);
 
-        if ($verifieduser && $verifieduser->ID != $userid) {
+        // Since we called a filter here, we'll sanity-check the result which should now be either false or a WP_User corresponding to the Vipps account. IOK 2026-06-17
+        if (! is_a($verifieduser, 'WP_User')) {
+            $verifieduser = false;
+        }
+
+        // Now, if we have *not* retrieved a user based on the verified data, or the Vipps users verified email is someone elses, this is
+        // a failure.  IOK 2026-06-17
+        if (!$verifieduser || $verifieduser->ID != $userid) {
             if($session) $session->destroy();
             $this->deleteBrowserCookie();
             $sorrytext  = sprintf(__('Login not confirmed: This user is not the user mapped to the %1$s account, and does not have the same email account', 'login-with-vipps'), VippsLogin::CompanyName());
             $sorrytext = apply_filters('login_with_vipps_confirm_login_wrong_usertext', $sorrytext, wp_get_current_user(), $userinfo, $session);
             return $this->continue_with_vipps_error_confirm_login('wrong_user', $sorrytext);
         }
+        // If we reach this branch, the *verified* user is the same as the $userid, based on the verified Vipps
+        // email address. We'll then continue to login.
+
+        // If we get here, we have a verified user and the user-id is correct. Continue to login. IOK 2026-06-17
         $this->deleteBrowserCookie();
         if ($session) $session->destroy();
-
         $this->map_phone_to_user($phone, $sub, $user);  // Map the user to the Vipps account just in case.
         $this->actually_login_user($user,$sid,$session);
     }
