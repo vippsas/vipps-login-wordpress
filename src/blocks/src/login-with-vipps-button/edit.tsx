@@ -57,7 +57,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 						rounded={ attributes.rounded }
 						verb={ attributes.verb }
 						stretched="false"
-						branded={ attributes.branded }
+						compact={ !attributes.branded }
 						// @ts-ignore
 					></vipps-mobilepay-button>
 				</div>
@@ -108,10 +108,10 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 					/>
 					<ToggleControl
 						onChange={ ( branded: boolean ) =>
-							setAttributes( { branded } )
+							setAttributes( { branded: !branded} )
 						}
-						label={ __( 'Branded', 'login-with-vipps' ) }
-						checked={ attributes.branded }
+						label={ __( 'Compact', 'login-with-vipps' ) }
+						checked={ !attributes.branded }
 					/>
 				</PanelBody>
 			</InspectorControls>

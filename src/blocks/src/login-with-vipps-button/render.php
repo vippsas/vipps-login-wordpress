@@ -25,7 +25,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
             rounded="<?php echo $block->attributes['rounded'] ? 'true' : 'false'; ?>"
             verb="<?php echo $block->attributes['verb']; ?>"
             stretched="false"
-            branded="<?php echo $block->attributes['branded'] ? 'true' : 'false'; ?>"
+            compact="<?php echo $block->attributes['branded'] ? 'false' : 'true'; ?>"
         ></vipps-mobilepay-button>
     </a>
 </div>

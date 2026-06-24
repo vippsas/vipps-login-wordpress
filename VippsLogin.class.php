@@ -138,13 +138,13 @@ class VippsLogin {
         add_action('continue_with_vipps_error_confirm_login', array($this, 'continue_with_vipps_error_confirm_login'), 10, 4);
 
         // Register web component button, enqueued frontend and backend. LP 2026-06-04
-        // The original is at https://checkout.vipps.no/checkout-button/v1/vipps-checkout-button.js - we host it locally to avoid running
+        // The original is at https://cdn.vippsmobilepay.com/js/button/button.js - we host it locally to avoid running
         // code from other domains. IOK 2026-06-17
         wp_register_script(
             "vipps-button-webcomponent",
-            plugins_url('js/vipps-checkout-button.js',__FILE__),
+            plugins_url('js/vipps-button.js',__FILE__),
             [],
-            filemtime(dirname(__FILE__) . "/js/vipps-checkout-button.js"),
+            filemtime(dirname(__FILE__) . "/js/vipps-button.js"),
             ['in_footer' => true, 'strategy'  => 'async'],
         );
     }
@@ -775,6 +775,11 @@ class VippsLogin {
         return $this->continue_with_vipps_shortcode($atts,$content,$tag);
     }
     public function continue_with_vipps_shortcode($atts, $content, $tag) {
+        // swap legacy arg branded => !compact. LP 2026-06-24
+        if (isset($atts['branded'])) {
+            $atts['compact'] = 'true' === $atts['branded'] ? 'false' : 'true';
+            unset($atts['branded']);
+        }
         $args = shortcode_atts([
             'application' => 'wordpress',
             'language' => 'store',
@@ -782,12 +787,12 @@ class VippsLogin {
             'rounded' => 'false',
             'verb' => 'continue',
             'stretched' => 'false',
-            'branded' => 'true',
+            'compact' => 'false',
         ], $atts);
 
         // The actual button web component attributes. LP 2026-06-04
         $button_args = [];
-        foreach(['language', 'variant', 'rounded', 'verb', 'stretched', 'branded'] as $key) {
+        foreach(['language', 'variant', 'rounded', 'verb', 'stretched', 'compact'] as $key) {
             if (isset($args[$key])) $button_args[$key] = $args[$key];
         }
 
@@ -849,13 +854,12 @@ class VippsLogin {
             'rounded' => 'false',
             'verb' => 'continue',
             'stretched' => 'false',
-            'branded' => 'true',
+            'compact' => 'false',
         ];
         $args = wp_parse_args($args, $default_args);
         // these are static for now. LP 2026-06-04
         $args['type'] = 'button';
         $args['brand'] = strtolower($login_method);
-        $args['compact'] = 'false';
 
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
         if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
@@ -877,7 +881,6 @@ class VippsLogin {
     verb="{$escaped_args['verb']}"
     stretched="{$escaped_args['stretched']}"
     compact="{$escaped_args['compact']}"
-    branded="{$escaped_args['branded']}"
 ></vipps-mobilepay-button>
 EOF;
         return apply_filters('continue_with_vipps_web_component_html', $html, $args);
