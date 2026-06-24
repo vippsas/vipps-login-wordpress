@@ -860,7 +860,7 @@ class VippsLogin {
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
         if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
 
-        if ('store' === $args['language']) $args['language'] = $this->get_site_language();
+        if ('site' === $args['language']) $args['language'] = $this->get_site_language();
 
         $escaped_args = [];
         foreach($args as $k=>$v) {
