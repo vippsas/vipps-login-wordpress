@@ -6,8 +6,8 @@ if ($content) {
 }
 
 $block_config = VippsLogin::instance()->login_with_vipps_block_config();
-$language = 'store' === $block->attributes['language']
-            ? $block_config['storeLanguage']
+$language = 'store' === $block->attributes['language'] || 'site' === $block->attributes['language']
+            ? $block_config['siteLanguage']
             : $block->attributes['language'];
 
 $wrapper_attributes = get_block_wrapper_attributes();

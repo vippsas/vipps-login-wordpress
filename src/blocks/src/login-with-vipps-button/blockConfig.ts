@@ -10,7 +10,7 @@ export interface BlockConfig {
 	applications: Option[];
 	applicationsText: string;
 	languages: Option[];
-	storeLanguage: string;
+	siteLanguage: string;
 	variants: Option[];
 	verbs: Option[];
 }

@@ -33,8 +33,8 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 	}
 
 	const language =
-		'store' === attributes.language
-			? blockConfig.storeLanguage
+		'store' === attributes.language || 'site' === attributes.language
+			? blockConfig.siteLanguage
 			: attributes.language;
 
 	return (

@@ -499,9 +499,9 @@ class VippsLogin {
     * Store in the class because we need it in render.php for some data we don't store in the block attributes. LP 2026-02-04 */
     public function login_with_vipps_block_config() {
         $login_method = strtolower($this->get_login_method());
-        $store_language = $this->get_site_language();
-        if ($store_language === 'se') {
-            $store_language = 'sv';
+        $site_language = $this->get_site_language();
+        if ($site_language === 'se') {
+            $site_language = 'sv';
         }
 
         $applications = [
@@ -514,7 +514,7 @@ class VippsLogin {
         }
 
         $languages = [
-            ['label' => __('Store language', 'login-with-vipps'), 'value' => 'store'],
+            ['label' => __('Site language', 'login-with-vipps'), 'value' => 'site'],
             ['label' => __('English', 'login-with-vipps'), 'value' => 'en'],
         ];
         switch ($login_method) {
@@ -546,7 +546,7 @@ class VippsLogin {
             'applications' => apply_filters('login_with_vipps_applications', $applications),
             'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
             'languages' => $languages,
-            'storeLanguage' => $store_language,
+            'siteLanguage' => $site_language,
             'variants' => $variants,
             'verbs' => $verbs,
         ];
