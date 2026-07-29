@@ -145,7 +145,7 @@ class VippsLogin {
             plugins_url('js/vipps-button.js',__FILE__),
             [],
             filemtime(dirname(__FILE__) . "/js/vipps-button.js"),
-            ['in_footer' => false, 'strategy'  => 'async'],
+            ['in_footer' => true, 'strategy'  => 'async'],
         );
     }
 
