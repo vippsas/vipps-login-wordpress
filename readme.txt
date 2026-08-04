@@ -116,7 +116,7 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2026.08.xx Version 1.5.2 =
+= 2026.08.04 Version 1.5.2 =
 Improvements to the web component button code
 
 = 2026.06.16 Version 1.5.1 =
