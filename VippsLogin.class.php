@@ -390,8 +390,8 @@ class VippsLogin {
         } 
         if (! $language) $language = substr(get_bloginfo('language'),0,2);
         if ($language == 'nb' || $language == 'nn') $language = 'no';
-        if ($language == 'da') $language = 'dk';
-        if (! in_array($language, ['en', 'no', 'dk', 'fi'])) $language = 'en';
+        if ($language == 'dk') $language = 'da';
+        if (! in_array($language, ['en', 'no', 'dk', 'da', 'fi'])) $language = 'en';
         return $language;
      }
 
@@ -411,9 +411,9 @@ class VippsLogin {
         $language = strtolower($language);
 
         if ($language == 'nb' || $language == 'nn') $language = 'no';
-        if ($language == 'da') $language = 'dk';
+        if ($language == 'dk') $language = 'da';
         if ($language == 'sv') $language = 'se';
-        if (! in_array($language, ['en', 'no', 'dk', 'fi', 'se'])) $language = 'en';
+        if (! in_array($language, ['en', 'no', 'dk', 'da', 'fi', 'se'])) $language = 'en';
         return $language;
     }
 
@@ -521,10 +521,15 @@ class VippsLogin {
             case 'vipps':
                 $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
                 $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
+                // Doesn't really exist for Vipps, but the web component does support it so. IOK 2026-08-11
+                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
                 break;
             case 'mobilepay':
+                // no and sv doesn't really work for mobilpay, but the WC supports it. IOK 2026-08-11
+                $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
+                $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
+                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
                 $languages[] = ['label' => __('Finnish', 'login-with-vipps'), 'value' => 'fi'];
-                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'dk'];
                 break;
         }
 

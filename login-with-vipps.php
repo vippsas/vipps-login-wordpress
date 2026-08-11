@@ -1,8 +1,8 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.5.2
-   Stable tag: 1.5.2
+   Version: 1.5.3
+   Stable tag: 1.5.3
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/

@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.1.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,6 +40,8 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.5.3
+Fix for change of language code for danish
 Version 1.5.2
 Improvements to the button code
 Version 1.5.1
