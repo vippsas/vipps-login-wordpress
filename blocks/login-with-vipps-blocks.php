@@ -31,6 +31,7 @@
 add_action('init', function () {
     register_block_type(__DIR__ . '/dist/login-with-vipps-button');
     register_block_type(__DIR__ . '/dist/continue-with-vipps-cart');
+    register_block_type(__DIR__ . '/dist/continue-with-vipps-checkout');
 });
 
 
@@ -53,6 +54,20 @@ add_action('enqueue_block_editor_assets', function () {
             'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
             'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
             'buttonHtml' => $continue_cart_button_html ?: '',
+        ]),
+        'before'
+    );
+
+    // and guten checkout. LP 2026-08-14
+    ob_start();
+    VippsWooLogin::instance()->cart_continue_with_vipps_button_html('checkout');
+    $continue_checkout_button_html = ob_get_clean();
+    wp_add_inline_script(
+        'login-with-vipps-continue-with-vipps-checkout-editor-script',
+        'const continueWithVippsCheckoutBlockConfig = ' . json_encode([
+            'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+            'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+            'buttonHtml' => $continue_checkout_button_html ?: '',
         ]),
         'before'
     );

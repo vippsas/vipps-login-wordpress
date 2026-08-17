@@ -258,6 +258,9 @@ class VippsWooLogin{
     public function cart_continue_with_vipps () {
         return $this->continue_with_vipps_button_for_carts('cart');
     }
+    public function checkout_continue_with_vipps () {
+        return $this->continue_with_vipps_button_for_carts('checkout');
+    }
     public function cart_widget_continue_with_vipps () {
         return $this->continue_with_vipps_button_for_carts('widget');
     }

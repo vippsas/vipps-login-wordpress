@@ -7,7 +7,7 @@ export default function Edit() {
 		<div
 			{ ...useBlockProps( {
 				className:
-					'login-with-vipps-block continue-with-vipps-cart backend',
+					'login-with-vipps-block continue-with-vipps-checkout backend',
 			} ) }
 		>
 			{ /* The buy-now button. LP 2026-01-19 */ }
