@@ -192,3 +192,8 @@ html body img.inline.vipps-logo {
     font-weight: bolder;
     background-color: transparent;
 }
+
+/* for the continue-with-vipps cart&checkout blocks. LP 2026-08-14 */
+.login-with-vipps-block {
+   margin: 1rem auto;
+}
