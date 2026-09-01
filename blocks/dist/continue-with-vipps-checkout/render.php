@@ -10,7 +10,7 @@ $wrapper_attributes = get_block_wrapper_attributes([
 <div <?php echo $wrapper_attributes; ?>>
     <span>
         <?php if (class_exists('VippsWooLogin')) {
-                VippsWooLogin::instance()->cart_continue_with_vipps();
+                VippsWooLogin::instance()->checkout_continue_with_vipps();
               }
         ?>
     </span>
