@@ -30,8 +30,10 @@
 
 add_action('init', function () {
     register_block_type(__DIR__ . '/dist/login-with-vipps-button');
-    register_block_type(__DIR__ . '/dist/continue-with-vipps-cart');
-    register_block_type(__DIR__ . '/dist/continue-with-vipps-checkout');
+    if (class_exists('VippsWooLogin')) {
+        register_block_type(__DIR__ . '/dist/continue-with-vipps-cart');
+        register_block_type(__DIR__ . '/dist/continue-with-vipps-checkout');
+    }
 });
 
 
