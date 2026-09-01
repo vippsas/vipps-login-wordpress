@@ -9,6 +9,9 @@ $wrapper_attributes = get_block_wrapper_attributes([
 ?>
 <div <?php echo $wrapper_attributes; ?>>
     <span>
-        <?php VippsWooLogin::instance()->cart_continue_with_vipps(); ?>
+        <?php if (class_exists('VippsWooLogin')) {
+                VippsWooLogin::instance()->cart_continue_with_vipps();
+              }
+        ?>
     </span>
 </div>

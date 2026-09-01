@@ -276,6 +276,8 @@ class VippsWooLogin{
         $express_checkout = $gw && $gw->show_express_checkout();
 
         $show_continue_with_vipps = apply_filters('continue_with_vipps_woo_show_in_cart', ($show_continue_with_vipps && !$express_checkout));
+
+
         if (!$show_continue_with_vipps) return;
         $this->cart_continue_with_vipps_button_html($type);
     }
@@ -288,7 +290,9 @@ class VippsWooLogin{
             <?php VippsLogin::instance()->continue_button_html('woocommerce'); ?>
             </div>
             <?php
-        echo apply_filters('continue_with_vipps_cart_button', ob_get_clean(), $type);
+        $html = ob_get_clean();
+        $filtered = apply_filters('continue_with_vipps_cart_button', $html, $type);
+        echo $filtered;
     }
 
     // This will display a banner  on the top of the checkout page. It will replace the express checkout button if that is used in the gateway. IOK 2019-10-14

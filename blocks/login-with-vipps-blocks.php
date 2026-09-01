@@ -44,33 +44,36 @@ add_action('enqueue_block_editor_assets', function () {
         'before'
     );
 
-    // Continue with vipps button block in guten cart. LP 2026-08-14
-    ob_start();
-    VippsWooLogin::instance()->cart_continue_with_vipps_button_html('cart');
-    $continue_cart_button_html = ob_get_clean();
-    wp_add_inline_script(
-        'login-with-vipps-continue-with-vipps-cart-editor-script',
-        'const continueWithVippsCartBlockConfig = ' . json_encode([
-            'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
-            'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
-            'buttonHtml' => $continue_cart_button_html ?: '',
-        ]),
-        'before'
-    );
+    // If we are using woocommerce, maybe add the buttons where they belong IOK 2026-09-01
+    if (class_exists('VippsWooLogin')) {
+        // Continue with vipps button block in guten cart. LP 2026-08-14
+        ob_start();
+        VippsWooLogin::instance()->cart_continue_with_vipps_button_html('cart');
+        $continue_cart_button_html = ob_get_clean();
+        wp_add_inline_script(
+                'login-with-vipps-continue-with-vipps-cart-editor-script',
+                'const continueWithVippsCartBlockConfig = ' . json_encode([
+                    'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+                    'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+                    'buttonHtml' => $continue_cart_button_html ?: '',
+                ]),
+                'before'
+                );
 
-    // and guten checkout. LP 2026-08-14
-    ob_start();
-    VippsWooLogin::instance()->cart_continue_with_vipps_button_html('checkout');
-    $continue_checkout_button_html = ob_get_clean();
-    wp_add_inline_script(
-        'login-with-vipps-continue-with-vipps-checkout-editor-script',
-        'const continueWithVippsCheckoutBlockConfig = ' . json_encode([
-            'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
-            'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
-            'buttonHtml' => $continue_checkout_button_html ?: '',
-        ]),
-        'before'
-    );
+        // and guten checkout. LP 2026-08-14
+        ob_start();
+        VippsWooLogin::instance()->cart_continue_with_vipps_button_html('checkout');
+        $continue_checkout_button_html = ob_get_clean();
+        wp_add_inline_script(
+                'login-with-vipps-continue-with-vipps-checkout-editor-script',
+                'const continueWithVippsCheckoutBlockConfig = ' . json_encode([
+                    'title' => sprintf(__('Continue with %s', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+                    'description' => sprintf(__( 'Add a "Continue with %s" button', 'login-with-vipps'), VippsLogin::instance()->get_login_method()),
+                    'buttonHtml' => $continue_checkout_button_html ?: '',
+                ]),
+                'before'
+                );
+    }
 
 });
 
