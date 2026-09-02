@@ -89,7 +89,7 @@ add_action('enqueue_block_assets', function () {
     }
 
     // CSS common for several blocks etc. Enqued both in admin. IOK 2025-02-25
-    wp_enqueue_style('vipps-block-editor-css',
+    wp_enqueue_style('vipps-login-block-editor-css',
         plugins_url('../css/login-with-vipps-blocks.css', __FILE__),
         [],
         filemtime(dirname(dirname(__FILE__)) . "/css/login-with-vipps-blocks.css")
