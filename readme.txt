@@ -1,10 +1,10 @@
 === Login with Vipps and MobilePay ===
 Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev,lassepladsen
 Tags: woocommerce,vipps,mobilepay,login
-Requires at least: 6.1.0
+Requires at least: 6.4.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,6 +40,9 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.5.6
+Fix css compatibility with the Vipps MobilePay payment gateway plugin.
+Avoid loading WooCommerce blocks when not using WooCommerce.
 Version 1.5.5
 Fix fatal error when not using WooCommerce
 Version 1.5.4
@@ -122,6 +125,10 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026-09-02 Version 1.5.6=
+Fix css compatibility with the Vipps MobilePay payment gateway plugin.
+Avoid loading WooCommerce blocks when not using WooCommerce.
+
 = 2026-09-01 Version 1.5.5=
 Fix fatal error when not using WooCommerce
 
