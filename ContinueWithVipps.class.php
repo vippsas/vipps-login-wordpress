@@ -198,10 +198,13 @@ class ContinueWithVipps {
         // WooCommerce notices, matching the payment settings screen.
         add_action('in_admin_header', function () {
             $screen = get_current_screen();
-            if (!$screen || !in_array($screen->id, array(
+            $canonical_request = isset($_GET['page']) && $_GET['page'] === 'vipps_login_options';
+            if (!$canonical_request && (!$screen || !in_array($screen->id, array(
                 'settings_page_vipps_login_settings',
                 'vipps-mobilepay_page_vipps_login_options',
-            ), true)) return;
+                'vipps_admin_menu_page_vipps_login_options',
+                'toplevel_page_vipps_login_options',
+            ), true))) return;
             remove_all_actions('admin_notices');
             remove_all_actions('all_admin_notices');
         }, 9999);
@@ -217,7 +220,7 @@ class ContinueWithVipps {
         $options = get_option('vipps_login_settings');
 
         global $pagenow;
-        if ($pagenow == 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] == 'vipps_login_settings') {
+        if ($this->is_login_settings_request()) {
             return; // Show only on other pages, not the vipps login settings page
         }
 
@@ -240,7 +243,7 @@ class ContinueWithVipps {
         add_action('admin_notices', function () {
             $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
-            $settingsurl = admin_url('options-general.php?page=vipps_login_settings');
+            $settingsurl = $this->settings_url();
             $options = get_option('vipps_login_settings');
 
             ?>
@@ -271,12 +274,54 @@ class ContinueWithVipps {
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
-        // If we have the Payment plugin, add the settings page there
-        if (class_exists('WC_Gateway_Vipps')) {
-            add_submenu_page( 'vipps_admin_menu', $option_name,  $option_name,   'manage_woocommerce', 'vipps_login_options', array($this, 'init_form_elements'), 90);
-        } 
-        // But leave old page in place
-        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'init_form_elements'));
+        // The payment plugin owns this parent when it is active. If it is not
+        // registered, Login with Vipps supplies the same parent independently.
+        if (!$this->parent_menu_registered()) {
+            $logo = plugins_url('img/vmp-logo.png', __FILE__);
+            add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
+        }
+        // Keep one canonical login child in either ownership arrangement.
+        add_submenu_page('vipps_admin_menu', $option_name, $option_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 90);
+
+        // Existing bookmarks continue to work, but the old Settings location is
+        // no longer registered as a second visible entry.
+        add_action('load-options-general.php', array($this, 'redirect_legacy_settings'));
+    }
+
+    /** Check the registered menu state rather than guessing from plugin classes. */
+    private function parent_menu_registered() {
+        global $menu;
+        if (!is_array($menu)) return false;
+        foreach ($menu as $entry) {
+            if (isset($entry[2]) && $entry[2] === 'vipps_admin_menu') return true;
+        }
+        return false;
+    }
+
+    public function settings_url() {
+        return admin_url('admin.php?page=vipps_login_options');
+    }
+
+    /** The fallback parent has no separate dashboard; open its login settings. */
+    public function redirect_parent_menu() {
+        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        wp_safe_redirect($this->settings_url());
+        exit();
+    }
+
+    private function is_login_settings_request() {
+        global $pagenow;
+        return ($pagenow === 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_settings')
+            || ($pagenow === 'admin.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_options');
+    }
+
+    /** Compatibility callback for old Settings-page bookmarks. */
+    public function redirect_legacy_settings() {
+        global $pagenow;
+        if ($pagenow !== 'options-general.php' || (($_GET['page'] ?? '') !== 'vipps_login_settings')) return;
+        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        wp_safe_redirect($this->settings_url());
+        exit();
     }
 
     public function ajax_vipps_dismiss_notice() {

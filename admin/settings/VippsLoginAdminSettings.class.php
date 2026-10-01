@@ -88,7 +88,8 @@ class VippsLoginAdminSettings {
 
     /** Enqueue and localize the bundle before WordPress prints the admin head. */
     public function enqueue_react_assets($suffix) {
-        if (!in_array($suffix, array('settings_page_vipps_login_settings', 'vipps-mobilepay_page_vipps_login_options'), true)) return;
+        global $pagenow;
+        if ($pagenow !== 'admin.php' || (($_GET['page'] ?? '') !== 'vipps_login_options')) return;
         $bootstrap = $this->bootstrap();
         if (is_wp_error($bootstrap)) return;
         $script = dirname(__DIR__) . '/settings/dist/plugin.js';
