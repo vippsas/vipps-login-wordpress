@@ -79,7 +79,13 @@ export function WPOptionsProvider({ children }: PropsWithChildren) {
   }
 
   async function copyPaymentKeys() {
-    const params = new URLSearchParams({ action: settings.copy_action, nonce: settings.nonce });
+    // Send the current form values: the administrator may have cleared both
+    // fields without saving, and that explicit action should permit copying.
+    const params = new URLSearchParams({
+      action: settings.copy_action,
+      nonce: settings.nonce,
+      values: JSON.stringify({ clientid: values.clientid ?? '', clientsecret: values.clientsecret ?? '' }),
+    });
     const response = await fetch(settings.ajax_url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },

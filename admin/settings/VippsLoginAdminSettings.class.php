@@ -319,8 +319,18 @@ class VippsLoginAdminSettings {
         }
         $stored = get_option(self::OPTION, array());
         $stored = is_array($stored) ? $stored : array();
-        if (!empty($stored['clientid']) || !empty($stored['clientsecret'])) {
-            wp_send_json_error(array('errors' => array('keys' => array(__('Login credentials are no longer empty.', 'login-with-vipps')))), 400);
+        // The React form may contain unsaved clears. Trust only an explicit
+        // request showing both current fields empty; older callers still use
+        // the saved values as the fallback check.
+        $request_values = null;
+        if (isset($_POST['values']) && is_string($_POST['values'])) {
+            $request_values = json_decode(wp_unslash($_POST['values']), true);
+        }
+        $keys_are_empty = is_array($request_values)
+            ? empty($request_values['clientid']) && empty($request_values['clientsecret'])
+            : empty($stored['clientid']) && empty($stored['clientsecret']);
+        if (!$keys_are_empty) {
+            wp_send_json_error(array('errors' => array('keys' => array(__('Both Login credential fields must be empty before copying.', 'login-with-vipps')))), 400);
             return;
         }
         $keys = $this->payment_keys();
