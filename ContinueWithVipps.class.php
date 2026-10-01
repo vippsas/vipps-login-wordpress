@@ -304,6 +304,9 @@ class ContinueWithVipps {
         // Keep the old page registered for direct bookmarks and hashes, then hide
         // its menu entry so Settings does not show a duplicate destination.
         add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings', array($this, 'init_form_elements'));
+        // The registration above makes WordPress authorize the old URL. Once
+        // the screen is loaded, move the browser to the canonical submenu URL.
+        add_action('load-options-general.php', array($this, 'redirect_legacy_settings'));
         add_action('admin_menu', function () {
             remove_submenu_page('options-general.php', 'vipps_login_settings');
         }, 999);
@@ -321,6 +324,15 @@ class ContinueWithVipps {
 
     public function settings_url() {
         return admin_url('admin.php?page=vipps_login_options');
+    }
+
+    /** Redirect old bookmarks only after the compatibility page is registered. */
+    public function redirect_legacy_settings() {
+        global $pagenow;
+        if ($pagenow !== 'options-general.php' || (($_GET['page'] ?? '') !== 'vipps_login_settings')) return;
+        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        wp_safe_redirect($this->settings_url());
+        exit();
     }
 
     /** The fallback parent has no separate dashboard; open its login settings. */
