@@ -75,8 +75,9 @@ export function AdminSettings(): JSX.Element {
               aria-labelledby={`vipps-login-tab-${selectedTab.id}`} tabIndex={0}>
               <div>
                 <h2>{selectedTab.title}</h2>
-                {/* Freeze inputs during a save so its response cannot overwrite newer edits. */}
-                <fieldset disabled={isLoading} className="vipps-login-fields">
+                {/* Keep the fields rendered normally while the save request runs;
+                    the save guard prevents duplicate submissions. */}
+                <fieldset className="vipps-login-fields">
                   {selectedTab.fields.filter((name) => fields[name]).map((name) => (
                     <OptionsFormField key={name} name={name} field={fields[name]} errors={errors[name]} />
                   ))}

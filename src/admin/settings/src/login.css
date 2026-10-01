@@ -19,6 +19,14 @@
 .vipps-login-react-admin-page .vipps-login-role-fields label { display: block; }
 .vipps-login-react-admin-page .vipps-login-input-row { display: flex; gap: 0.5rem; }
 .vipps-login-react-admin-page .vipps-login-input-row input { min-width: 0; flex: 1; }
+.vipps-login-react-admin-page .vipps-login-input-row input.vipps-mobilepay-react-control {
+  /* WordPress/WooCommerce can add native autocomplete decorations while a
+     control changes state. Login credentials are plain text/password inputs,
+     so those downward indicators are not useful here. */
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none !important;
+}
 .vipps-login-react-admin-page .vipps-login-callback { overflow-wrap: anywhere; user-select: all; }
 .vipps-login-react-admin-page .vipps-login-unsaved { color: var(--vipps-settings-muted); }
 .vipps-login-react-admin-page .vipps-settings-panel h2 {
