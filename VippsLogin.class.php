@@ -419,20 +419,9 @@ class VippsLogin {
 
 
      public function init_form_login_options2() {
-        $options = get_option('vipps_login_settings');
-
         $continuepageoptions = array(
            ''=>__('Create a new page', 'login-with-vipps'),
         );
-        $continuepageid = $options['continuepageid'] ?? 0;
-
-        $continuepage = $this->ensure_continue_with_vipps_page();
-        if (is_wp_error($continuepage)) {
-            $notice = $continuepage->get_error_message();
-            add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-error is-dismissible'><p>$notice</p></div>"; });
-        } else {
-            $continuepageid = $continuepage->ID;
-        }
         foreach(get_pages() as $page) {
             $continuepageoptions[$page->ID] = $page->post_title;
         }
@@ -442,6 +431,12 @@ class VippsLogin {
         );
         foreach(wp_roles()->roles as $role=>$roledata) {
             $roles[$role] = $roledata['name'];
+        }
+        $settings = get_option('vipps_login_settings', array());
+        foreach ((array) ($settings['required_roles'] ?? array()) as $role => $selected) {
+            if (!isset($roles[$role])) {
+                $roles[$role] = sprintf(__('Unavailable role: %s', 'login-with-vipps'), $role);
+            }
         }
 
         $fields = array(
@@ -563,13 +558,18 @@ class VippsLogin {
         $continuepageid = $options['continuepageid'] ?? false;
         if ($continuepageid) {
             $page = get_post($continuepageid);
-            if ($page) return $page;
-            if (!$page) {
-                $options['continuepageid'] = 0;
-                update_option('vipps_login_settings', $options);
-            }
+            if ($page && $page->post_type === 'page' && $page->post_status !== 'trash') return $page;
         }
 
+        $page = $this->create_continue_with_vipps_page();
+        if (is_wp_error($page)) return $page;
+        $options['continuepageid'] = $page->ID;
+        update_option('vipps_login_settings', $options);
+        return $page;
+    }
+
+    // Create the page without updating options, so settings validation can return its ID.
+    public function create_continue_with_vipps_page($method = null) {
         // This is the typical case, when the user installs and activates the plugin. We use the users' id as the pages author. 2019-10-14 
         $author = null;
         if (current_user_can('manage_options')) $author = wp_get_current_user();
@@ -585,16 +585,14 @@ class VippsLogin {
         $authorid = 0;
         if ($author) $authorid = $author->ID;
 
-        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
+        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), $method === null ? $this->get_login_method() : $method);
 
         $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
-        $newid = wp_insert_post($pagedata);
+        $newid = wp_insert_post($pagedata, true);
         if (is_wp_error($newid)) {
-            return new WP_Error(sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()) . ": " .  $newid->get_error_message());
+            return new WP_Error('continuepageid', sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), $this->get_login_method()) . ": " .  $newid->get_error_message());
         }
 
-        $options['continuepageid'] = $newid;
-        update_option('vipps_login_settings', $options);
         return get_post($newid);
     }
 

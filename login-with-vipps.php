@@ -65,6 +65,7 @@ if (PHP_MAJOR_VERSION >= 8) {
 // This is the main class, a singleton. We'll store it in a global variable for hook-writing-convenience. IOK 2019-10-14
 global $ContinueWithVipps;
 require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');
+require_once(dirname(__FILE__) . '/admin/settings/VippsLoginAdminSettings.class.php');
 $ContinueWithVipps = ContinueWithVipps::instance();
 register_activation_hook(__FILE__,array($ContinueWithVipps,'activate'));
 register_deactivation_hook(__FILE__,array('ContinueWithVipps','deactivate'));

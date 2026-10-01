@@ -194,7 +194,7 @@ class ContinueWithVipps {
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
-        register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
+        VippsLoginAdminSettings::instance()->register();
         VippsSession::clean();
     }
 
@@ -376,6 +376,7 @@ class ContinueWithVipps {
                 break;
             // Creates a list of checkboxes
             case 'multicheck':
+                $html .= "<input type='hidden' name='" . esc_attr($name) . "' value=''>";
                 foreach($options as $option => $label) {
                     $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='1'" . checked(array_key_exists($option, $value), true, false) . " />";
                     $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
@@ -396,25 +397,21 @@ class ContinueWithVipps {
             die(__("Insufficient privileges",'login-with-vipps'));
         }
 
-        // Group the form fields into an array, so we can loop through them and render them in the same way.
-        $main_options = $this->init_form_login_options();
-        $main_options2 = VippsLogin::instance()->init_form_login_options2();
-        $form_fields = array($main_options, $main_options2);
-
-        // Only show if WooCommerce is present NT 2024-04-24
-        if (class_exists('VippsWooLogin')) {
-            $woo_options = VippsWooLogin::instance()->init_form_login_woo_options();
-            if ($woo_options) {
-                $form_fields[] = $woo_options;
-            }
+        // Explicit legacy-screen repair; reading field metadata itself has no side effects.
+        $continuepage = VippsLogin::instance()->ensure_continue_with_vipps_page();
+        if (is_wp_error($continuepage)) {
+            add_settings_error('vipps_login_settings', 'continuepageid', $continuepage->get_error_message());
         }
+        $form_fields = VippsLoginAdminSettings::instance()->sections();
         // Get the current values from the database
         $values = get_option('vipps_login_settings', array());
 
         ?>
         <div class="wrap">
+            <?php settings_errors('vipps_login_settings'); ?>
             <form method="post" action="options.php">
                 <?php settings_fields('vipps_login_settings'); ?>
+                <?php wp_nonce_field(VippsLoginAdminSettings::NONCE, 'vipps_login_settings_nonce', false); ?>
                 
                 <?php foreach($form_fields as $key => $form_fields) {
                     ?>
@@ -469,17 +466,7 @@ class ContinueWithVipps {
     // Validating user options, unsetting any options that are not in the form fields.
     // Changed not to overwrite hidden settings, eg. database table versions etc IOK 2024-04-22
     public function validate ($input) {
-        $current =  get_option('vipps_login_settings');
-        if (empty($input)) return $current;
-
-        $valid = $current;
-        foreach($input as $k=>$v) {
-            switch ($k) {
-                default:
-                    $valid[$k] = $v;
-            }
-        }
-        return $valid;
+        return VippsLoginAdminSettings::instance()->validate_legacy($input);
     }   
 
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
