@@ -194,6 +194,17 @@ class ContinueWithVipps {
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
+        // Keep the React settings surface free of unrelated WordPress and
+        // WooCommerce notices, matching the payment settings screen.
+        add_action('in_admin_header', function () {
+            $screen = get_current_screen();
+            if (!$screen || !in_array($screen->id, array(
+                'settings_page_vipps_login_settings',
+                'vipps-mobilepay_page_vipps_login_options',
+            ), true)) return;
+            remove_all_actions('admin_notices');
+            remove_all_actions('all_admin_notices');
+        }, 9999);
         VippsLoginAdminSettings::instance()->register();
         VippsSession::clean();
     }

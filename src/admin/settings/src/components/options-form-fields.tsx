@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { FormField, gettext, loginMethodText } from '../lib/wp-data';
+import { FormField, loginMethodText } from '../lib/wp-data';
 import { useWP } from '../wp-options-provider';
-import { WPButton, WPFormField, WPInput, WPLabel, WPOption, WPSelect, WPSwitchToggle } from './form-elements';
+import { WPFormField, WPInput, WPLabel, WPOption, WPSelect, WPSwitchToggle } from './form-elements';
 import { UnsafeHtmlText } from './unsafe-html-text';
 
 interface Props { name: string; field: FormField; errors?: string[] }
@@ -9,7 +8,6 @@ interface Props { name: string; field: FormField; errors?: string[] }
 /** Render the PHP field schema with the same form primitives as payment settings. */
 export function OptionsFormField({ name, field, errors = [] }: Props): JSX.Element {
   const { getOption, setOption } = useWP();
-  const [showPassword, setShowPassword] = useState(false);
   const value = getOption(name);
   const method = String(getOption('login_method'));
   const title = loginMethodText(field.title, method);
@@ -33,7 +31,7 @@ export function OptionsFormField({ name, field, errors = [] }: Props): JSX.Eleme
       <WPFormField className="vipps-mobilepay-react-switch-field">
         <WPSwitchToggle id={id} name={name} checked={value === 1 || value === '1' || value === true ? 'yes' : 'no'}
           aria-describedby={describedBy} aria-invalid={errors.length > 0}
-          onChange={(checked) => setOption(name, checked ? 1 : 0)} />
+          onChange={(checked) => setOption(name, checked === 'yes' ? 1 : 0)} />
         <div className="vipps-mobilepay-react-switch-info"><WPLabel htmlFor={id}>{title}</WPLabel>{help}{error}</div>
       </WPFormField>
     );
@@ -76,19 +74,20 @@ export function OptionsFormField({ name, field, errors = [] }: Props): JSX.Eleme
           </WPSelect>
         ) : (
           <div className="vipps-login-input-row">
-            <WPInput id={id} name={name} type={field.type === 'password' && !showPassword ? 'password' : 'text'}
+            <WPInput id={id} name={name} type={field.type === 'password' ? 'password' : 'text'}
               value={scalarValue} placeholder={loginMethodText(field.placeholder ?? '', method)}
               autoComplete={field.type === 'password' ? 'off' : undefined}
               spellCheck={field.type === 'password' ? false : undefined}
               aria-describedby={describedBy} aria-invalid={errors.length > 0}
+              onFocus={(event) => {
+                // Match the former settings page: credentials are readable only
+                // while the field has focus, without adding a show/hide button.
+                if (field.type === 'password') event.currentTarget.type = 'text';
+              }}
+              onBlur={(event) => {
+                if (field.type === 'password') event.currentTarget.type = 'password';
+              }}
               onChange={(event) => setOption(name, event.target.value)} />
-            {field.type === 'password' && (
-              <WPButton type="button" aria-controls={id} aria-pressed={showPassword}
-                aria-label={`${showPassword ? gettext('hide') : gettext('show')} ${title}`}
-                onClick={() => setShowPassword((shown) => !shown)}>
-                {showPassword ? gettext('hide') : gettext('show')}
-              </WPButton>
-            )}
           </div>
         )}
         {help}{error}

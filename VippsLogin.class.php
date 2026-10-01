@@ -639,7 +639,7 @@ class VippsLogin {
             <tr>
             <th><?php printf(__('Require this user to confirm their login with %1$s if logging in normally', 'login-with-vipps'), $this->get_login_method()); ?></th>
             <td>
-               <input type="hidden" name="_require_vipps_confirm" value=0>
+               <input type="hidden" name="_require_vipps_confirm" value="">
 
                <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_yes" 
                       <?php if (get_user_meta($user->ID, "_require_vipps_confirm", true)=='yes') echo "checked=checked" ?>
@@ -680,7 +680,14 @@ class VippsLogin {
 
         // Allow admin (only) to set the "require Vipps confirmation field
         if (current_user_can('manage_options') && isset($_POST['_require_vipps_confirm'])) {
-           update_user_meta($userid, '_require_vipps_confirm', sanitize_key($_POST['_require_vipps_confirm']));
+           $require_confirmation = sanitize_key(wp_unslash($_POST['_require_vipps_confirm']));
+           if (in_array($require_confirmation, array('yes', 'no'), true)) {
+               update_user_meta($userid, '_require_vipps_confirm', $require_confirmation);
+           } else {
+               // The empty/default radio means “follow the role policy”. Removing
+               // the meta makes that fallback explicit and reversible.
+               delete_user_meta($userid, '_require_vipps_confirm');
+           }
         }
     }
 
