@@ -155,7 +155,7 @@ class VippsLoginAdminSettings {
             'settings_saved' => __('Settings saved', 'login-with-vipps'),
             'save_changes' => __('Save changes', 'login-with-vipps'),
             'save_failed' => __('Could not save settings. Please try again.', 'login-with-vipps'),
-            'copy_keys' => __('Copy payment plugins\' keys', 'login-with-vipps'),
+            'copy_keys' => __('Copy payment gateway keys', 'login-with-vipps'),
             'copy_keys_failed' => __('Could not copy the payment plugin credentials.', 'login-with-vipps'),
             'unsaved_changes' => __('You have unsaved changes.', 'login-with-vipps'),
             'show' => __('Show', 'login-with-vipps'),
