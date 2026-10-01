@@ -9,26 +9,27 @@ import { SettingsTab, Tabs } from '../tabs';
 
 /** Login-specific sections inside the payment plugin's familiar settings layout. */
 export function AdminSettings(): JSX.Element {
-  const { settings, isDirty, submitChanges } = useWP();
+  const { settings, isDirty, submitChanges, copyPaymentKeys, getOption } = useWP();
   const [activeTab, setActiveTab] = useHash('general');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCopyingKeys, setIsCopyingKeys] = useState(false);
   const saving = useRef(false);
   const [banner, setBanner] = useState<NotificationBannerProps | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
   const notice = useRef<HTMLDivElement>(null);
   const fields = Object.assign({}, ...settings.sections.map((section) => section.fields));
+  const loginEnabled = [1, '1', true].includes(getOption('use_vipps_login') as number | string | boolean);
 
   // IDs are stable across language changes; WooCommerce appears only when PHP
-  // supplies its integration fields. Disabling login does not hide its settings.
+  // supplies its integration fields. API keys remain available while login is
+  // disabled; behavioral settings are only useful once login is enabled.
   const tabs: SettingsTab[] = [
-    { id: 'general', title: gettext('general'), fields: ['login_method', 'use_vipps_login', 'login_page'] },
+    { id: 'general', title: gettext('general'), fields: loginEnabled ? ['login_method', 'use_vipps_login', 'login_page'] : ['login_method', 'use_vipps_login'] },
   ];
   const wooFields = Object.keys(fields).filter((key) => key.startsWith('woo-'));
-  if (wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
-  tabs.push(
-    { id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] },
-    { id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] },
-  );
+  if (loginEnabled && wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
+  tabs.push({ id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] });
+  if (loginEnabled) tabs.push({ id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] });
   const selectedTab = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   async function handleSaveSettings(event: React.FormEvent<HTMLFormElement>) {
@@ -54,6 +55,24 @@ export function AdminSettings(): JSX.Element {
       window.requestAnimationFrame(() => notice.current?.focus());
     }
   }
+
+  async function handleCopyPaymentKeys() {
+    setIsCopyingKeys(true);
+    setBanner(null);
+    setErrors({});
+    try {
+      await copyPaymentKeys();
+      setBanner({ variant: 'success', text: gettext('settings_saved') });
+    } catch (error) {
+      const fieldErrors = error instanceof SettingsError ? error.errors : { keys: [gettext('copy_keys_failed')] };
+      setErrors(fieldErrors);
+      setBanner({ variant: 'error', text: Object.values(fieldErrors).flat() });
+    } finally {
+      setIsCopyingKeys(false);
+    }
+  }
+
+  const keysAreEmpty = !getOption('clientid') && !getOption('clientsecret');
 
   return (
     <div className="vipps-settings-shell">
@@ -83,6 +102,11 @@ export function AdminSettings(): JSX.Element {
                   {selectedTab.fields.filter((name) => fields[name]).map((name) => (
                     <OptionsFormField key={name} name={name} field={fields[name]} errors={errors[name]} />
                   ))}
+                  {selectedTab.id === 'keys' && settings.payment_keys_available && keysAreEmpty && (
+                    <WPButton type="button" variant="secondary" isLoading={isCopyingKeys} onClick={handleCopyPaymentKeys}>
+                      {gettext('copy_keys')}
+                    </WPButton>
+                  )}
                 </fieldset>
               </div>
             </section>

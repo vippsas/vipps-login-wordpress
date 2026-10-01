@@ -17,7 +17,9 @@ export interface SettingsData {
   sections: { title: string; fields: Record<string, FormField> }[];
   ajax_url: string;
   action: string;
+  copy_action: string;
   nonce: string;
+  payment_keys_available: boolean;
   translations: Record<string, string>;
 }
 

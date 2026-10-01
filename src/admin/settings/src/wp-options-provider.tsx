@@ -7,6 +7,7 @@ interface WPContext {
   settings: SettingsData;
   isDirty: boolean;
   submitChanges: () => Promise<void>;
+  copyPaymentKeys: () => Promise<void>;
 }
 
 /** Keep field errors structured so the form can open the relevant tab. */
@@ -77,8 +78,25 @@ export function WPOptionsProvider({ children }: PropsWithChildren) {
     }
   }
 
+  async function copyPaymentKeys() {
+    const params = new URLSearchParams({ action: settings.copy_action, nonce: settings.nonce });
+    const response = await fetch(settings.ajax_url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      credentials: 'same-origin',
+      body: params.toString(),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok || result?.success !== true) {
+      throw new SettingsError(result?.data?.errors ?? { keys: ['Could not copy the payment plugin credentials.'] });
+    }
+    const saved = result.data as SettingsData;
+    setSettings(saved);
+    setValues(saved.values);
+  }
+
   return (
-    <WPContext.Provider value={{ settings, isDirty, getOption: (key) => values[key] ?? '', setOption, submitChanges }}>
+    <WPContext.Provider value={{ settings, isDirty, getOption: (key) => values[key] ?? '', setOption, submitChanges, copyPaymentKeys }}>
       {children}
     </WPContext.Provider>
   );

@@ -7,7 +7,9 @@ if (!defined('ABSPATH')) exit;
 class VippsLoginAdminSettings {
     const OPTION = 'vipps_login_settings';
     const ACTION = 'vipps_login_save_settings';
+    const COPY_ACTION = 'vipps_login_copy_payment_keys';
     const NONCE = 'vipps_login_settings';
+    const PAYMENT_KEYS_IMPORTED = 'payment_keys_imported';
     private static $instance;
     private $legacy_result;
 
@@ -28,6 +30,7 @@ class VippsLoginAdminSettings {
         }
         register_setting(self::OPTION, self::OPTION, $args);
         add_action('wp_ajax_' . self::ACTION, array($this, 'ajax_save'));
+        add_action('wp_ajax_' . self::COPY_ACTION, array($this, 'ajax_copy_payment_keys'));
     }
 
     // Field definitions are read-only. WooCommerce fields exist only when its
@@ -60,6 +63,8 @@ class VippsLoginAdminSettings {
         if (!current_user_can('manage_options')) {
             return new WP_Error('forbidden', __('Insufficient privileges', 'login-with-vipps'));
         }
+        // Retry after activation if WooCommerce was not initialized yet.
+        $this->maybe_import_payment_keys();
         $stored = get_option(self::OPTION, array());
         $values = array();
         foreach ($this->fields() as $key => $field) {
@@ -73,10 +78,47 @@ class VippsLoginAdminSettings {
             'sections' => $this->sections(),
             'ajax_url' => admin_url('admin-ajax.php'),
             'action' => self::ACTION,
+            'copy_action' => self::COPY_ACTION,
             'nonce' => wp_create_nonce(self::NONCE),
+            'payment_keys_available' => $this->payment_keys_available(),
             'translations' => $this->translations(),
         );
     }
+
+    /** Import payment credentials once, without overwriting Login credentials. */
+    public function maybe_import_payment_keys() {
+        $stored = get_option(self::OPTION, array());
+        $stored = is_array($stored) ? $stored : array();
+        if (!empty($stored[self::PAYMENT_KEYS_IMPORTED])) return false;
+        if (!empty($stored['clientid']) || !empty($stored['clientsecret'])) {
+            $stored[self::PAYMENT_KEYS_IMPORTED] = 1;
+            update_option(self::OPTION, $stored);
+            return false;
+        }
+        if (!empty($stored['use_vipps_login'])) return false;
+        $keys = $this->payment_keys();
+        if (!$keys) return false;
+        $stored['clientid'] = $keys['clientid'];
+        $stored['clientsecret'] = $keys['clientsecret'];
+        $stored[self::PAYMENT_KEYS_IMPORTED] = 1;
+        update_option(self::OPTION, $stored);
+        return true;
+    }
+
+    /** Read primary credentials from whichever payment gateway class is present. */
+    private function payment_keys() {
+        foreach (array('WC_Payment_Gateway_Vipps', 'WC_Gateway_Vipps') as $class) {
+            if (!class_exists($class) || !method_exists($class, 'instance')) continue;
+            $gateway = call_user_func(array($class, 'instance'));
+            if (!$gateway || !method_exists($gateway, 'get_option')) continue;
+            $clientid = (string) $gateway->get_option('clientId');
+            $clientsecret = (string) $gateway->get_option('secret');
+            if ($clientid !== '' && $clientsecret !== '') return array('clientid' => $clientid, 'clientsecret' => $clientsecret);
+        }
+        return false;
+    }
+
+    private function payment_keys_available() { return (bool) $this->payment_keys(); }
 
     /** Render the React root and provide all data before loading the bundle. */
     public function render_react_settings_page() {
@@ -113,6 +155,8 @@ class VippsLoginAdminSettings {
             'settings_saved' => __('Settings saved', 'login-with-vipps'),
             'save_changes' => __('Save changes', 'login-with-vipps'),
             'save_failed' => __('Could not save settings. Please try again.', 'login-with-vipps'),
+            'copy_keys' => __('Copy payment plugins\' keys', 'login-with-vipps'),
+            'copy_keys_failed' => __('Could not copy the payment plugin credentials.', 'login-with-vipps'),
             'unsaved_changes' => __('You have unsaved changes.', 'login-with-vipps'),
             'show' => __('Show', 'login-with-vipps'),
             'hide' => __('Hide', 'login-with-vipps'),
@@ -260,6 +304,35 @@ class VippsLoginAdminSettings {
             return;
         }
         ContinueWithVipps::instance()->settings = get_option(self::OPTION, array());
+        wp_send_json_success($this->bootstrap());
+    }
+
+    /** Explicit manual copy action for an administrator viewing the Keys tab. */
+    public function ajax_copy_payment_keys() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('errors' => array('forbidden' => array(__('Insufficient privileges', 'login-with-vipps')))), 403);
+            return;
+        }
+        if (!check_ajax_referer(self::NONCE, 'nonce', false)) {
+            wp_send_json_error(array('errors' => array('nonce' => array(__('Your session has expired. Reload the page and try again.', 'login-with-vipps')))), 403);
+            return;
+        }
+        $stored = get_option(self::OPTION, array());
+        $stored = is_array($stored) ? $stored : array();
+        if (!empty($stored['clientid']) || !empty($stored['clientsecret'])) {
+            wp_send_json_error(array('errors' => array('keys' => array(__('Login credentials are no longer empty.', 'login-with-vipps')))), 400);
+            return;
+        }
+        $keys = $this->payment_keys();
+        if (!$keys) {
+            wp_send_json_error(array('errors' => array('keys' => array(__('Payment plugin credentials are unavailable.', 'login-with-vipps')))), 400);
+            return;
+        }
+        $stored['clientid'] = $keys['clientid'];
+        $stored['clientsecret'] = $keys['clientsecret'];
+        $stored[self::PAYMENT_KEYS_IMPORTED] = 1;
+        update_option(self::OPTION, $stored);
+        ContinueWithVipps::instance()->settings = $stored;
         wp_send_json_success($this->bootstrap());
     }
 }

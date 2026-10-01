@@ -521,6 +521,9 @@ class ContinueWithVipps {
         $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time(), 'migrated'=>false, 'initialized'=>0);
         add_option('vipps_login_settings',$default,false);
         $this->maybe_migrate_options();
+        // Import payment credentials once when activation occurs with Login off.
+        // The settings bootstrap retries if WooCommerce was not initialized yet.
+        VippsLoginAdminSettings::instance()->maybe_import_payment_keys();
         $this->dbtables();
     }
 
