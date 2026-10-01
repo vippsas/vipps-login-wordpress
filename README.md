@@ -48,7 +48,7 @@ Allows login and registration on your account pages, cart, checkout and via shor
 
 ### No need for usernames and passwords
 
-Users don't need to worry about forgetting usernames and passwords. All they need to sign in is their phone number. For an even smoother sign in experience, the user can choose to be remembered in the browser, enabling automatic sign-ins for later visits.
+Users don't need to worry about forgetting usernames and passwords. All they need to sign in is their phone number. For an even smoother sign-in experience, the user can choose to be remembered in the browser, enabling automatic sign-ins for later visits.
 
 ### User can register with one click
 
@@ -69,7 +69,7 @@ Read more about pricing on [vippsmobilepay.com](https://vippsmobilepay.com/prici
 
 ### Customizable for your application
 
-You can use the framework of this plugin to implement other signed actions, such as submitting data with verified identities, without requiring the user to login.
+You can use the framework of this plugin to implement other signed actions, such as submitting data with verified identities, without requiring the user to log in.
 
 ## Shortcodes
 
@@ -82,7 +82,7 @@ To use 'Continue with Vipps' in your application, there are two levels of custom
 
 ### Adding another 'application' to log into
 
-Logging into basic WordPress and into an application like WooCommerce is different in the details, especially in regard to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the users' address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
+Logging into basic WordPress and into an application like WooCommerce is different in the details, especially in regard to what page to redirect to (the profile page, or your account page, or maybe the checkout page), with handling of user data (for WooCommerce you want to update the user's address) and for error handling.  For your own application, you may well have other actions you want done after new user registration, logins etc. We aim to provide support for as many applications as possible in time, but to create your own, these are the main steps:
 
 * Define your application with a name. It should be a simple slug, like `wordpress` or `woocommerce`.
 * Create your login button, and make it call the supplied JavaScript function `login_with_vipps` with your application name as argument.
@@ -95,13 +95,12 @@ Logging into basic WordPress and into an application like WooCommerce is differe
 
 ### Adding another 'action' apart from logging in
 
-You may want to do other things than logging in with the users' confirmed Vipps identity, and this plugin absolutely allows this. This might be submissions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address.
+You may want to do other things than logging in with the user's confirmed Vipps identity, and this plugin absolutely allows this. This might be submissions of comments, reviews and so forth without requiring logins, or even just as a convenient way of letting users input their address.
 
 These are the main steps:
 
 * Define your own action, like `submit address`.
 * Create your button. The handler should call the static method `ContinueWithVipps::getAuthRedirect($action)`. You can also provide an array of session data which will be available in your handlers, and restrict the scope of the data to retrieve from Vipps. The return value is a URL to which you should redirect your user.
-* Create your success handler.
 * Create your error handler. This should be hooked to `continue_with_vipps_error_*your action*`. It will receive an error string, a description of the error, sometimes an error hint, and the contents of your session (which will no longer be active). You will need to redirect to your error page here and show your user the error. The redirect is important, you should not output content in this action.
 * Create your success handler. This should be hooked to `continue_with_vipps_*your action*`. It will receive an array of [userinfo from Vipps MobilePay](https://developer.vippsmobilepay.com/api/userinfo/), and a live session. This handler too should end with a redirect to your success page.
 
