@@ -9,7 +9,7 @@ import { SettingsTab, Tabs } from '../tabs';
 
 /** Login-specific sections inside the payment plugin's familiar settings layout. */
 export function AdminSettings(): JSX.Element {
-  const { settings, isDirty, submitChanges } = useWP();
+  const { settings, isDirty, submitChanges, getOption } = useWP();
   const [activeTab, setActiveTab] = useHash('general');
   const [isLoading, setIsLoading] = useState(false);
   const saving = useRef(false);
@@ -17,18 +17,18 @@ export function AdminSettings(): JSX.Element {
   const [errors, setErrors] = useState<FieldErrors>({});
   const notice = useRef<HTMLDivElement>(null);
   const fields = Object.assign({}, ...settings.sections.map((section) => section.fields));
+  const loginEnabled = [1, '1', true].includes(getOption('use_vipps_login') as number | string | boolean);
 
   // IDs are stable across language changes; WooCommerce appears only when PHP
-  // supplies its integration fields. Disabling login does not hide its settings.
+  // supplies its integration fields. API keys remain available while login is
+  // disabled; behavioral settings are only useful once login is enabled.
   const tabs: SettingsTab[] = [
-    { id: 'general', title: gettext('general'), fields: ['login_method', 'use_vipps_login', 'login_page'] },
+    { id: 'general', title: gettext('general'), fields: loginEnabled ? ['login_method', 'use_vipps_login', 'login_page'] : ['login_method', 'use_vipps_login'] },
   ];
   const wooFields = Object.keys(fields).filter((key) => key.startsWith('woo-'));
-  if (wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
-  tabs.push(
-    { id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] },
-    { id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] },
-  );
+  if (loginEnabled && wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
+  tabs.push({ id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] });
+  if (loginEnabled) tabs.push({ id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] });
   const selectedTab = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   async function handleSaveSettings(event: React.FormEvent<HTMLFormElement>) {
