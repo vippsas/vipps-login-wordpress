@@ -274,6 +274,7 @@ class ContinueWithVipps {
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
+        $submenu_name = _x('Login', 'Vipps MobilePay admin submenu label', 'login-with-vipps');
         // The payment plugin owns this parent when it is active. If it is not
         // registered, Login with Vipps supplies the same parent independently.
         $login_owns_parent = !$this->parent_menu_registered();
@@ -282,7 +283,42 @@ class ContinueWithVipps {
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
-        add_submenu_page('vipps_admin_menu', $option_name, $option_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 90);
+        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 90);
+
+        // The payment plugin registers its submenu entries before this plugin,
+        // and several entries share the same numeric position. Reorder only our
+        // own child after all registrations so Login appears after Recurring
+        // Payments when available, otherwise directly after Settings.
+        add_action('admin_menu', function () {
+            global $submenu;
+            if (empty($submenu['vipps_admin_menu']) || !is_array($submenu['vipps_admin_menu'])) return;
+            $items = $submenu['vipps_admin_menu'];
+            $login = null;
+            foreach ($items as $index => $item) {
+                if (isset($item[2]) && $item[2] === 'vipps_login_options') {
+                    $login = $item;
+                    unset($items[$index]);
+                    break;
+                }
+            }
+            if ($login === null) return;
+            $items = array_values($items);
+            $after = null;
+            foreach (array('vipps_recurring__settings_menu', 'vipps_settings_menu') as $target) {
+                foreach ($items as $index => $item) {
+                    if (isset($item[2]) && $item[2] === $target) {
+                        $after = $index;
+                        break 2;
+                    }
+                }
+            }
+            if ($after === null) {
+                $items[] = $login;
+            } else {
+                array_splice($items, $after + 1, 0, array($login));
+            }
+            $submenu['vipps_admin_menu'] = $items;
+        }, 999);
 
         if ($login_owns_parent) {
             // WordPress automatically adds a submenu entry whose slug is the

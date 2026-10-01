@@ -401,6 +401,11 @@ msgstr ""
 msgid "MobilePay"
 msgstr ""
 
+#. Short admin submenu label inside the Vipps MobilePay menu.
+msgctxt "Vipps MobilePay admin submenu label"
+msgid "Login"
+msgstr ""
+
 #. Description of the plugin
 msgid "No need to remember passwords ever again. Vipps, and you are logged in."
 msgstr ""
