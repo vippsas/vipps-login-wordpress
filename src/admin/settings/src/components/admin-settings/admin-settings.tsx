@@ -22,11 +22,13 @@ export function AdminSettings(): JSX.Element {
   // supplies its integration fields. Disabling login does not hide its settings.
   const tabs: SettingsTab[] = [
     { id: 'general', title: gettext('general'), fields: ['login_method', 'use_vipps_login', 'login_page'] },
-    { id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] },
-    { id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] },
   ];
   const wooFields = Object.keys(fields).filter((key) => key.startsWith('woo-'));
   if (wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
+  tabs.push(
+    { id: 'keys', title: gettext('api_keys'), fields: ['clientid', 'clientsecret', 'redirect-uri'] },
+    { id: 'advanced', title: gettext('advanced'), fields: ['required_roles', 'continuepageid'] },
+  );
   const selectedTab = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
 
   async function handleSaveSettings(event: React.FormEvent<HTMLFormElement>) {
