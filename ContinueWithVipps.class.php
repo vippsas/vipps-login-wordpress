@@ -304,9 +304,6 @@ class ContinueWithVipps {
         // Keep the old page registered for direct bookmarks and hashes, then hide
         // its menu entry so Settings does not show a duplicate destination.
         add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings', array($this, 'init_form_elements'));
-        // The registration above makes WordPress authorize the old URL. Once
-        // the screen is loaded, move the browser to the canonical submenu URL.
-        add_action('load-options-general.php', array($this, 'redirect_legacy_settings'));
         add_action('admin_menu', function () {
             remove_submenu_page('options-general.php', 'vipps_login_settings');
         }, 999);

@@ -73,6 +73,10 @@ add_action('init',array($ContinueWithVipps,'init'));
 add_action('plugins_loaded', array($ContinueWithVipps,'plugins_loaded'));
 if (is_admin()) {
     add_action('admin_init',array($ContinueWithVipps,'admin_init'));
+    // Register the legacy-settings redirect before WordPress dispatches the
+    // current admin screen. Registering it from admin_menu is too late for
+    // options-general.php's load hook.
+    add_action('admin_init',array($ContinueWithVipps,'redirect_legacy_settings'), 1);
     add_action('admin_menu',array($ContinueWithVipps,'admin_menu'), 90);
 } else {
     // IOK 2019-12-06 The below is required only because certain plugins in this
