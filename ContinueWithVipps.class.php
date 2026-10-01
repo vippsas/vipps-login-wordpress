@@ -276,16 +276,37 @@ class ContinueWithVipps {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
         // The payment plugin owns this parent when it is active. If it is not
         // registered, Login with Vipps supplies the same parent independently.
-        if (!$this->parent_menu_registered()) {
+        $login_owns_parent = !$this->parent_menu_registered();
+        if ($login_owns_parent) {
             $logo = plugins_url('img/vmp-logo.png', __FILE__);
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
         add_submenu_page('vipps_admin_menu', $option_name, $option_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 90);
 
-        // Existing bookmarks continue to work, but the old Settings location is
-        // no longer registered as a second visible entry.
-        add_action('load-options-general.php', array($this, 'redirect_legacy_settings'));
+        if ($login_owns_parent) {
+            // WordPress automatically adds a submenu entry whose slug is the
+            // same as the parent whenever add_menu_page() is used. The payment
+            // plugin gives that entry a substantial settings/dashboard page,
+            // but the Login with Vipps fallback currently has only a routing
+            // placeholder. Remove that generated entry so the fallback menu
+            // contains only Login with Vipps while retaining the parent icon.
+            //
+            // Keep this as a late admin_menu action: add_submenu_page() and any
+            // other plugin menu registrations must have completed first. If we
+            // later build a standalone fallback dashboard, remove this block
+            // and point the parent callback at that page instead.
+            add_action('admin_menu', function () {
+                remove_submenu_page('vipps_admin_menu', 'vipps_admin_menu');
+            }, 999);
+        }
+
+        // Keep the old page registered for direct bookmarks and hashes, then hide
+        // its menu entry so Settings does not show a duplicate destination.
+        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings', array($this, 'init_form_elements'));
+        add_action('admin_menu', function () {
+            remove_submenu_page('options-general.php', 'vipps_login_settings');
+        }, 999);
     }
 
     /** Check the registered menu state rather than guessing from plugin classes. */
@@ -313,15 +334,6 @@ class ContinueWithVipps {
         global $pagenow;
         return ($pagenow === 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_settings')
             || ($pagenow === 'admin.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_options');
-    }
-
-    /** Compatibility callback for old Settings-page bookmarks. */
-    public function redirect_legacy_settings() {
-        global $pagenow;
-        if ($pagenow !== 'options-general.php' || (($_GET['page'] ?? '') !== 'vipps_login_settings')) return;
-        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
-        wp_safe_redirect($this->settings_url());
-        exit();
     }
 
     public function ajax_vipps_dismiss_notice() {

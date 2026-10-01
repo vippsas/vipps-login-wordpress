@@ -89,7 +89,9 @@ class VippsLoginAdminSettings {
     /** Enqueue and localize the bundle before WordPress prints the admin head. */
     public function enqueue_react_assets($suffix) {
         global $pagenow;
-        if ($pagenow !== 'admin.php' || (($_GET['page'] ?? '') !== 'vipps_login_options')) return;
+        $canonical_page = $pagenow === 'admin.php' && (($_GET['page'] ?? '') === 'vipps_login_options');
+        $legacy_page = $pagenow === 'options-general.php' && (($_GET['page'] ?? '') === 'vipps_login_settings');
+        if (!$canonical_page && !$legacy_page) return;
         $bootstrap = $this->bootstrap();
         if (is_wp_error($bootstrap)) return;
         $script = dirname(__DIR__) . '/settings/dist/plugin.js';
