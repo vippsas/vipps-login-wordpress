@@ -253,10 +253,9 @@ class ContinueWithVipps {
         wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
 
         wp_enqueue_script('login-vipps-admin');
-        // Code for the settings screen(s) handling password show/hide etc IOK 2026-02-26
-        if ($suffix == 'settings_page_vipps_login_settings' || $suffix == 'vipps-mobilepay_page_vipps_login_options') {
-            wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
-        }
+        // React owns the settings screens. Enqueue its assets before the admin
+        // head is printed; unrelated profile/admin scripts remain available.
+        VippsLoginAdminSettings::instance()->enqueue_react_assets($suffix);
     }
 
     public function admin_menu () {
@@ -393,38 +392,8 @@ class ContinueWithVipps {
     // The settings page for the plugin. This page will contain all the settings for the plugin, and will be accessible from the admin menu.
     // This function collects all the form elements and renders them on the page.
     public function init_form_elements() {
-        if (!is_admin() || !current_user_can('manage_options')) {
-            die(__("Insufficient privileges",'login-with-vipps'));
-        }
-
-        // Explicit legacy-screen repair; reading field metadata itself has no side effects.
-        $continuepage = VippsLogin::instance()->ensure_continue_with_vipps_page();
-        if (is_wp_error($continuepage)) {
-            add_settings_error('vipps_login_settings', 'continuepageid', $continuepage->get_error_message());
-        }
-        $form_fields = VippsLoginAdminSettings::instance()->sections();
-        // Get the current values from the database
-        $values = get_option('vipps_login_settings', array());
-
-        ?>
-        <div class="wrap">
-            <?php settings_errors('vipps_login_settings'); ?>
-            <form method="post" action="options.php">
-                <?php settings_fields('vipps_login_settings'); ?>
-                <?php wp_nonce_field(VippsLoginAdminSettings::NONCE, 'vipps_login_settings_nonce', false); ?>
-                
-                <?php foreach($form_fields as $key => $form_fields) {
-                    ?>
-                        <h2><?php _e($form_fields['title']) ?></h2>
-                        <table class="form-table" style="width:100%">
-                            <?php foreach ($form_fields['fields'] as $key => $option) echo $this->render_form_field($key, $option, $values); ?>
-                        </table>
-                <?php } ?>  
-                <button type="submit" class="button-primary"><?php _e('Save Changes', 'login-with-vipps')?></button>
-            </form>
-        </div>
-        <?php
-
+        // React owns both existing URLs in this phase; menu relocation is a later phase.
+        VippsLoginAdminSettings::instance()->render_react_settings_page();
     }
 
     // Lists all the possible options for the integration with Vipps MobilePay.

@@ -1,0 +1,29 @@
+/* Login-only additions. App.css stays aligned with the payment settings source. */
+.vipps-login-react-admin-page .vipps-login-subtitle {
+  margin: 0.65rem 0 0;
+  color: var(--vipps-settings-muted);
+  font-size: 1rem;
+}
+.vipps-login-react-admin-page .vipps-login-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.vipps-login-react-admin-page .vipps-login-role-fields {
+  border: 0;
+  border-bottom: 1px solid #eef0f5;
+  min-width: 0;
+  padding-inline: 0;
+}
+.vipps-login-react-admin-page .vipps-login-role-fields label { display: block; }
+.vipps-login-react-admin-page .vipps-login-input-row { display: flex; gap: 0.5rem; }
+.vipps-login-react-admin-page .vipps-login-input-row input { min-width: 0; flex: 1; }
+.vipps-login-react-admin-page .vipps-login-callback { overflow-wrap: anywhere; user-select: all; }
+.vipps-login-react-admin-page .vipps-login-unsaved { color: var(--vipps-settings-muted); }
+.vipps-login-react-admin-page .vipps-settings-panel h2 {
+  margin: 0 0 1rem;
+  color: #2d3040;
+  font-family: 'Vipps Display', 'Vipps Text', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1.2rem;
+}

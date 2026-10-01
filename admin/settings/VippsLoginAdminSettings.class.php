@@ -74,6 +74,45 @@ class VippsLoginAdminSettings {
             'ajax_url' => admin_url('admin-ajax.php'),
             'action' => self::ACTION,
             'nonce' => wp_create_nonce(self::NONCE),
+            'translations' => $this->translations(),
+        );
+    }
+
+    /** Render the React root and provide all data before loading the bundle. */
+    public function render_react_settings_page() {
+        if (!is_admin() || !current_user_can('manage_options')) {
+            wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        }
+        echo '<div class="wrap vipps-login-admin-settings-page"><div class="wp-header-end"></div><div id="vipps-login-react-ui"></div></div>';
+    }
+
+    /** Enqueue and localize the bundle before WordPress prints the admin head. */
+    public function enqueue_react_assets($suffix) {
+        if (!in_array($suffix, array('settings_page_vipps_login_settings', 'vipps-mobilepay_page_vipps_login_options'), true)) return;
+        $bootstrap = $this->bootstrap();
+        if (is_wp_error($bootstrap)) return;
+        $script = dirname(__DIR__) . '/settings/dist/plugin.js';
+        $style = dirname(__DIR__) . '/settings/dist/plugin.css';
+        wp_enqueue_script('vipps-login-react-ui', plugins_url('dist/plugin.js', __FILE__), array('wp-element'), file_exists($script) ? filemtime($script) : null, true);
+        if (file_exists($style)) wp_enqueue_style('vipps-login-react-ui', plugins_url('dist/plugin.css', __FILE__), array(), filemtime($style));
+        wp_localize_script('vipps-login-react-ui', 'VippsLoginReactSettings', $bootstrap);
+    }
+
+    /** Keep UI copy in the login text domain and independent from payment translations. */
+    private function translations() {
+        return array(
+            'company_name' => VippsLogin::CompanyName(),
+            'page_title' => sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
+            'general' => __('General', 'login-with-vipps'),
+            'api_keys' => __('API keys', 'login-with-vipps'),
+            'advanced' => __('Advanced', 'login-with-vipps'),
+            'woocommerce' => __('WooCommerce', 'login-with-vipps'),
+            'settings_saved' => __('Settings saved', 'login-with-vipps'),
+            'save_changes' => __('Save changes', 'login-with-vipps'),
+            'save_failed' => __('Could not save settings. Please try again.', 'login-with-vipps'),
+            'unsaved_changes' => __('You have unsaved changes.', 'login-with-vipps'),
+            'show' => __('Show', 'login-with-vipps'),
+            'hide' => __('Hide', 'login-with-vipps'),
         );
     }
 
