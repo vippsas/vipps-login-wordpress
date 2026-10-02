@@ -149,6 +149,7 @@ class VippsLoginAdminSettings {
             'company_name' => VippsLogin::CompanyName(),
             'page_title' => sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName()),
             'general' => __('General', 'login-with-vipps'),
+            'main_options' => __('Main options', 'login-with-vipps'),
             'api_keys' => __('API keys', 'login-with-vipps'),
             'advanced' => __('Advanced', 'login-with-vipps'),
             'woocommerce' => __('WooCommerce', 'login-with-vipps'),

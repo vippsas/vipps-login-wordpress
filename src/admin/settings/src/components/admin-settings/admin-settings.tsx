@@ -24,7 +24,7 @@ export function AdminSettings(): JSX.Element {
   // supplies its integration fields. API keys remain available while login is
   // disabled; behavioral settings are only useful once login is enabled.
   const tabs: SettingsTab[] = [
-    { id: 'general', title: gettext('general'), fields: loginEnabled ? ['login_method', 'use_vipps_login', 'login_page'] : ['login_method', 'use_vipps_login'] },
+    { id: 'general', title: gettext('main_options'), fields: loginEnabled ? ['login_method', 'use_vipps_login', 'login_page'] : ['login_method', 'use_vipps_login'] },
   ];
   const wooFields = Object.keys(fields).filter((key) => key.startsWith('woo-'));
   if (loginEnabled && wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
