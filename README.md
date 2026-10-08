@@ -21,7 +21,7 @@ For support, contact [WordPress: *Login with Vipps and MobilePay Support*](https
 💥 Please use the plugin pages on [https://developer.vippsmobilepay.com](https://developer.vippsmobilepay.com/docs/plugins/). 💥
 <!-- END_COMMENT -->
 
-Branded locally as MobilePay in Denmark and Finland, and as Vipps in Norway. One platform gathering more than 11 million users and more than 400,000 merchants across the Nordics.
+One platform gathering more than 11 million users and more than 400,000 merchants across the Nordics.
 
 *Login with Vipps MobilePay* is the easiest way to sign in and create an account. No need to worry about usernames and passwords. All you need to sign in is your phone number, Vipps or MobilePay, and you are logged in. Fully integrated with WooCommerce. Easy to customize for your own applications.
 
