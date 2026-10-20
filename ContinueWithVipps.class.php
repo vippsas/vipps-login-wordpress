@@ -274,7 +274,8 @@ class ContinueWithVipps {
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
-        $submenu_name = _x('Login', 'Vipps MobilePay admin submenu label', 'login-with-vipps');
+        $submenu_name = sprintf(_x('Login with %s', 'Vipps MobilePay admin submenu label', 'login-with-vipps'), VippsLogin::CompanyName());
+
         // The payment plugin owns this parent when it is active. If it is not
         // registered, Login with Vipps supplies the same parent independently.
         $login_owns_parent = !$this->parent_menu_registered();
@@ -283,7 +284,7 @@ class ContinueWithVipps {
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
-        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 90);
+        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 2);
 
         // The payment plugin registers its submenu entries before this plugin,
         // and several entries share the same numeric position. Reorder only our
