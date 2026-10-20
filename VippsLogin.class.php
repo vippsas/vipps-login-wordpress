@@ -872,7 +872,8 @@ class VippsLogin {
         $args['brand'] = strtolower($login_method);
 
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
-        if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
+        // And some others IOK 2026-10-20
+        if (!in_array($args['verb'], ['continue', 'login', 'register', 'confirm'])) $args['verb'] = 'continue';
 
         if ('site' === $args['language']) $args['language'] = $this->get_site_language();
 
