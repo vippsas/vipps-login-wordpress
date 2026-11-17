@@ -41,14 +41,18 @@
 class VippsLogin {
     protected static $instance = null;
     protected static $isactive = null;
-
+    private static $brand_merged = false;  // to be true after 2027-01-12, when Vipps and MobilePay merge to just Vipps. IOK 2026-11-17
 
     public static function CompanyName() { 
         return __("Vipps MobilePay", 'login-with-vipps');
     }
 
     function __construct() {
+        if (date('Y-m-d') >= '2027-01-12') {
+            static::$brand_merged = true;
+        }
     }
+
     // This is a singleton class; access the single instance with this method. IOK 2019-10-14
     public static function instance()  {
         if (!static::$instance) static::$instance = new VippsLogin();
@@ -140,13 +144,20 @@ class VippsLogin {
         // Register web component button, enqueued frontend and backend. LP 2026-06-04
         // The original is at https://cdn.vippsmobilepay.com/js/button/button.js - we host it locally to avoid running
         // code from other domains. IOK 2026-06-17
-        wp_register_script(
-            "vipps-button-webcomponent",
-            plugins_url('js/vipps-button.js',__FILE__),
-            [],
-            filemtime(dirname(__FILE__) . "/js/vipps-button.js"),
-            ['in_footer' => false]
-        );
+        // We'll add the button script iff the Woo-vipps plugin is not currently active. IOK 2026-11-17
+        if (!class_exists('WC_Gateway_Vipps')) {
+            // Changes after brand merge on 12. january. IOK 2026-11-17
+            $button_sdk_name = static::$brand_merged ? 'vipps-button-v2.js' : 'vipps-button.js';
+            wp_register_script('vipps-button-webcomponent',
+                    plugins_url('js/' . $button_sdk_name, __FILE__),
+                    array(),
+                    filemtime(dirname(__FILE__) . '/js/' . $button_sdk_name),
+                    [
+                    'in_footer' => false
+                    ]
+                    );
+
+        }
     }
 
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
@@ -162,7 +173,11 @@ class VippsLogin {
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
         $logo = plugins_url("img/vmp-logo.png", __FILE__);
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
-        wp_enqueue_script("vipps-button-webcomponent");
+
+        // We'll add the button script iff the Woo-vipps plugin is not currently active. IOK 2026-11-17
+        if (!class_exists('WC_Gateway_Vipps')) {
+            wp_enqueue_script("vipps-button-webcomponent");
+        }
     }
 
 
