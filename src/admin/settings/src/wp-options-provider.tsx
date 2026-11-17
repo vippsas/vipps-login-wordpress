@@ -98,7 +98,12 @@ export function WPOptionsProvider({ children }: PropsWithChildren) {
     }
     const saved = result.data as SettingsData;
     setSettings(saved);
-    setValues(saved.values);
+    // Copying saves only credentials; preserve pending edits to other settings.
+    setValues((current) => ({
+      ...current,
+      clientid: saved.values.clientid,
+      clientsecret: saved.values.clientsecret,
+    }));
   }
 
   return (
