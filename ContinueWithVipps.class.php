@@ -284,7 +284,7 @@ class ContinueWithVipps {
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
-        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 2);
+        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 3);
 
         // The payment plugin registers its submenu entries before this plugin,
         // and several entries share the same numeric position. Reorder only our
