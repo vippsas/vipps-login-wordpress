@@ -144,8 +144,8 @@ class VippsLogin {
         // Register web component button, enqueued frontend and backend. LP 2026-06-04
         // The original is at https://cdn.vippsmobilepay.com/js/button/button.js - we host it locally to avoid running
         // code from other domains. IOK 2026-06-17
-        // We'll add the button script iff the Woo-vipps plugin is not currently active. IOK 2026-11-17
-        if (!class_exists('WC_Gateway_Vipps') && is_defined('WOO_VIPPS_VERSION') && (version_compare(WOO_VIPPS_VERSION, '6.3.0') >= 0)) {
+        // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
+        if (!is_defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '>='))) {
             // Changes after brand merge on 12. january. IOK 2026-11-17
             $button_sdk_name = static::$brand_merged ? 'vipps-button-v2.js' : 'vipps-button.js';
             wp_register_script('vipps-button-webcomponent',
@@ -175,8 +175,8 @@ class VippsLogin {
         $logo = plugins_url("img/vmp-logo.png", __FILE__);
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
 
-        // We'll add the button script iff the Woo-vipps plugin is not currently active. IOK 2026-11-17
-        if (!class_exists('WC_Gateway_Vipps') && is_defined('WOO_VIPPS_VERSION') && (version_compare(WOO_VIPPS_VERSION, '6.3.0') >= 0)) {
+        // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
+        if (!is_defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '>='))) {
             wp_enqueue_script("vipps-button-webcomponent");
         }
     }
