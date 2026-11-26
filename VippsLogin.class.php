@@ -145,7 +145,8 @@ class VippsLogin {
         // The original is at https://cdn.vippsmobilepay.com/js/button/button.js - we host it locally to avoid running
         // code from other domains. IOK 2026-06-17
         // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
-        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '>='))) {
+
+        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
             // Changes after brand merge on 12. january. IOK 2026-11-17
             $button_sdk_name = static::$brand_merged ? 'vipps-button-v2.js' : 'vipps-button.js';
             wp_register_script('vipps-button-webcomponent',
