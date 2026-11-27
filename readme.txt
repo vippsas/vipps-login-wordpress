@@ -127,7 +127,7 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
-= 2026-11-27 Version 1.5.8=
+= 2026-11-27 Version 1.5.9=
 More fixes for the button-loader
 
 = 2026-11-26 Version 1.5.8=
