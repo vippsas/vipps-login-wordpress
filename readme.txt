@@ -2,9 +2,9 @@
 Contributors: wphostingdev,iverok,perwilhelmsen,nikolaidev,lassepladsen
 Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.4.0
-Tested up to: 7.0
+Tested up to: 7.2
 Requires PHP: 7.2
-Stable tag: 1.5.6
+Stable tag: 1.5.9
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,6 +40,8 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
+Version 1.5.9 to Version 1.5.7
+Avoid loading the Vipps button sdk if the woo-vipps plugin is present.
 Version 1.5.6
 Fix css compatibility with the Vipps MobilePay payment gateway plugin.
 Avoid loading WooCommerce blocks when not using WooCommerce.
@@ -73,7 +75,7 @@ Already registered users can link their current accounts when signing in with Vi
 You can use the framework of this plugin to implement other solutions that require verified users, without actually requiring login. For example, you might create a system for having users sign their comments with Vipps MobilePay so as to avoid spam issues.
 
 == Shortcodes ==
- * `[login-with-vipps application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WordPress or WooCommerce. Uses this web component and supports the parameters: https://developer.vippsmobilepay.com/docs/knowledge-base/buttons/.
+ * `[login-with-vipps application="wordpress"]` - This will print out a Login with Vipps button that will log you into the given application, which by default can be either WordPress or WooCommerce. Uses this web component and supports the parameters: https://developer.vippsmobilepay.com/docs/buttons-and-widgets/buttons/.
  * `[continue-with-vipps application="wordpress"]` - This is the same, except for a different default text verb.
 
 == Installation ==
@@ -125,6 +127,15 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026-11-26 Version 1.5.9=
+Another small issue in the button loader fixed.
+
+= 2026-11-26 Version 1.5.8=
+Fix button-loader; testing on 7.2
+
+= 2026-11-17 Version 1.5.7=
+Avoid loading the Vipps button SDK if the woo-vipps plugin is loaded
+
 = 2026-09-02 Version 1.5.6=
 Fix css compatibility with the Vipps MobilePay payment gateway plugin.
 Avoid loading WooCommerce blocks when not using WooCommerce.

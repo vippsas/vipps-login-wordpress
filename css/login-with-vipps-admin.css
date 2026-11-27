@@ -27,6 +27,14 @@
    color: white;
 }
 
+/* Keep the fallback Vipps MobilePay parent icon at WordPress menu size when
+   the payment plugin is not supplying its own admin stylesheet. */
+li#toplevel_page_vipps_admin_menu .wp-menu-image.dashicons-before img {
+    width: 20px;
+    opacity: .9;
+    padding-bottom: 2px;
+}
+
 /* for the continue-with-vipps cart&checkout blocks. LP 2026-08-14 */
 .login-with-vipps-block {
    text-align: center;

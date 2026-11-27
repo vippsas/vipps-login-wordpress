@@ -41,14 +41,19 @@
 class VippsLogin {
     protected static $instance = null;
     protected static $isactive = null;
-
+    private static $brand_merged = false;  // to be true after 2027-01-12, when Vipps and MobilePay merge to just Vipps. IOK 2026-11-17
 
     public static function CompanyName() { 
         return __("Vipps MobilePay", 'login-with-vipps');
     }
 
     function __construct() {
+        // Brands are merged after 12. january 2027, but it can be tested by defining the constant below in wp-config.php IOK 2026-11-27
+        if ((defined("WOO_VIPPS_BRAND_MERGED") && ("yes" === WOO_VIPPS_BRAND_MERGED)) || (date('Y-m-d') >= '2027-01-12')) {
+            static::$brand_merged = true;
+        }
     }
+
     // This is a singleton class; access the single instance with this method. IOK 2019-10-14
     public static function instance()  {
         if (!static::$instance) static::$instance = new VippsLogin();
@@ -140,13 +145,22 @@ class VippsLogin {
         // Register web component button, enqueued frontend and backend. LP 2026-06-04
         // The original is at https://cdn.vippsmobilepay.com/js/button/button.js - we host it locally to avoid running
         // code from other domains. IOK 2026-06-17
-        wp_register_script(
-            "vipps-button-webcomponent",
-            plugins_url('js/vipps-button.js',__FILE__),
-            [],
-            filemtime(dirname(__FILE__) . "/js/vipps-button.js"),
-            ['in_footer' => false]
-        );
+        // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
+
+        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
+            // Changes after brand merge on 12. january. IOK 2026-11-17
+            $button_sdk_name = static::$brand_merged ? 'vipps-button-v2.js' : 'vipps-button.js';
+            wp_register_script('vipps-button-webcomponent',
+                    plugins_url('js/' . $button_sdk_name, __FILE__),
+                    array(),
+                    filemtime(dirname(__FILE__) . '/js/' . $button_sdk_name),
+                    [
+                    'in_footer' => false
+                    ]
+                    );
+
+        }
+
     }
 
     // Scripts used to make the 'login' button work; they use Ajax. IOK 2019-10-14
@@ -162,7 +176,11 @@ class VippsLogin {
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
         $logo = plugins_url("img/vmp-logo.png", __FILE__);
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
-        wp_enqueue_script("vipps-button-webcomponent");
+
+        // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
+        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
+            wp_enqueue_script("vipps-button-webcomponent");
+        }
     }
 
 
@@ -419,20 +437,9 @@ class VippsLogin {
 
 
      public function init_form_login_options2() {
-        $options = get_option('vipps_login_settings');
-
         $continuepageoptions = array(
            ''=>__('Create a new page', 'login-with-vipps'),
         );
-        $continuepageid = $options['continuepageid'] ?? 0;
-
-        $continuepage = $this->ensure_continue_with_vipps_page();
-        if (is_wp_error($continuepage)) {
-            $notice = $continuepage->get_error_message();
-            add_action('admin_notices', function() use ($notice) { echo "<div class='notice notice-error is-dismissible'><p>$notice</p></div>"; });
-        } else {
-            $continuepageid = $continuepage->ID;
-        }
         foreach(get_pages() as $page) {
             $continuepageoptions[$page->ID] = $page->post_title;
         }
@@ -442,6 +449,12 @@ class VippsLogin {
         );
         foreach(wp_roles()->roles as $role=>$roledata) {
             $roles[$role] = $roledata['name'];
+        }
+        $settings = get_option('vipps_login_settings', array());
+        foreach ((array) ($settings['required_roles'] ?? array()) as $role => $selected) {
+            if (!isset($roles[$role])) {
+                $roles[$role] = sprintf(__('Unavailable role: %s', 'login-with-vipps'), $role);
+            }
         }
 
         $fields = array(
@@ -563,13 +576,18 @@ class VippsLogin {
         $continuepageid = $options['continuepageid'] ?? false;
         if ($continuepageid) {
             $page = get_post($continuepageid);
-            if ($page) return $page;
-            if (!$page) {
-                $options['continuepageid'] = 0;
-                update_option('vipps_login_settings', $options);
-            }
+            if ($page && $page->post_type === 'page' && $page->post_status !== 'trash') return $page;
         }
 
+        $page = $this->create_continue_with_vipps_page();
+        if (is_wp_error($page)) return $page;
+        $options['continuepageid'] = $page->ID;
+        update_option('vipps_login_settings', $options);
+        return $page;
+    }
+
+    // Create the page without updating options, so settings validation can return its ID.
+    public function create_continue_with_vipps_page($method = null) {
         // This is the typical case, when the user installs and activates the plugin. We use the users' id as the pages author. 2019-10-14 
         $author = null;
         if (current_user_can('manage_options')) $author = wp_get_current_user();
@@ -585,16 +603,14 @@ class VippsLogin {
         $authorid = 0;
         if ($author) $authorid = $author->ID;
 
-        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), VippsLogin::instance()->get_login_method());
+        $defaultname = sprintf(__('Continue with %1$s page', 'login-with-vipps'), $method === null ? $this->get_login_method() : $method);
 
         $pagedata = array('post_title'=>$defaultname, 'post_status'=> 'publish', 'post_author'=>$authorid, 'post_type'=>'page');
-        $newid = wp_insert_post($pagedata);
+        $newid = wp_insert_post($pagedata, true);
         if (is_wp_error($newid)) {
-            return new WP_Error(sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), VippsLogin::instance()->get_login_method()) . ": " .  $newid->get_error_message());
+            return new WP_Error('continuepageid', sprintf(__('Could not find or create the "Continue with %1$s" page.', 'login-with-vipps'), $this->get_login_method()) . ": " .  $newid->get_error_message());
         }
 
-        $options['continuepageid'] = $newid;
-        update_option('vipps_login_settings', $options);
         return get_post($newid);
     }
 
@@ -641,7 +657,7 @@ class VippsLogin {
             <tr>
             <th><?php printf(__('Require this user to confirm their login with %1$s if logging in normally', 'login-with-vipps'), $this->get_login_method()); ?></th>
             <td>
-               <input type="hidden" name="_require_vipps_confirm" value=0>
+               <input type="hidden" name="_require_vipps_confirm" value="">
 
                <input type="radio" name="_require_vipps_confirm" id="_require_vipps_confirm_yes" 
                       <?php if (get_user_meta($user->ID, "_require_vipps_confirm", true)=='yes') echo "checked=checked" ?>
@@ -682,7 +698,14 @@ class VippsLogin {
 
         // Allow admin (only) to set the "require Vipps confirmation field
         if (current_user_can('manage_options') && isset($_POST['_require_vipps_confirm'])) {
-           update_user_meta($userid, '_require_vipps_confirm', sanitize_key($_POST['_require_vipps_confirm']));
+           $require_confirmation = sanitize_key(wp_unslash($_POST['_require_vipps_confirm']));
+           if (in_array($require_confirmation, array('yes', 'no'), true)) {
+               update_user_meta($userid, '_require_vipps_confirm', $require_confirmation);
+           } else {
+               // The empty/default radio means “follow the role policy”. Removing
+               // the meta makes that fallback explicit and reversible.
+               delete_user_meta($userid, '_require_vipps_confirm');
+           }
         }
     }
 
@@ -867,7 +890,8 @@ class VippsLogin {
         $args['brand'] = strtolower($login_method);
 
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
-        if (!in_array($args['verb'], ['continue', 'login'])) $args['verb'] = 'continue';
+        // And some others IOK 2026-10-20
+        if (!in_array($args['verb'], ['continue', 'login', 'register', 'confirm'])) $args['verb'] = 'continue';
 
         if ('site' === $args['language']) $args['language'] = $this->get_site_language();
 

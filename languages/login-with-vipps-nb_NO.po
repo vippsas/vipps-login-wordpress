@@ -487,6 +487,11 @@ msgstr "Gjør hele banneret klikkbart"
 msgid "MobilePay"
 msgstr "MobilePay"
 
+#. Short admin submenu label inside the Vipps MobilePay menu.
+msgctxt "Vipps MobilePay admin submenu label"
+msgid "Login"
+msgstr "Innlogging"
+
 #. Description of the plugin
 msgid "No need to remember passwords ever again. Vipps, and you are logged in."
 msgstr "Aldri mer brukernavn og passord. Vipps, så er du logget inn."
