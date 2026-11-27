@@ -7,9 +7,14 @@ interface Props { name: string; field: FormField; errors?: string[] }
 
 /** Render the PHP field schema with the same form primitives as payment settings. */
 export function OptionsFormField({ name, field, errors = [] }: Props): JSX.Element {
-  const { getOption, setOption } = useWP();
+  const { getOption, setOption, settings } = useWP();
   const value = getOption(name);
-  const method = String(getOption('login_method'));
+  let method: string;
+  if (settings.brand_merged) {
+    method = 'Vipps';
+  } else {
+    method = String(getOption('login_method'));
+  }
   const title = loginMethodText(field.title, method);
   const description = loginMethodText(field.description ?? '', method);
   const id = `vipps-login-${name}`;

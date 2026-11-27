@@ -20,6 +20,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
     >
         <vipps-mobilepay-button
             brand="<?php echo $block_config['loginMethod']; ?>"
+            country="<?php echo esc_attr($block_config['country']); ?>"
             language="<?php echo $language; ?>"
             variant="<?php echo $block->attributes['variant']; ?>"
             rounded="<?php echo $block->attributes['rounded'] ? 'true' : 'false'; ?>"

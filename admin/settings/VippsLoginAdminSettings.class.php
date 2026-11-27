@@ -75,6 +75,8 @@ class VippsLoginAdminSettings {
         }
         return array(
             'values' => $values,
+            // Pass through brand_merged; React owns the explicit UI dispatch.
+            'brand_merged' => VippsLogin::is_brand_merged(),
             'sections' => $this->sections(),
             'ajax_url' => admin_url('admin-ajax.php'),
             'action' => self::ACTION,

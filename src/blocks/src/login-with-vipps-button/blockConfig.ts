@@ -7,6 +7,7 @@ export interface BlockConfig {
 	iconSrc: string;
 	defaultApp: string;
 	loginMethod: string;
+	country: string;
 	applications: Option[];
 	applicationsText: string;
 	languages: Option[];

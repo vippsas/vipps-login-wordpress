@@ -319,6 +319,16 @@ class VippsWooLogin{
         }
         return $clickable;
     }
+    protected function banner_classes() {
+        if (VippsLogin::is_brand_merged()) {
+            $blue = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true);
+        } else {
+            $blue = VippsLogin::instance()->get_login_method() === 'MobilePay';
+        }
+        // Retain the existing CSS classes for themes that customize these banners.
+        return $blue ? 'mobilepay-banner mobilepay-info' : 'vipps-banner vipps-info';
+    }
+
     // Banner text overriden by settings IOK 2020-09-25
     protected function overidden_banner_text($message) {
         $company_name = VippsLogin::CompanyName();
@@ -357,10 +367,7 @@ class VippsWooLogin{
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_checkout_banner', $message);
 
-        $class = 'vipps-banner vipps-info';
-        if ($login_method == 'MobilePay') {
-            $class = 'mobilepay-banner mobilepay-info';
-        }
+        $class = $this->banner_classes();
 
         $notice_logo = '<img class="notice-logo" src="' . VippsLogin::instance()->get_notice_logo() . '"/>';
 
@@ -384,13 +391,10 @@ class VippsWooLogin{
         } else {
             $text = sprintf(__('Are you registered as a customer? Log in with %s.', 'login-with-vipps'), $login_method);
         }
-        $logo = plugins_url('img/vmp-logo.png',__FILE__);
+        $logo = VippsLogin::instance()->get_logo();
         $linktext = __('Click here to continue', 'login-with-vipps');
 
-        $class = 'vipps-banner vipps-info';
-        if ($login_method == 'MobilePay') {
-            $class = 'mobilepay-banner mobilepay-info';
-        }
+        $class = $this->banner_classes();
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$login_method'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_login_banner', $message);
@@ -417,10 +421,7 @@ class VippsWooLogin{
         $message = sprintf($text, "<img class='inline vipps-logo negative' border=0 src='$logo' alt='$text'/>") . "  -  <a href='javascript:login_with_vipps(\"woocommerce\");'>" . $linktext . "</a>";
         $message = $this->overidden_banner_text($message);
         $message = apply_filters('continue_with_vipps_register_banner', $message);
-        $class = 'vipps-banner vipps-info';
-        if ($login_method == 'MobilePay') {
-            $class = 'mobilepay-banner mobilepay-info';
-        }
+        $class = $this->banner_classes();
         $notice_logo = '<img class="notice-logo" src="' . VippsLogin::instance()->get_notice_logo() . '"/>';
 
         ob_start();

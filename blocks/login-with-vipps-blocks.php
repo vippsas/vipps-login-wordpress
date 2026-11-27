@@ -29,10 +29,14 @@
 
 
 add_action('init', function () {
-    register_block_type(__DIR__ . '/dist/login-with-vipps-button');
+    // Match the editor's effective names; get_login_method() handles brand_merged.
+    $login = VippsLogin::instance();
+    $login_config = $login->login_with_vipps_block_config();
+    $continue_title = sprintf(__('Continue with %s', 'login-with-vipps'), $login->get_login_method());
+    register_block_type(__DIR__ . '/dist/login-with-vipps-button', array('title' => $login_config['title']));
     if (class_exists('VippsWooLogin')) {
-        register_block_type(__DIR__ . '/dist/continue-with-vipps-cart');
-        register_block_type(__DIR__ . '/dist/continue-with-vipps-checkout');
+        register_block_type(__DIR__ . '/dist/continue-with-vipps-cart', array('title' => $continue_title));
+        register_block_type(__DIR__ . '/dist/continue-with-vipps-checkout', array('title' => $continue_title));
     }
 });
 

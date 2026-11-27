@@ -158,17 +158,55 @@ class ContinueWithVipps {
     // To simplify development, we load translations from the plugins' own .mos on development branches. IOK 2024-04-22
     public static function load_plugin_textdomain( $domain, $deprecated = false, $plugin_rel_path = false ) {
         $development = apply_filters('login_with_vipps_use_plugin_translations', true);
-        if (!$development) {
-           return load_plugin_textdomain($domain, $deprecated, $plugin_rel_path);
-        }
         // Available since 6.1.0 only IOK 2023-01-25
         global $wp_textdomain_registry;
-        if ($wp_textdomain_registry) {
+        if ($development && $wp_textdomain_registry) {
             $locale = apply_filters( 'plugin_locale', determine_locale(), $domain );
             $mofile = $domain . '-' . $locale . '.mo';
             $path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
             $wp_textdomain_registry->set_custom_path( $domain, $path );
             return load_textdomain( $domain, $path . '/' . $mofile, $locale );
+        }
+
+        // Prefer official translations, adding bundled entries where they are missing.
+        $loaded = load_plugin_textdomain( $domain, $deprecated, $plugin_rel_path );
+        if ( false !== $plugin_rel_path ) {
+            $path = WP_PLUGIN_DIR . '/' . trim( $plugin_rel_path, '/' );
+        } elseif ( false !== $deprecated ) {
+            $path = ABSPATH . trim( $deprecated, '/' );
+        } else {
+            $path = WP_PLUGIN_DIR;
+        }
+
+        // WordPress 6.7+ defers loading until the domain is first requested.
+        // init runs after after_setup_theme, so that lookup is safe here.
+        global $wp_version;
+        $locale = determine_locale();
+        if ( version_compare( $wp_version, '6.7', '<' ) ) {
+            $locale = apply_filters( 'plugin_locale', $locale, $domain );
+        }
+
+        static $locale_hook_registered = false;
+        if ( ! $locale_hook_registered ) {
+            add_action( 'change_locale', static function ( $locale ) use ( $domain, $path ) {
+                self::load_translation_fallback( $domain, $path, $locale );
+            } );
+            $locale_hook_registered = true;
+        }
+        self::load_translation_fallback( $domain, $path, $locale );
+        return $loaded;
+    }
+
+    private static function load_translation_fallback( $domain, $path, $locale ) {
+        $mofile = $path . '/' . $domain . '-' . $locale . '.mo';
+        if ( ! is_readable( $mofile ) ) return;
+
+        // Load official entries first so they win when the bundled file is merged.
+        get_translations_for_domain( $domain );
+        global $wp_textdomain_registry;
+        $preferred_path = $wp_textdomain_registry->get( $domain, $locale );
+        if ( load_textdomain( $domain, $mofile, $locale ) && $preferred_path ) {
+            $wp_textdomain_registry->set( $domain, $locale, $preferred_path );
         }
     }
 
@@ -241,17 +279,20 @@ class ContinueWithVipps {
         }
 
         add_action('admin_notices', function () {
-            $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
+            // This banner uses Vipps branding even before brand_merged.
+            $company_name = __('Vipps', 'login-with-vipps');
+            $logo = plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
+            $colorclass = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true) ? 'Blue' : '';
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
             $settingsurl = $this->settings_url();
             $options = get_option('vipps_login_settings');
 
             ?>
-            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure05'>
+            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible <?php echo esc_attr($colorclass); ?>'  data-key='configure05'>
             <a target="_blank"  href="<?php echo $configurl; ?>">
-            <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
+            <img src="<?php echo $logo; ?>" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), $company_name);?>">
              <div>
-                 <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
+                 <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), $company_name); ?></p>
              </div>
              </a>
             </div>
@@ -280,7 +321,7 @@ class ContinueWithVipps {
         // registered, Login with Vipps supplies the same parent independently.
         $login_owns_parent = !$this->parent_menu_registered();
         if ($login_owns_parent) {
-            $logo = plugins_url('img/vmp-logo.png', __FILE__);
+            $logo = VippsLogin::instance()->get_logo();
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
@@ -402,9 +443,20 @@ class ContinueWithVipps {
         }
         add_action('admin_notices', function() use ($text,$type, $key) {
                 $company_name = VippsLogin::CompanyName();
-                $logo = plugins_url('img/vipps_logo_rgb.png',__FILE__);
+                if (VippsLogin::is_brand_merged()) {
+                    if (in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true)) {
+                        $logo = plugins_url('img/Vipps_logo_DK-FI_blue_RGB.png', __FILE__);
+                        $colorclass = 'Blue';
+                    } else {
+                        $logo = plugins_url('img/vipps_logo_rgb.png', __FILE__);
+                        $colorclass = '';
+                    }
+                } else {
+                    $logo = plugins_url('img/vipps_logo_rgb.png', __FILE__);
+                    $colorclass = '';
+                }
                 $text= "<img style='height:40px;float:left;' src='$logo' alt='$company_name-logo'> $text";
-                echo "<div class='notice notice-vipps-login notice-$type is-dismissible'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
+                echo "<div class='notice notice-vipps-login notice-$type is-dismissible " . esc_attr($colorclass) . "'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
                 });
     }
 
@@ -522,6 +574,18 @@ class ContinueWithVipps {
                 ),
                 'default' => VippsLogin::instance()->get_login_method(),
                 'description' => __('Choose which login method you\'d like to enable for your users.', 'login-with-vipps'),
+            ),
+            'country' => array(
+                'type' => 'select',
+                'title' => __('Country', 'login-with-vipps'),
+                'options' => array(
+                    'NO' => __('Norway', 'login-with-vipps'),
+                    'SE' => __('Sweden', 'login-with-vipps'),
+                    'DK' => __('Denmark', 'login-with-vipps'),
+                    'FI' => __('Finland', 'login-with-vipps'),
+                ),
+                'default' => VippsLogin::instance()->get_country(),
+                'description' => __('Choose the country to use for Login.', 'login-with-vipps'),
             ),
             'clientid' => array(
                 'type' => 'password',

@@ -19,14 +19,21 @@ export function AdminSettings(): JSX.Element {
   const notice = useRef<HTMLDivElement>(null);
   const fields = Object.assign({}, ...settings.sections.map((section) => section.fields));
   const loginEnabled = [1, '1', true].includes(getOption('use_vipps_login') as number | string | boolean);
-  // The login method is held in provider state, so its palette changes immediately.
-  const brandClass = getOption('login_method') === 'MobilePay' ? 'MobilePay' : 'Vipps';
+  let colorClass: string;
+  let generalFields: string[];
+  if (settings.brand_merged) {
+    colorClass = ['DK', 'FI'].includes(String(getOption('country'))) ? 'Blue' : '';
+    generalFields = loginEnabled ? ['country', 'use_vipps_login', 'login_page'] : ['country', 'use_vipps_login'];
+  } else {
+    colorClass = getOption('login_method') === 'MobilePay' ? 'Blue' : '';
+    generalFields = loginEnabled ? ['login_method', 'country', 'use_vipps_login', 'login_page'] : ['login_method', 'country', 'use_vipps_login'];
+  }
 
   // IDs are stable across language changes; WooCommerce appears only when PHP
   // supplies its integration fields. API keys remain available while login is
   // disabled; behavioral settings are only useful once login is enabled.
   const tabs: SettingsTab[] = [
-    { id: 'general', title: gettext('main_options'), fields: loginEnabled ? ['login_method', 'use_vipps_login', 'login_page'] : ['login_method', 'use_vipps_login'] },
+    { id: 'general', title: gettext('main_options'), fields: generalFields },
   ];
   const wooFields = Object.keys(fields).filter((key) => key.startsWith('woo-'));
   if (loginEnabled && wooFields.length) tabs.push({ id: 'woocommerce', title: gettext('woocommerce'), fields: wooFields });
@@ -77,7 +84,7 @@ export function AdminSettings(): JSX.Element {
   const keysAreEmpty = !getOption('clientid') && !getOption('clientsecret');
 
   return (
-    <div className={`vipps-settings-shell ${brandClass}`}>
+    <div className={`vipps-settings-shell ${colorClass}`}>
       <header className="vipps-settings-header">
         <h1>{gettext('company_name')}</h1>
         <p className="vipps-login-subtitle">{gettext('page_title')}</p>

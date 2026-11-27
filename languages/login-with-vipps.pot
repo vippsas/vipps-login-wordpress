@@ -672,3 +672,27 @@ msgstr ""
 #: ContinueWithVipps.class.php:448
 msgid "Your redirect-URI is:"
 msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Country"
+msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Norway"
+msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Sweden"
+msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Denmark"
+msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Finland"
+msgstr ""
+
+#: ContinueWithVipps.class.php
+msgid "Choose the country to use for Login."
+msgstr ""
