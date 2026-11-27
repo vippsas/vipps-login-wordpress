@@ -279,13 +279,19 @@ class ContinueWithVipps {
         }
 
         add_action('admin_notices', function () {
-            $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
+            if (VippsLogin::is_brand_merged()) {
+                $logo = plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
+                $colorclass = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true) ? 'Blue' : '';
+            } else {
+                $logo = plugins_url('img/vipps-rgb-orange-neg.svg', __FILE__);
+                $colorclass = '';
+            }
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
             $settingsurl = $this->settings_url();
             $options = get_option('vipps_login_settings');
 
             ?>
-            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible'  data-key='configure05'>
+            <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible <?php echo esc_attr($colorclass); ?>'  data-key='configure05'>
             <a target="_blank"  href="<?php echo $configurl; ?>">
             <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
              <div>
@@ -440,9 +446,20 @@ class ContinueWithVipps {
         }
         add_action('admin_notices', function() use ($text,$type, $key) {
                 $company_name = VippsLogin::CompanyName();
-                $logo = plugins_url('img/vipps_logo_rgb.png',__FILE__);
+                if (VippsLogin::is_brand_merged()) {
+                    if (in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true)) {
+                        $logo = plugins_url('img/Vipps_logo_DK-FI_blue_RGB.png', __FILE__);
+                        $colorclass = 'Blue';
+                    } else {
+                        $logo = plugins_url('img/vipps_logo_rgb.png', __FILE__);
+                        $colorclass = '';
+                    }
+                } else {
+                    $logo = plugins_url('img/vipps_logo_rgb.png', __FILE__);
+                    $colorclass = '';
+                }
                 $text= "<img style='height:40px;float:left;' src='$logo' alt='$company_name-logo'> $text";
-                echo "<div class='notice notice-vipps-login notice-$type is-dismissible'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
+                echo "<div class='notice notice-vipps-login notice-$type is-dismissible " . esc_attr($colorclass) . "'  data-key='" . esc_attr($key) . "'><p>$text</p></div>";
                 });
     }
 

@@ -13,6 +13,13 @@
     color: white !important;
     min-height: 56px;
 }
+.notice.notice-vipps-login.notice-info.Blue {
+    border-left-color: #5a78ff;
+}
+.notice.notice-vipps-login.notice-info.notice-vipps-neg.Blue {
+    border-color: #5a78ff !important;
+    background-color: #5a78ff !important;
+}
 .notice.notice-vipps-login.notice-info.notice-vipps-neg img {
     max-height: 54px;
 }
