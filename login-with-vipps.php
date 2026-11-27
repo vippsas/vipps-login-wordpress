@@ -1,8 +1,8 @@
 <?php 
 /*
    Plugin Name: Login with Vipps
-   Version: 1.5.6
-   Stable tag: 1.5.6
+   Version: 1.5.9
+   Stable tag: 1.5.9
    Description: No need to remember passwords ever again. Vipps, and you are logged in.
    Author: WP-Hosting AS
    Plugin URI: https://wordpress.org/plugins/login-with-vipps/
@@ -10,7 +10,7 @@
    Author: WP Hosting
    Author URI: https://www.wp-hosting.no/
    Requires at least: 6.4.0
-   Tested up to: 7.0
+   Tested up to: 7.2
    Requires PHP: 7.2
    Text-domain: login-with-vipps
    Domain Path: /languages
@@ -50,7 +50,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define('VIPPS_LOGIN_VERSION', '1.5.6');
+define('VIPPS_LOGIN_VERSION', '1.5.9');
 
 // Utility classes used to verify JWT tokens and manage login sessions. IOK 2019-10-14
 require_once(dirname(__FILE__) . '/VippsJWTVerifier.class.php');
@@ -65,6 +65,7 @@ if (PHP_MAJOR_VERSION >= 8) {
 // This is the main class, a singleton. We'll store it in a global variable for hook-writing-convenience. IOK 2019-10-14
 global $ContinueWithVipps;
 require_once(dirname(__FILE__) . '/ContinueWithVipps.class.php');
+require_once(dirname(__FILE__) . '/admin/settings/VippsLoginAdminSettings.class.php');
 $ContinueWithVipps = ContinueWithVipps::instance();
 register_activation_hook(__FILE__,array($ContinueWithVipps,'activate'));
 register_deactivation_hook(__FILE__,array('ContinueWithVipps','deactivate'));
@@ -72,6 +73,10 @@ add_action('init',array($ContinueWithVipps,'init'));
 add_action('plugins_loaded', array($ContinueWithVipps,'plugins_loaded'));
 if (is_admin()) {
     add_action('admin_init',array($ContinueWithVipps,'admin_init'));
+    // Register the legacy-settings redirect before WordPress dispatches the
+    // current admin screen. Registering it from admin_menu is too late for
+    // options-general.php's load hook.
+    add_action('admin_init',array($ContinueWithVipps,'redirect_legacy_settings'), 1);
     add_action('admin_menu',array($ContinueWithVipps,'admin_menu'), 90);
 } else {
     // IOK 2019-12-06 The below is required only because certain plugins in this
