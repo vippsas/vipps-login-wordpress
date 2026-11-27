@@ -19,8 +19,8 @@ export function AdminSettings(): JSX.Element {
   const notice = useRef<HTMLDivElement>(null);
   const fields = Object.assign({}, ...settings.sections.map((section) => section.fields));
   const loginEnabled = [1, '1', true].includes(getOption('use_vipps_login') as number | string | boolean);
-  // The login method is held in provider state, so its palette changes immediately.
-  const brandClass = getOption('login_method') === 'MobilePay' ? 'MobilePay' : 'Vipps';
+  // Orange is the default; the Blue class selects the blue palette.
+  const colorClass = getOption('login_method') === 'MobilePay' ? 'Blue' : '';
 
   // IDs are stable across language changes; WooCommerce appears only when PHP
   // supplies its integration fields. API keys remain available while login is
@@ -77,7 +77,7 @@ export function AdminSettings(): JSX.Element {
   const keysAreEmpty = !getOption('clientid') && !getOption('clientsecret');
 
   return (
-    <div className={`vipps-settings-shell ${brandClass}`}>
+    <div className={`vipps-settings-shell ${colorClass}`}>
       <header className="vipps-settings-header">
         <h1>{gettext('company_name')}</h1>
         <p className="vipps-login-subtitle">{gettext('page_title')}</p>
