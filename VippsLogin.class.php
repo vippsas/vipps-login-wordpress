@@ -189,7 +189,7 @@ class VippsLogin {
 
         wp_localize_script('login-with-vipps', 'vippsLoginConfig', $loginconfig);
         wp_enqueue_style('login-with-vipps',plugins_url('css/login-with-vipps.css',__FILE__),array(),filemtime(dirname(__FILE__) . "/css/login-with-vipps.css"), 'all');
-        $logo = plugins_url("img/vmp-logo.png", __FILE__);
+        $logo = $this->get_logo();
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
 
         // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
@@ -631,7 +631,7 @@ class VippsLogin {
         ];
         return [
             'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
-            'iconSrc' => $this->get_vmp_logo(),
+            'iconSrc' => $this->get_logo(),
             'defaultApp' => $gotWoo ? 'woocommerce' : 'wordpress',
             'loginMethod' => $login_method,
             'country' => $this->get_country(),
@@ -1007,9 +1007,18 @@ EOF;
         return plugins_url('img/circle-exclamation-solid.svg', __FILE__);
     }
 
-    // The combined VippsMobilePay logo png. LP 08.11.2024
-    public function get_vmp_logo() {
-        return plugins_url('img/vmp-logo.png', __FILE__);
+    // Keep the combined logo before brand_merged; afterwards use the country's smile.
+    public function get_logo() {
+        if (static::$brand_merged) {
+            if (in_array($this->get_country(), array('DK', 'FI'), true)) {
+                $logo = 'img/Vipps_symbol_DK-FI_blue_RGB.png';
+            } else {
+                $logo = 'img/vipps-smile-orange.png';
+            }
+        } else {
+            $logo = 'img/vmp-logo.png';
+        }
+        return plugins_url($logo, __FILE__);
     }
 
 

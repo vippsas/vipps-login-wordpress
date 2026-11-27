@@ -384,7 +384,7 @@ class VippsWooLogin{
         } else {
             $text = sprintf(__('Are you registered as a customer? Log in with %s.', 'login-with-vipps'), $login_method);
         }
-        $logo = plugins_url('img/vmp-logo.png',__FILE__);
+        $logo = VippsLogin::instance()->get_logo();
         $linktext = __('Click here to continue', 'login-with-vipps');
 
         $class = 'vipps-banner vipps-info';

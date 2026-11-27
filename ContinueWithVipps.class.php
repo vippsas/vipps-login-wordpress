@@ -318,7 +318,7 @@ class ContinueWithVipps {
         // registered, Login with Vipps supplies the same parent independently.
         $login_owns_parent = !$this->parent_menu_registered();
         if ($login_owns_parent) {
-            $logo = plugins_url('img/vmp-logo.png', __FILE__);
+            $logo = VippsLogin::instance()->get_logo();
             add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
         }
         // Keep one canonical login child in either ownership arrangement.
