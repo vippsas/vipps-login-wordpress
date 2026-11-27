@@ -200,15 +200,15 @@ msgstr ""
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Variant"
-msgstr ""
+msgstr "Vaihtoehto"
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Language"
-msgstr ""
+msgstr "Kieli"
 
 #: VippsLogin.class.php:556
 msgid "Continue"
-msgstr ""
+msgstr "Jatka"
 
 #: VippsLogin.class.php:555
 msgid "Login"
@@ -244,7 +244,7 @@ msgstr ""
 
 #: VippsLogin.class.php:530
 msgid "English"
-msgstr ""
+msgstr "Englanti"
 
 #: blocks/dist/login-with-vipps-button/block.json
 #: src/blocks/src/login-with-vipps-button/block.json

@@ -18,7 +18,7 @@ msgstr ""
 #: ContinueWithVipps.class.php:277
 msgctxt "Vipps MobilePay admin submenu label"
 msgid "Login with %s"
-msgstr ""
+msgstr "Logga in med %s"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:339
 msgid "Payment plugin credentials are unavailable."
@@ -35,7 +35,7 @@ msgstr ""
 #: admin/settings/VippsLoginAdminSettings.class.php:283
 #: admin/settings/VippsLoginAdminSettings.class.php:318
 msgid "Your session has expired. Reload the page and try again."
-msgstr ""
+msgstr "Din session har gått ut. Läs in sidan igen och försök på nytt."
 
 #: admin/settings/VippsLoginAdminSettings.class.php:235
 msgid "Invalid value for %s."
@@ -43,7 +43,7 @@ msgstr ""
 
 #: admin/settings/VippsLoginAdminSettings.class.php:181
 msgid "An unknown or unavailable setting was submitted."
-msgstr ""
+msgstr "En okänd eller otillgänglig inställning skickades in."
 
 #: admin/settings/VippsLoginAdminSettings.class.php:172
 msgid "Settings must be an object."
@@ -51,15 +51,15 @@ msgstr ""
 
 #: admin/settings/VippsLoginAdminSettings.class.php:163
 msgid "Hide"
-msgstr ""
+msgstr "Dölj"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:162
 msgid "Show"
-msgstr ""
+msgstr "Visa"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:161
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Du har osparade ändringar."
 
 #: admin/settings/VippsLoginAdminSettings.class.php:160
 msgid "Could not copy the payment plugin credentials."
@@ -72,37 +72,37 @@ msgstr ""
 #: admin/settings/VippsLoginAdminSettings.class.php:158
 #: admin/settings/VippsLoginAdminSettings.class.php:304
 msgid "Could not save settings. Please try again."
-msgstr ""
+msgstr "Kunde inte spara inställningarna. Försök igen."
 
 #: admin/settings/VippsLoginAdminSettings.class.php:156
 msgid "Settings saved"
-msgstr ""
+msgstr "Inställningar sparade"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:155
 msgid "WooCommerce"
-msgstr ""
+msgstr "WooCommerce"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:154
 msgid "Advanced"
-msgstr ""
+msgstr "Avancerad"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:153
 msgid "API keys"
-msgstr ""
+msgstr "API-nycklar"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:152
 msgid "Main options"
-msgstr ""
+msgstr "Huvudalternativ"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:151
 msgid "General"
-msgstr ""
+msgstr "Allmänt"
 
 #: blocks/dist/continue-with-vipps-checkout/block.json
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block title"
 msgid "Continue with Vipps MobilePay (checkout)"
-msgstr ""
+msgstr "Fortsätt med Vipps MobilePay (kassa)"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -110,7 +110,7 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "Continue"
-msgstr ""
+msgstr "Fortsätt"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -118,7 +118,7 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "Log In"
-msgstr ""
+msgstr "Logga in"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -126,7 +126,7 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "Login"
-msgstr ""
+msgstr "Logga in"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -134,7 +134,7 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "MobilePay"
-msgstr ""
+msgstr "MobilePay"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -142,7 +142,7 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "Vipps"
-msgstr ""
+msgstr "Vipps"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: blocks/dist/continue-with-vipps-checkout/block.json
@@ -158,29 +158,29 @@ msgstr ""
 #: src/blocks/src/continue-with-vipps-checkout/block.json
 msgctxt "block keyword"
 msgid "WooCommerce"
-msgstr ""
+msgstr "WooCommerce"
 
 #: blocks/dist/continue-with-vipps-cart/block.json
 #: src/blocks/src/continue-with-vipps-cart/block.json
 msgctxt "block title"
 msgid "Continue with Vipps MobilePay (cart)"
-msgstr ""
+msgstr "Fortsätt med Vipps MobilePay (varukorg)"
 
 #: blocks/login-with-vipps-blocks.php:59 blocks/login-with-vipps-blocks.php:73
 msgid "Add a \"Continue with %s\" button"
-msgstr ""
+msgstr "Lägg till en \"Fortsätt med %s\"-knapp"
 
 #: blocks/login-with-vipps-blocks.php:58 blocks/login-with-vipps-blocks.php:72
 msgid "Continue with %s"
-msgstr ""
+msgstr "Fortsätt med %s"
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Compact"
-msgstr ""
+msgstr "Kompakt"
 
 #: VippsLogin.class.php:529
 msgid "Site language"
-msgstr ""
+msgstr "Webbplatsens språk"
 
 #: ContinueWithVipps.class.php:773
 msgid "The code passed is invalid."
@@ -192,65 +192,65 @@ msgstr ""
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Rounded"
-msgstr ""
+msgstr "Avrundad"
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Verb"
-msgstr ""
+msgstr "Verb"
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Variant"
-msgstr ""
+msgstr "Variant"
 
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Language"
-msgstr ""
+msgstr "Språk"
 
 #: VippsLogin.class.php:556
 msgid "Continue"
-msgstr ""
+msgstr "Fortsätt"
 
 #: VippsLogin.class.php:555
 msgid "Login"
-msgstr ""
+msgstr "Logga in"
 
 #: VippsLogin.class.php:552
 msgid "Light"
-msgstr ""
+msgstr "Ljus"
 
 #: VippsLogin.class.php:551
 msgid "Dark"
-msgstr ""
+msgstr "Mörk"
 
 #: VippsLogin.class.php:550
 msgid "Primary"
-msgstr ""
+msgstr "Primär"
 
 #: VippsLogin.class.php:537 VippsLogin.class.php:543
 msgid "Danish"
-msgstr ""
+msgstr "Danska"
 
 #: VippsLogin.class.php:544
 msgid "Finnish"
-msgstr ""
+msgstr "Finska"
 
 #: VippsLogin.class.php:535 VippsLogin.class.php:542
 msgid "Swedish"
-msgstr ""
+msgstr "Svenska"
 
 #: VippsLogin.class.php:534 VippsLogin.class.php:541
 msgid "Norwegian"
-msgstr ""
+msgstr "Norska"
 
 #: VippsLogin.class.php:530
 msgid "English"
-msgstr ""
+msgstr "Engelska"
 
 #: blocks/dist/login-with-vipps-button/block.json
 #: src/blocks/src/login-with-vipps-button/block.json
 msgctxt "block title"
 msgid "Login with Vipps/MobilePay-button"
-msgstr ""
+msgstr "Logga in med Vipps/MobilePay-knapp"
 
 #: VippsLogin.class.php:720 VippsLogin.class.php:721
 msgid "Cannot disconnect"
@@ -278,7 +278,7 @@ msgstr ""
 
 #: VippsLogin.class.php:630
 msgid "Log in with %1$s"
-msgstr ""
+msgstr "Logga in med %1$s"
 
 #: VippsLogin.class.php:474
 msgid "Require users in these roles to log in with %1$s"
@@ -286,7 +286,7 @@ msgstr ""
 
 #: VippsLogin.class.php:47
 msgid "Vipps MobilePay"
-msgstr ""
+msgstr "Vipps MobilePay"
 
 #: ContinueWithVipps.class.php:544
 msgid "%1$s integration settings"
@@ -298,11 +298,11 @@ msgstr ""
 
 #: ContinueWithVipps.class.php:521
 msgid "MobilePay"
-msgstr ""
+msgstr "MobilePay"
 
 #: ContinueWithVipps.class.php:518
 msgid "Login method"
-msgstr ""
+msgstr "Inloggningsmetod"
 
 #: ContinueWithVipps.class.php:252
 msgid "Logg inn med %1$s-logo"
@@ -313,11 +313,11 @@ msgstr ""
 #: VippsLogin.class.php:489 VippsWooLogin.class.php:492
 #: VippsWooLogin.class.php:566
 msgid "Login with %1$s"
-msgstr ""
+msgstr "Logga in med %1$s"
 
 #: blocks/login-with-vipps.php:73
 msgid "Log in with %1$s!"
-msgstr ""
+msgstr "Logga in med %1$s!"
 
 #: VippsLogin.class.php:1545
 msgid "Login not confirmed: This user is not the user mapped to the %1$s account, and does not have the same email account"
@@ -361,7 +361,7 @@ msgstr ""
 
 #: ContinueWithVipps.class.php:520
 msgid "Vipps"
-msgstr ""
+msgstr "Vipps"
 
 #: VippsWooLogin.class.php:484
 msgid "You are now connected to the %1$s profile <b>%2$s</b>!"
@@ -658,15 +658,15 @@ msgstr ""
 
 #: admin/settings/VippsLoginAdminSettings.class.php:157
 msgid "Save changes"
-msgstr ""
+msgstr "Spara ändringar"
 
 #: ContinueWithVipps.class.php:533
 msgid "Client Secret"
-msgstr ""
+msgstr "Klienthemlighet"
 
 #: ContinueWithVipps.class.php:528
 msgid "Client ID"
-msgstr ""
+msgstr "Klient-ID"
 
 #: admin/settings/VippsLoginAdminSettings.class.php:64
 #: admin/settings/VippsLoginAdminSettings.class.php:126
@@ -675,11 +675,11 @@ msgstr ""
 #: admin/settings/VippsLoginAdminSettings.class.php:314
 #: ContinueWithVipps.class.php:367 ContinueWithVipps.class.php:374
 msgid "Insufficient privileges"
-msgstr ""
+msgstr "Otillräcklig behörighet"
 
 #: ContinueWithVipps.class.php:392
 msgid "Dismissed message "
-msgstr ""
+msgstr "Avvisat meddelande "
 
 #: ContinueWithVipps.class.php:539
 msgid "Copy the URI above. Then go to <a target=\"_blank\" href=\"%s\">https://portal.vippsmobilepay.com</a> and choose \"Developer\". Find your point of sale and press \"Setup login\". Press \"Activate Login\" and paste the URI into the field \"URI\". Then press \"Save\". If you change your websites name or your permalink setup, you will need to register the new URI the same way."
@@ -711,7 +711,7 @@ msgstr ""
 
 #: blocks/login-with-vipps.php:71
 msgid "Log in with"
-msgstr ""
+msgstr "Logga in med"
 
 #: blocks/login-with-vipps.php:69
 msgid "This will be used as the title/popup of the button"
@@ -719,7 +719,7 @@ msgstr ""
 
 #: blocks/login-with-vipps.php:68
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #: blocks/login-with-vipps.php:67 VippsLogin.class.php:564
 msgid "The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more"
@@ -728,24 +728,24 @@ msgstr ""
 #: blocks/login-with-vipps.php:66
 #: blocks/dist/login-with-vipps-button/index.js:1
 msgid "Application"
-msgstr ""
+msgstr "Applikation"
 
 #: blocks/login-with-vipps.php:61 VippsLogin.class.php:559
 msgid "Log in with %1$s-button"
-msgstr ""
+msgstr "Logga in med %1$s-knapp"
 
 #: blocks/login-with-vipps.php:54 VippsLogin.class.php:525
 msgid "Log in to WooCommerce"
-msgstr ""
+msgstr "Logga in på WooCommerce"
 
 #: blocks/login-with-vipps.php:49 VippsLogin.class.php:520
 msgid "Log in to WordPress"
-msgstr ""
+msgstr "Logga in på WordPress"
 
 #. Author URI of the plugin
 #: login-with-vipps.php
 msgid "https://www.wp-hosting.no/"
-msgstr ""
+msgstr "https://www.wp-hosting.no/"
 
 #. Author of the plugin
 #: login-with-vipps.php
@@ -765,7 +765,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: login-with-vipps.php
 msgid "Login with Vipps"
-msgstr ""
+msgstr "Logga in med Vipps"
 
 #: ContinueWithVipps.class.php
 msgid "Country"
