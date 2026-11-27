@@ -293,7 +293,7 @@ class ContinueWithVipps {
             ?>
             <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible <?php echo esc_attr($colorclass); ?>'  data-key='configure05'>
             <a target="_blank"  href="<?php echo $configurl; ?>">
-            <img src="<?php echo $logo; ?>" style="float:left; height: 4rem; margin-top: 0.2rem" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
+            <img src="<?php echo $logo; ?>" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
              <div>
                  <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
              </div>

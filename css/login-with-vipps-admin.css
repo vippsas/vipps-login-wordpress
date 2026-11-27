@@ -21,10 +21,20 @@
     background-color: #5a78ff !important;
 }
 .notice.notice-vipps-login.notice-info.notice-vipps-neg img {
+    float: left;
+    box-sizing: border-box;
+    width: 10rem;
+    max-width: 100%;
+    height: auto;
     max-height: 54px;
+    padding-left: 1rem;
+    margin: .2rem 1rem 0 0;
 }
+.notice.notice-vipps-login.notice-info.notice-vipps-neg p,
 .notice.notice-vipps-login.notice-info.notice-vipps-neg a {
    color: white !important;
+}
+.notice.notice-vipps-login.notice-info.notice-vipps-neg a {
    text-decoration: none;
 }
 .notice.notice-vipps-login.notice-info.notice-vipps-neg button.notice-dismiss {
