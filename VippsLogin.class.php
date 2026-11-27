@@ -394,6 +394,11 @@ class VippsLogin {
         return 'MobilePay';
     }
 
+    public function get_country() {
+        $settings = get_option('vipps_login_settings', array());
+        return !empty($settings['country']) ? $settings['country'] : $this->detect_default_country();
+    }
+
     // Guess the country for installs without a saved country, without changing settings.
     public function detect_default_country() {
         $settings = get_option('vipps_login_settings', array());
@@ -526,6 +531,12 @@ class VippsLogin {
     // Upon activation, this plugin will create a new page that is used for one thing only: Waiting for the user to confirm that the
     // account they are trying to log into is actually owned by them, or that they control the email address. This code ensures that this page exists. IOK 2019-10-14
     public function activate () {
+        // Initialize existing installs without overwriting an explicitly selected country.
+        $settings = get_option('vipps_login_settings', array());
+        if (empty($settings['country'])) {
+            $settings['country'] = $this->detect_default_country();
+            update_option('vipps_login_settings', $settings);
+        }
         $continuepage = $this->ensure_continue_with_vipps_page();
         $continueid = 0;
         if (!is_wp_error($continuepage)) {
@@ -592,6 +603,7 @@ class VippsLogin {
             'iconSrc' => $this->get_vmp_logo(),
             'defaultApp' => $gotWoo ? 'woocommerce' : 'wordpress',
             'loginMethod' => $login_method,
+            'country' => $this->get_country(),
             'applications' => apply_filters('login_with_vipps_applications', $applications),
             'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
             'languages' => $languages,
@@ -919,6 +931,7 @@ class VippsLogin {
         // these are static for now. LP 2026-06-04
         $args['type'] = 'button';
         $args['brand'] = strtolower($login_method);
+        $args['country'] = $this->get_country();
 
         // Only support verbs 'login' and 'continue'. LP 2026-06-04
         // And some others IOK 2026-10-20
@@ -935,6 +948,7 @@ class VippsLogin {
 <vipps-mobilepay-button
     type="{$escaped_args['type']}"
     brand="{$escaped_args['brand']}"
+    country="{$escaped_args['country']}"
     language="{$escaped_args['language']}"
     variant="{$escaped_args['variant']}"
     rounded="{$escaped_args['rounded']}"

@@ -52,6 +52,7 @@ export default function Edit( { attributes, setAttributes }: EditProps ) {
 					{ /* @ts-ignore */ }
 					<vipps-mobilepay-button
 						brand={ blockConfig.loginMethod }
+						country={ blockConfig.country }
 						language={ language }
 						variant={ attributes.variant }
 						rounded={ attributes.rounded }

@@ -523,6 +523,18 @@ class ContinueWithVipps {
                 'default' => VippsLogin::instance()->get_login_method(),
                 'description' => __('Choose which login method you\'d like to enable for your users.', 'login-with-vipps'),
             ),
+            'country' => array(
+                'type' => 'select',
+                'title' => __('Country', 'login-with-vipps'),
+                'options' => array(
+                    'NO' => __('Norway', 'login-with-vipps'),
+                    'SE' => __('Sweden', 'login-with-vipps'),
+                    'DK' => __('Denmark', 'login-with-vipps'),
+                    'FI' => __('Finland', 'login-with-vipps'),
+                ),
+                'default' => VippsLogin::instance()->get_country(),
+                'description' => __('Choose the country to use for Login.', 'login-with-vipps'),
+            ),
             'clientid' => array(
                 'type' => 'password',
                 'title' => __('Client ID', 'login-with-vipps'),
