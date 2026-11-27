@@ -27,8 +27,8 @@
     max-width: 100%;
     height: auto;
     max-height: 54px;
-    padding-left: 1rem;
-    margin: .2rem 1rem 0 0;
+    padding-right: 1rem;
+    margin: 1rem 0 0;
 }
 .notice.notice-vipps-login.notice-info.notice-vipps-neg p,
 .notice.notice-vipps-login.notice-info.notice-vipps-neg a {
