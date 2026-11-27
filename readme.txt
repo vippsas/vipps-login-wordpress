@@ -4,7 +4,7 @@ Tags: woocommerce,vipps,mobilepay,login
 Requires at least: 6.4.0
 Tested up to: 7.2
 Requires PHP: 7.2
-Stable tag: 1.5.8
+Stable tag: 1.5.9
 License: MIT
 License URI: https://choosealicense.com/licenses/mit/
 
@@ -40,7 +40,7 @@ This solution is great for all websites that wants to:
  * The port 443 must be open for outward traffic on your servers firewall
 
 == Upgrade Notice ==
-Version 1.5.8 && Version 1.5.7
+Version 1.5.9 to Version 1.5.7
 Avoid loading the Vipps button sdk if the woo-vipps plugin is present.
 Version 1.5.6
 Fix css compatibility with the Vipps MobilePay payment gateway plugin.
@@ -127,6 +127,9 @@ These are the main steps:
 The rest is a simple matter of programming.
 
 == Changelog ==
+= 2026-11-27 Version 1.5.8=
+More fixes for the button-loader
+
 = 2026-11-26 Version 1.5.8=
 Fix button-loader; testing on 7.2
 

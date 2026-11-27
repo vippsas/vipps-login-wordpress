@@ -177,7 +177,7 @@ class VippsLogin {
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
 
         // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
-        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '>='))) {
+        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
             wp_enqueue_script("vipps-button-webcomponent");
         }
     }
