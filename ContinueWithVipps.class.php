@@ -194,7 +194,21 @@ class ContinueWithVipps {
         add_action('admin_notices',array($this,'stored_admin_notices'));
         $this->add_configure_help_login_banner();
         add_action('admin_enqueue_scripts', array($this,'admin_enqueue_scripts'));
-        register_setting('vipps_login_settings','vipps_login_settings', array($this,'validate'));
+        // Keep the React settings surface free of unrelated WordPress and
+        // WooCommerce notices, matching the payment settings screen.
+        add_action('in_admin_header', function () {
+            $screen = get_current_screen();
+            $canonical_request = isset($_GET['page']) && $_GET['page'] === 'vipps_login_options';
+            if (!$canonical_request && (!$screen || !in_array($screen->id, array(
+                'settings_page_vipps_login_settings',
+                'vipps-mobilepay_page_vipps_login_options',
+                'vipps_admin_menu_page_vipps_login_options',
+                'toplevel_page_vipps_login_options',
+            ), true))) return;
+            remove_all_actions('admin_notices');
+            remove_all_actions('all_admin_notices');
+        }, 9999);
+        VippsLoginAdminSettings::instance()->register();
         VippsSession::clean();
     }
 
@@ -206,7 +220,7 @@ class ContinueWithVipps {
         $options = get_option('vipps_login_settings');
 
         global $pagenow;
-        if ($pagenow == 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] == 'vipps_login_settings') {
+        if ($this->is_login_settings_request()) {
             return; // Show only on other pages, not the vipps login settings page
         }
 
@@ -229,7 +243,7 @@ class ContinueWithVipps {
         add_action('admin_notices', function () {
             $logo = plugins_url('img/vipps-rgb-orange-neg.svg',__FILE__);
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
-            $settingsurl = admin_url('options-general.php?page=vipps_login_settings');
+            $settingsurl = $this->settings_url();
             $options = get_option('vipps_login_settings');
 
             ?>
@@ -253,20 +267,119 @@ class ContinueWithVipps {
         wp_enqueue_style('login-vipps-admin', plugins_url('css/login-with-vipps-admin.css', __FILE__), array(), filemtime(dirname(__FILE__) . "/css/login-with-vipps-admin.css"));
 
         wp_enqueue_script('login-vipps-admin');
-        // Code for the settings screen(s) handling password show/hide etc IOK 2026-02-26
-        if ($suffix == 'settings_page_vipps_login_settings' || $suffix == 'vipps-mobilepay_page_vipps_login_options') {
-            wp_enqueue_script('vipps-settings',plugins_url('js/vipps-settings.js',__FILE__),array('login-vipps-admin','jquery'),filemtime(dirname(__FILE__) . "/js/vipps-settings.js"), 'true');
-        }
+        // React owns the settings screens. Enqueue its assets before the admin
+        // head is printed; unrelated profile/admin scripts remain available.
+        VippsLoginAdminSettings::instance()->enqueue_react_assets($suffix);
     }
 
     public function admin_menu () {
         $option_name = sprintf(__('Login with %1$s', 'login-with-vipps'), VippsLogin::CompanyName());
-        // If we have the Payment plugin, add the settings page there
-        if (class_exists('WC_Gateway_Vipps')) {
-            add_submenu_page( 'vipps_admin_menu', $option_name,  $option_name,   'manage_woocommerce', 'vipps_login_options', array($this, 'init_form_elements'), 90);
-        } 
-        // But leave old page in place
-        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings',array($this,'init_form_elements'));
+        $submenu_name = sprintf(_x('Login with %s', 'Vipps MobilePay admin submenu label', 'login-with-vipps'), VippsLogin::CompanyName());
+
+        // The payment plugin owns this parent when it is active. If it is not
+        // registered, Login with Vipps supplies the same parent independently.
+        $login_owns_parent = !$this->parent_menu_registered();
+        if ($login_owns_parent) {
+            $logo = plugins_url('img/vmp-logo.png', __FILE__);
+            add_menu_page(VippsLogin::CompanyName(), VippsLogin::CompanyName(), 'manage_options', 'vipps_admin_menu', array($this, 'redirect_parent_menu'), $logo, 58);
+        }
+        // Keep one canonical login child in either ownership arrangement.
+        add_submenu_page('vipps_admin_menu', $submenu_name, $submenu_name, 'manage_options', 'vipps_login_options', array($this, 'init_form_elements'), 3);
+
+        // The payment plugin registers its submenu entries before this plugin,
+        // and several entries share the same numeric position. Reorder only our
+        // own child after all registrations so Login appears after Recurring
+        // Payments when available, otherwise directly after Settings.
+        add_action('admin_menu', function () {
+            global $submenu;
+            if (empty($submenu['vipps_admin_menu']) || !is_array($submenu['vipps_admin_menu'])) return;
+            $items = $submenu['vipps_admin_menu'];
+            $login = null;
+            foreach ($items as $index => $item) {
+                if (isset($item[2]) && $item[2] === 'vipps_login_options') {
+                    $login = $item;
+                    unset($items[$index]);
+                    break;
+                }
+            }
+            if ($login === null) return;
+            $items = array_values($items);
+            $after = null;
+            foreach (array('vipps_recurring__settings_menu', 'vipps_settings_menu') as $target) {
+                foreach ($items as $index => $item) {
+                    if (isset($item[2]) && $item[2] === $target) {
+                        $after = $index;
+                        break 2;
+                    }
+                }
+            }
+            if ($after === null) {
+                $items[] = $login;
+            } else {
+                array_splice($items, $after + 1, 0, array($login));
+            }
+            $submenu['vipps_admin_menu'] = $items;
+        }, 999);
+
+        if ($login_owns_parent) {
+            // WordPress automatically adds a submenu entry whose slug is the
+            // same as the parent whenever add_menu_page() is used. The payment
+            // plugin gives that entry a substantial settings/dashboard page,
+            // but the Login with Vipps fallback currently has only a routing
+            // placeholder. Remove that generated entry so the fallback menu
+            // contains only Login with Vipps while retaining the parent icon.
+            //
+            // Keep this as a late admin_menu action: add_submenu_page() and any
+            // other plugin menu registrations must have completed first. If we
+            // later build a standalone fallback dashboard, remove this block
+            // and point the parent callback at that page instead.
+            add_action('admin_menu', function () {
+                remove_submenu_page('vipps_admin_menu', 'vipps_admin_menu');
+            }, 999);
+        }
+
+        // Keep the old page registered for direct bookmarks and hashes, then hide
+        // its menu entry so Settings does not show a duplicate destination.
+        add_options_page($option_name, $option_name, 'manage_options', 'vipps_login_settings', array($this, 'init_form_elements'));
+        add_action('admin_menu', function () {
+            remove_submenu_page('options-general.php', 'vipps_login_settings');
+        }, 999);
+    }
+
+    /** Check the registered menu state rather than guessing from plugin classes. */
+    private function parent_menu_registered() {
+        global $menu;
+        if (!is_array($menu)) return false;
+        foreach ($menu as $entry) {
+            if (isset($entry[2]) && $entry[2] === 'vipps_admin_menu') return true;
+        }
+        return false;
+    }
+
+    public function settings_url() {
+        return admin_url('admin.php?page=vipps_login_options');
+    }
+
+    /** Redirect old bookmarks only after the compatibility page is registered. */
+    public function redirect_legacy_settings() {
+        global $pagenow;
+        if ($pagenow !== 'options-general.php' || (($_GET['page'] ?? '') !== 'vipps_login_settings')) return;
+        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        wp_safe_redirect($this->settings_url());
+        exit();
+    }
+
+    /** The fallback parent has no separate dashboard; open its login settings. */
+    public function redirect_parent_menu() {
+        if (!current_user_can('manage_options')) wp_die(__('Insufficient privileges', 'login-with-vipps'));
+        wp_safe_redirect($this->settings_url());
+        exit();
+    }
+
+    private function is_login_settings_request() {
+        global $pagenow;
+        return ($pagenow === 'options-general.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_settings')
+            || ($pagenow === 'admin.php' && isset($_REQUEST['page']) && $_REQUEST['page'] === 'vipps_login_options');
     }
 
     public function ajax_vipps_dismiss_notice() {
@@ -376,6 +489,7 @@ class ContinueWithVipps {
                 break;
             // Creates a list of checkboxes
             case 'multicheck':
+                $html .= "<input type='hidden' name='" . esc_attr($name) . "' value=''>";
                 foreach($options as $option => $label) {
                     $html .= "<input name='" . esc_attr($name) . "[".$option."]' id='" . esc_attr($key . $option) . "' type='checkbox' value='1'" . checked(array_key_exists($option, $value), true, false) . " />";
                     $html .= "<label for='" . esc_attr($key . $option) . "'>" . esc_html($label) . "</label><br>";
@@ -392,42 +506,8 @@ class ContinueWithVipps {
     // The settings page for the plugin. This page will contain all the settings for the plugin, and will be accessible from the admin menu.
     // This function collects all the form elements and renders them on the page.
     public function init_form_elements() {
-        if (!is_admin() || !current_user_can('manage_options')) {
-            die(__("Insufficient privileges",'login-with-vipps'));
-        }
-
-        // Group the form fields into an array, so we can loop through them and render them in the same way.
-        $main_options = $this->init_form_login_options();
-        $main_options2 = VippsLogin::instance()->init_form_login_options2();
-        $form_fields = array($main_options, $main_options2);
-
-        // Only show if WooCommerce is present NT 2024-04-24
-        if (class_exists('VippsWooLogin')) {
-            $woo_options = VippsWooLogin::instance()->init_form_login_woo_options();
-            if ($woo_options) {
-                $form_fields[] = $woo_options;
-            }
-        }
-        // Get the current values from the database
-        $values = get_option('vipps_login_settings', array());
-
-        ?>
-        <div class="wrap">
-            <form method="post" action="options.php">
-                <?php settings_fields('vipps_login_settings'); ?>
-                
-                <?php foreach($form_fields as $key => $form_fields) {
-                    ?>
-                        <h2><?php _e($form_fields['title']) ?></h2>
-                        <table class="form-table" style="width:100%">
-                            <?php foreach ($form_fields['fields'] as $key => $option) echo $this->render_form_field($key, $option, $values); ?>
-                        </table>
-                <?php } ?>  
-                <button type="submit" class="button-primary"><?php _e('Save Changes', 'login-with-vipps')?></button>
-            </form>
-        </div>
-        <?php
-
+        // React owns both existing URLs in this phase; menu relocation is a later phase.
+        VippsLoginAdminSettings::instance()->render_react_settings_page();
     }
 
     // Lists all the possible options for the integration with Vipps MobilePay.
@@ -469,17 +549,7 @@ class ContinueWithVipps {
     // Validating user options, unsetting any options that are not in the form fields.
     // Changed not to overwrite hidden settings, eg. database table versions etc IOK 2024-04-22
     public function validate ($input) {
-        $current =  get_option('vipps_login_settings');
-        if (empty($input)) return $current;
-
-        $valid = $current;
-        foreach($input as $k=>$v) {
-            switch ($k) {
-                default:
-                    $valid[$k] = $v;
-            }
-        }
-        return $valid;
+        return VippsLoginAdminSettings::instance()->validate_legacy($input);
     }   
 
     // The activation hook will create the session database tables if they do not or if the database has been upgraded. IOK 2019-10-14
@@ -488,6 +558,9 @@ class ContinueWithVipps {
         $default = array('clientid'=>'','clientsecret'=>'', 'dbversion'=>0, 'installtime'=>time(), 'migrated'=>false, 'initialized'=>0);
         add_option('vipps_login_settings',$default,false);
         $this->maybe_migrate_options();
+        // Import payment credentials once when activation occurs with Login off.
+        // The settings bootstrap retries if WooCommerce was not initialized yet.
+        VippsLoginAdminSettings::instance()->maybe_import_payment_keys();
         $this->dbtables();
     }
 
