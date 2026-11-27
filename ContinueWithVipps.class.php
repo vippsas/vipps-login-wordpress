@@ -279,13 +279,8 @@ class ContinueWithVipps {
         }
 
         add_action('admin_notices', function () {
-            if (VippsLogin::is_brand_merged()) {
-                $logo = plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
-                $colorclass = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true) ? 'Blue' : '';
-            } else {
-                $logo = plugins_url('img/vipps-rgb-orange-neg.svg', __FILE__);
-                $colorclass = '';
-            }
+            $logo = plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
+            $colorclass = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true) ? 'Blue' : '';
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
             $settingsurl = $this->settings_url();
             $options = get_option('vipps_login_settings');
