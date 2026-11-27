@@ -394,6 +394,37 @@ class VippsLogin {
         return 'MobilePay';
     }
 
+    // Guess the country for installs without a saved country, without changing settings.
+    public function detect_default_country() {
+        $settings = get_option('vipps_login_settings', array());
+        $method = $settings['login_method'] ?? '';
+        $countries = $method === 'MobilePay' ? array('DK', 'FI')
+            : ($method === 'Vipps' ? array('NO', 'SE') : array('NO', 'SE', 'DK', 'FI'));
+
+        if (class_exists('WC_Gateway_Vipps')) {
+            $country = strtoupper((string) WC_Gateway_Vipps::instance()->get_option('country'));
+            if (in_array($country, $countries, true)) return $country;
+        }
+
+        if (class_exists('WooCommerce') && function_exists('wc_get_base_location')) {
+            $store_location = wc_get_base_location();
+            $country = strtoupper($store_location['country'] ?? '');
+            if (in_array($country, $countries, true)) return $country;
+        }
+
+        // Use the site's locale, not the current visitor's or administrator's language.
+        $locale = strtolower(str_replace('-', '_', get_locale()));
+        if (preg_match('/_([a-z]{2})(?:_|$)/', $locale, $match)) {
+            $country = strtoupper($match[1]);
+            if (in_array($country, $countries, true)) return $country;
+        }
+        $language_countries = array('nb' => 'NO', 'nn' => 'NO', 'no' => 'NO', 'sv' => 'SE', 'da' => 'DK', 'fi' => 'FI');
+        $country = $language_countries[substr($locale, 0, 2)] ?? '';
+        if (in_array($country, $countries, true)) return $country;
+
+        return $method === 'MobilePay' ? 'DK' : 'NO';
+    }
+
     // Try to get the current language in the format Vipps wants, one of 'en' and 'no'
     // Follows the same implementation as the main VippsMobilePay plugin
     public function get_customer_language() {
