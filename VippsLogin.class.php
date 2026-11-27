@@ -48,7 +48,8 @@ class VippsLogin {
     }
 
     function __construct() {
-        if (date('Y-m-d') >= '2027-01-12') {
+        // Brands are merged after 12. january 2027, but it can be tested by defining the constant below in wp-config.php IOK 2026-11-27
+        if ((defined("WOO_VIPPS_BRAND_MERGED") && ("yes" === WOO_VIPPS_BRAND_MERGED)) || (date('Y-m-d') >= '2027-01-12')) {
             static::$brand_merged = true;
         }
     }
@@ -177,7 +178,7 @@ class VippsLogin {
         wp_add_inline_style('login-with-vipps', ".woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--vipps a::before { background-image: url('{$logo}'); }");
 
         // We'll add the button script iff the Woo-vipps plugin is not currently active or older than widgetsdk version. IOK 2026-11-17
-        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '>='))) {
+        if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
             wp_enqueue_script("vipps-button-webcomponent");
         }
     }
