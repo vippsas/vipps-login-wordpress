@@ -44,13 +44,24 @@ class VippsLogin {
     private static $brand_merged = false;  // to be true after 2027-01-12, when Vipps and MobilePay merge to just Vipps. IOK 2026-11-17
 
     public static function CompanyName() { 
-        return __("Vipps MobilePay", 'login-with-vipps');
+        if (static::$brand_merged) {
+            return __('Vipps', 'login-with-vipps');
+        } else {
+            return __('Vipps MobilePay', 'login-with-vipps');
+        }
+    }
+
+    // Expose brand_merged to the settings UI; dispatch remains explicit at each caller.
+    public static function is_brand_merged() {
+        return static::$brand_merged;
     }
 
     function __construct() {
         // Brands are merged after 12. january 2027, but it can be tested by defining the constant below in wp-config.php IOK 2026-11-27
         if ((defined("WOO_VIPPS_BRAND_MERGED") && ("yes" === WOO_VIPPS_BRAND_MERGED)) || (date('Y-m-d') >= '2027-01-12')) {
             static::$brand_merged = true;
+        } else {
+            static::$brand_merged = false;
         }
     }
 
@@ -149,7 +160,11 @@ class VippsLogin {
 
         if (!defined('WOO_VIPPS_VERSION') || (version_compare(WOO_VIPPS_VERSION, '6.3.0', '<'))) {
             // Changes after brand merge on 12. january. IOK 2026-11-17
-            $button_sdk_name = static::$brand_merged ? 'vipps-button-v2.js' : 'vipps-button.js';
+            if (static::$brand_merged) {
+                $button_sdk_name = 'vipps-button-v2.js';
+            } else {
+                $button_sdk_name = 'vipps-button.js';
+            }
             wp_register_script('vipps-button-webcomponent',
                     plugins_url('js/' . $button_sdk_name, __FILE__),
                     array(),
@@ -357,11 +372,15 @@ class VippsLogin {
     }
 
     public function get_login_method() {
-        $settings = get_option('vipps_login_settings', array());
-        if(!isset($settings['login_method'])) {
-            return $this->detect_default_login_method();
+        if (static::$brand_merged) {
+            return 'Vipps';
+        } else {
+            $settings = get_option('vipps_login_settings', array());
+            if(!isset($settings['login_method'])) {
+                return $this->detect_default_login_method();
+            }
+            return $settings['login_method'];
         }
-        return $settings['login_method'];
     }
 
     // Detect default payment method based on store location, user locale, currency NT 2023-11-30
@@ -568,24 +587,36 @@ class VippsLogin {
             $applications[] = ['label' => __("Log in to WooCommerce", 'login-with-vipps'), 'value' => 'woocommerce'];
         }
 
-        $languages = [
-            ['label' => __('Site language', 'login-with-vipps'), 'value' => 'site'],
-            ['label' => __('English', 'login-with-vipps'), 'value' => 'en'],
-        ];
-        switch ($login_method) {
-            case 'vipps':
-                $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
-                $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
-                // Doesn't really exist for Vipps, but the web component does support it so. IOK 2026-08-11
-                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
-                break;
-            case 'mobilepay':
-                // no and sv doesn't really work for mobilpay, but the WC supports it. IOK 2026-08-11
-                $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
-                $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
-                $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
-                $languages[] = ['label' => __('Finnish', 'login-with-vipps'), 'value' => 'fi'];
-                break;
+        if (static::$brand_merged) {
+            // The merged Vipps button supports all four markets, including Finnish.
+            $languages = [
+                ['label' => __('Site language', 'login-with-vipps'), 'value' => 'site'],
+                ['label' => __('English', 'login-with-vipps'), 'value' => 'en'],
+                ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'],
+                ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'],
+                ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'],
+                ['label' => __('Finnish', 'login-with-vipps'), 'value' => 'fi'],
+            ];
+        } else {
+            $languages = [
+                ['label' => __('Site language', 'login-with-vipps'), 'value' => 'site'],
+                ['label' => __('English', 'login-with-vipps'), 'value' => 'en'],
+            ];
+            switch ($login_method) {
+                case 'vipps':
+                    $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
+                    $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
+                    // Doesn't really exist for Vipps, but the web component does support it so. IOK 2026-08-11
+                    $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
+                    break;
+                case 'mobilepay':
+                    // no and sv doesn't really work for mobilpay, but the WC supports it. IOK 2026-08-11
+                    $languages[] = ['label' => __('Norwegian', 'login-with-vipps'), 'value' => 'no'];
+                    $languages[] = ['label' => __('Swedish', 'login-with-vipps'), 'value' => 'sv'];
+                    $languages[] = ['label' => __('Danish', 'login-with-vipps'), 'value' => 'da'];
+                    $languages[] = ['label' => __('Finnish', 'login-with-vipps'), 'value' => 'fi'];
+                    break;
+            }
         }
 
 

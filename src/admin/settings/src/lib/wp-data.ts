@@ -14,6 +14,7 @@ export interface FormField {
 
 export interface SettingsData {
   values: Options;
+  brand_merged: boolean;
   sections: { title: string; fields: Record<string, FormField> }[];
   ajax_url: string;
   action: string;
