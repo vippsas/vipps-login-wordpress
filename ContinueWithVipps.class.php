@@ -279,6 +279,8 @@ class ContinueWithVipps {
         }
 
         add_action('admin_notices', function () {
+            // This banner uses Vipps branding even before brand_merged.
+            $company_name = __('Vipps', 'login-with-vipps');
             $logo = plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
             $colorclass = in_array(VippsLogin::instance()->get_country(), array('DK', 'FI'), true) ? 'Blue' : '';
             $configurl = "https://wordpress.org/plugins/login-with-vipps/#installation";
@@ -288,9 +290,9 @@ class ContinueWithVipps {
             ?>
             <div class='notice notice-vipps-login notice-vipps-neg notice-info is-dismissible <?php echo esc_attr($colorclass); ?>'  data-key='configure05'>
             <a target="_blank"  href="<?php echo $configurl; ?>">
-            <img src="<?php echo $logo; ?>" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), VippsLogin::CompanyName());?>">
+            <img src="<?php echo $logo; ?>" alt="<?php printf(__('Logg inn med %1$s-logo', 'login-with-vipps'), $company_name);?>">
              <div>
-                 <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), VippsLogin::CompanyName()); ?></p>
+                 <p style="font-size:1rem"><?php echo sprintf(__('Having downloaded Log in with %1$s: It is quick and easy to get started! Get your API keys in the %1$s Portal and add them to the plugin to activate Log in with %1$s.', 'login-with-vipps'), $company_name); ?></p>
              </div>
              </a>
             </div>

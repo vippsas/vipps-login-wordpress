@@ -572,7 +572,8 @@ class VippsLogin {
     /** This is the config data for the login-with-vipps guten block. LP 2026-02-04
     * Store in the class because we need it in render.php for some data we don't store in the block attributes. LP 2026-02-04 */
     public function login_with_vipps_block_config() {
-        $login_method = strtolower($this->get_login_method());
+        $login_method_name = $this->get_login_method();
+        $login_method = strtolower($login_method_name);
         $site_language = $this->get_site_language();
         if ($site_language === 'se') {
             $site_language = 'sv';
@@ -630,13 +631,13 @@ class VippsLogin {
             [ 'label' => __('Continue', 'login-with-vipps'), 'value' => 'continue' ],
         ];
         return [
-            'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method),
+            'title' => sprintf(__('Log in with %1$s-button', 'login-with-vipps'), $login_method_name),
             'iconSrc' => $this->get_logo(),
             'defaultApp' => $gotWoo ? 'woocommerce' : 'wordpress',
             'loginMethod' => $login_method,
             'country' => $this->get_country(),
             'applications' => apply_filters('login_with_vipps_applications', $applications),
-            'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method),
+            'applicationsText' => sprintf(__('The continue with %1$s-button can perform different actions depending on what is defined in your system. Per default it will log you in to WordPress or WooCommerce if installed, but plugins and themes can define more', 'login-with-vipps'), $login_method_name),
             'languages' => $languages,
             'siteLanguage' => $site_language,
             'variants' => $variants,
@@ -991,14 +992,18 @@ EOF;
         return apply_filters('continue_with_vipps_web_component_html', $html, $args);
     }
 
-    // The logo for the login button, depending on the login method.
+    // White wordmark for WooCommerce banners and inline logos.
     public function get_transparent_logo() {
-        $method = $this->get_login_method();
-        if ($method == 'MobilePay') {
-            return plugins_url('img/mobilepay_logo_negativ_rgb_transparent.png',__FILE__);
-        }
-        if ($method == 'Vipps') {
-            return plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+        if (static::$brand_merged) {
+            return plugins_url('img/Vipps_logo_white_RGB.svg', __FILE__);
+        } else {
+            $method = $this->get_login_method();
+            if ($method == 'MobilePay') {
+                return plugins_url('img/mobilepay_logo_negativ_rgb_transparent.png',__FILE__);
+            }
+            if ($method == 'Vipps') {
+                return plugins_url('img/vipps_logo_negativ_rgb_transparent.png',__FILE__);
+            }
         }
     }
 
