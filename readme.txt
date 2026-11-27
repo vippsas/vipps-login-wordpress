@@ -128,7 +128,7 @@ The rest is a simple matter of programming.
 
 == Changelog ==
 = 2026-11-27 Version 1.5.9=
-Another small issue in the button loader fixed.
+More fixes for the button-loader
 
 = 2026-11-26 Version 1.5.8=
 Fix button-loader; testing on 7.2
